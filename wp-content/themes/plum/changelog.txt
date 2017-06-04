@@ -24,3 +24,8 @@ Version 1.0.1
 	i) Added a New Featured Posts Area
 	ii) Minor Changes to Customizer
 	iii) Other Bug Fixes.	
+
+Version 1.0.2
+
+	i) Fix for Woocommerce Update
+	ii) Added support for WooCommerce Product Gallery Lightbox Plugin

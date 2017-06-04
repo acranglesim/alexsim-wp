@@ -95,6 +95,8 @@ function plum_setup() {
 	//Slider Support
 	add_theme_support('rt-slider', array( 10 , 'pages', 'front-page-only') );
 	
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	
 }
 endif; // plum_setup
 add_action( 'after_setup_theme', 'plum_setup' );
