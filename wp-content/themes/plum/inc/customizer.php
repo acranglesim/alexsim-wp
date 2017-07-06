@@ -438,10 +438,38 @@ function plum_customize_register( $wp_customize ) {
 			)
 	);
 	
+	//help and support section
+	$wp_customize->add_section(
+	    'plum_sec_h',
+	    array(
+	        'title'     => __('-> Plum Help & Support!!','plum'),
+	        'priority'  => 10,
+	    )
+	);
+	
+	$wp_customize->add_setting(
+			'plum_h',
+			array( 'sanitize_callback' => 'esc_textarea' )
+		);
+			
+	$wp_customize->add_control(
+	    new Plum_WP_Customize_Upgrade_Control(
+	        $wp_customize,
+	        'plum_h',
+	        array(
+	            'label' => __('Free Help & Support','plum'),
+	            'description' => __('<a href="https://inkhive.com/contact-us/">Contact Us</a> and help us make Plum a better theme with Feature Requests, Bug Reports or for any other help you need. <br /> <br />. We Generally Respond to Free theme support emails. ','plum'),
+	            'section' => 'plum_sec_h',
+	            'settings' => 'plum_h',			       
+	        )
+		)
+	);
+	
+	//Upgrade to Pro
 	$wp_customize->add_section(
 	    'plum_sec_pro',
 	    array(
-	        'title'     => __('-> Make Plum Better!!','plum'),
+	        'title'     => __('-> Upgrade to Plum Pro Version','plum'),
 	        'priority'  => 10,
 	    )
 	);
@@ -456,8 +484,23 @@ function plum_customize_register( $wp_customize ) {
 	        $wp_customize,
 	        'plum_pro',
 	        array(
-	            'label' => __('Feature Requests','plum'),
-	            'description' => __('<a href="https://inkhive.com/contact-us/">Contact Us</a> and help us make Plum a better theme with Feature Requests, Bug Reports or any other ideas you have to help us make this theme better. <br /> <br /> We Will Reward everyone who helps us with a 30% Discount when Plum Plus Releases. ','plum'),
+	            'label' => __('Unlock More Features','plum'),
+	            'description' => __('
+	            			Plum Plus comes with so many features that you will fall in love with the theme. We have added everything everyone requested for and so much more. Here is a small list of what Plum Plus includes<br/><br/>
+	            			<ul>
+	            			<li> - Improved Mobile Friendliness</li>
+	            			<li> - Custom Header Images for Posts & Pages</li>
+	            			<li> - Advanced Slider</li>
+	            			<li> - More Featured Areas</li>
+	            			<li> - <strong>Unlimited Colors & Skins</strong></li>
+	            			<li> - Improved SEO Friendliness</li>
+							<li> - Custom Options for Pages</li>
+							<li> - Multiple Blog Layouts</li>
+							<li> - 30+ Social Icons</li>
+							<li> - 650+ Google Fonts</li>
+							<li> - and much more</li></ul><br/>
+	            			To know more or to purchase, visit <a href="https://inkhive.com/product/plum-plus/">Plum Plus.</a> 
+							','plum'),
 	            'section' => 'plum_sec_pro',
 	            'settings' => 'plum_pro',			       
 	        )
@@ -481,11 +524,12 @@ function plum_customize_register( $wp_customize ) {
 					'vimeo-square' => __('Vimeo','plum'),
 					'youtube' => __('Youtube','plum'),
 					'flickr' => __('Flickr','plum'),
+					'pinterest-p'	=> __('Pinterest', 'plum'),
 				);
 				
 	$social_count = count($social_networks);
 				
-	for ($x = 1 ; $x <= ($social_count - 3) ; $x++) :
+	for ($x = 1 ; $x <= ($social_count - 4) ; $x++) :
 			
 		$wp_customize->add_setting(
 			'plum_social_'.$x, array(
@@ -527,7 +571,8 @@ function plum_customize_register( $wp_customize ) {
 					'vine',
 					'vimeo-square',
 					'youtube',
-					'flickr'
+					'flickr',
+					'pinterest-p'
 				);
 		if ( in_array($input, $social_networks) )
 			return $input;
