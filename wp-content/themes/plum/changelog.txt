@@ -29,3 +29,13 @@ Version 1.0.2
 
 	i) Fix for Woocommerce Update
 	ii) Added support for WooCommerce Product Gallery Lightbox Plugin
+	
+Version 1.0.4
+
+	i) Added Link to Plum Plus
+	ii) Minor Changes in Customizer
+	
+Version 1.0.5
+
+	i) Fixed Readability issues with the Green Skin. Switched to a Darker version of Green.
+	
