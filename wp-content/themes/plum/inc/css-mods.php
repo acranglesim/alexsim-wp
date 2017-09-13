@@ -15,8 +15,8 @@ function plum_custom_css_mods() {
 		$custom_css .= "body, h2.site-description { font-family: ".esc_html( get_theme_mod('plum_body_font','Ubuntu') )."; }";
 	endif;
 	
-	if ( get_theme_mod('plum_site_titlecolor') ) :
-		$custom_css .= "#masthead .masthead-inner .site-branding .site-title a { color: ".esc_html( get_theme_mod('plum_site_titlecolor', '#FFFFFF') )."; }";
+	if ( get_header_textcolor() ) :
+		$custom_css .= "#masthead .masthead-inner .site-branding .site-title a { color: #".get_header_textcolor()."; }";
 	endif;
 	
 	
@@ -28,16 +28,63 @@ function plum_custom_css_mods() {
 		$custom_css .= '.pagination { display: none; }';
 	
 	
-	if ( get_theme_mod('plum_hide_title_tagline') ) :
-		$custom_css .= "#header-image .site-branding #text-title-desc { display: none; }";
+	if ( !display_header_text() ) :
+		$custom_css .= "#masthead .site-branding #text-title-desc { display: none; }";
 	endif;
+	
+	if  ( get_theme_mod('plum_header_image_style','default') == 'full-image' && ( is_home() || (is_page() && has_post_thumbnail()))) : 
+		$custom_css .= "@media screen and (max-width: 767px) {
+			#masthead #mobile-header-image { display: block; }
+			#masthead {
+			min-height: auto;
+			padding-bottom: 90px;
+			background-image: none !important; 
+			
+			}
+		}";
+		
+	endif;
+	
+	if (strlen(get_bloginfo( 'name' )) > 25) :
+		$custom_css .= "@media screen and (min-width: 768px) { #masthead .masthead-inner .site-branding .site-title { font-size: 18px; } }"; 
+	endif;
+	
 	
 	if ( get_theme_mod('plum_logo_resize') ) :
 		$val = esc_html( get_theme_mod('plum_logo_resize') )/100;
 		$custom_css .= "#masthead .custom-logo { transform: scale(".$val."); -webkit-transform: scale(".$val."); -moz-transform: scale(".$val."); -ms-transform: scale(".$val."); }";
-		endif;
+	endif;
 
-	wp_add_inline_style( 'plum-main-theme-style', strip_tags($custom_css) );
+	if(!is_home() && is_front_page()):
+        if( get_theme_mod('plum_page_title', true)):
+            $custom_css .= "#primary-mono .entry-header { display:none; }";
+	    endif;
+	endif;
+
+    if (!is_home() && is_front_page()) :
+        if ( get_theme_mod('plum_content_font_size') ) :
+            $size = (get_theme_mod('plum_content_font_size'));
+            $custom_css .= "#primary-mono .entry-content { font-size:".$size.";}";
+        endif;
+    endif;
+
+    if (get_theme_mod('plum_hero_background_image') != '') :
+        $image = get_theme_mod('plum_hero_background_image');
+        $custom_css .= "#hero {
+                    	background-image: url('" . $image . "');
+                        background-size: cover;
+                }";
+    endif;
+
+    if (get_theme_mod('plum_hero_background_image')) :
+        $image1 = get_theme_mod('plum_hero2_background_image');
+        $custom_css .= "#hero2 {
+                    background-image: url('" . $image1 . "');
+                    background-size: cover;
+                }";
+    endif;
+
+    wp_add_inline_style( 'plum-main-theme-style', wp_strip_all_tags($custom_css) );
 	
 }
 

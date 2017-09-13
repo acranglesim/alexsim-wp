@@ -5,6 +5,12 @@
  */
  ?>
  </div><!--.mega-container-->
+
+<?php if (!is_home() && is_front_page()) :
+    get_template_part('modules/hero/hero-bottom');
+endif;
+?>
+
  <?php if ( is_active_sidebar('footer-1') || is_active_sidebar('footer-2') || is_active_sidebar('footer-3') ) : ?>
 	 <div id="footer-sidebar" class="widget-area">
 	 	<div class="container">

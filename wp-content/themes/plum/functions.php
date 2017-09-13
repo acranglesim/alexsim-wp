@@ -161,25 +161,25 @@ function plum_scripts() {
 	
 	wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/assets/bootstrap/css/bootstrap.min.css' );
 	
-	wp_enqueue_style( 'hover-style', get_template_directory_uri() . '/assets/css/hover.min.css' );
+	wp_enqueue_style( 'hover-style', get_template_directory_uri() . '/assets/ext-css/hover.min.css' );
 
-	wp_enqueue_style( 'slicknav', get_template_directory_uri() . '/assets/css/slicknav.css' );
+	wp_enqueue_style( 'slicknav', get_template_directory_uri() . '/assets/ext-css/slicknav.css' );
 	
-	wp_enqueue_style( 'swiper', get_template_directory_uri() . '/assets/css/swiper.min.css' );
+	wp_enqueue_style( 'swiper', get_template_directory_uri() . '/assets/ext-css/swiper.min.css' );
 	
-	wp_enqueue_style( 'plum-main-theme-style', get_template_directory_uri() . '/assets/css/'.get_theme_mod('plum_skin', 'default').'.css', array(), null );
+	wp_enqueue_style( 'plum-main-theme-style', get_template_directory_uri() . '/assets/theme_styles/css/'.get_theme_mod('plum_skin', 'default').'.css', array(), null );
 
-	wp_enqueue_script( 'plum-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
+	wp_enqueue_script( 'plum-navigation', get_template_directory_uri() . '/assets/js/navigation.js', array(), '20120206', true );
 	
-	wp_enqueue_script( 'plum-externaljs', get_template_directory_uri() . '/js/external.js', array('jquery'), '20120206', true );
+	wp_enqueue_script( 'plum-externaljs', get_template_directory_uri() . '/assets/js/external.js', array('jquery'), '20120206', true );
 
-	wp_enqueue_script( 'plum-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
+	wp_enqueue_script( 'plum-skip-link-focus-fix', get_template_directory_uri() . '/assets/js/skip-link-focus-fix.js', array(), '20130115', true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 	
-	wp_enqueue_script( 'plum-custom-js', get_template_directory_uri() . '/js/custom.js', array('plum-externaljs') );
+	wp_enqueue_script( 'plum-custom-js', get_template_directory_uri() . '/assets/js/custom.js', array('plum-externaljs') );
 }
 add_action( 'wp_enqueue_scripts', 'plum_scripts' );
 
@@ -230,7 +230,7 @@ require get_template_directory() . '/inc/extras.php';
 /**
  * Customizer additions.
  */
-require get_template_directory() . '/inc/customizer.php';
+require get_template_directory() . '/framework/customizer/_init.php';
 
 /**
  * Load Jetpack compatibility file.
