@@ -7,7 +7,7 @@
  * and that other 'pages' on your WordPress site will use a
  * different template.
  *
- * Template: Full Width Page (No Sidebar)
+ * Template Name: Full Width Page (No Sidebar)
  * @package plum
  */
 
@@ -25,9 +25,11 @@ endif; ?>
 				<?php get_template_part( 'content', 'page' ); ?>
 
 				<?php
-					// If comments are open or we have at least one comment, load up the comment template
-					if ( comments_open() || get_comments_number() ) :
-						comments_template();
+					if( is_front_page() && get_theme_mod('plum_disable_comments')) :
+						// If comments are open or we have at least one comment, load up the comment template
+						if ( comments_open() || get_comments_number() ) :
+							comments_template();
+						endif;
 					endif;
 				?>
 

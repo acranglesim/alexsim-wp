@@ -26,8 +26,8 @@ function plum_custom_header_setup() {
 	add_theme_support( 'custom-header', apply_filters( 'plum_custom_header_args', array(
 		'default-image'          => get_template_directory_uri().'/assets/images/header.jpg',
 		'default-text-color'     => '#ffffff',
-		'height'				 => 400,
-		'width'					 => 1200,
+		'height'				 => 600,
+		'width'					 => 1440,
 		'flex-height'            => true,
 		'wp-head-callback'       => 'plum_header_style',
 	) ) );
@@ -42,7 +42,7 @@ if ( ! function_exists( 'plum_header_style' ) ) :
  */
 function plum_header_style() {
 	
-	if (is_single() && has_post_thumbnail()) : 
+	if ((is_page() || is_single()) && has_post_thumbnail()) : 
 	$image_data = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), "full" );
 	?>
 	<style>
