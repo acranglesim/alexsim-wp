@@ -9,7 +9,12 @@
 		overflow: hidden;
 		position: relative;
 		@media screen and (max-width: 767px) {
-			text-align: center;	
+			text-align: center;
+		}
+		.fg-item{
+			img{
+				width: 100%;
+			}
 		}
 		.post-details {
 			position: absolute;
@@ -31,6 +36,9 @@
 					.transform(translateY(0%));
 					padding: 10px;
 					background: fade(@accent, 75%);
+				}
+				@media screen and (min-width: 767px) and (max-width: 991px) {
+					font-size: 12px;
 				}
 			}
 		}

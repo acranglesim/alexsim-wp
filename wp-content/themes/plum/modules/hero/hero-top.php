@@ -1,4 +1,4 @@
-<?php if ( get_theme_mod('plum_hero_enable') && is_front_page() && !is_home() ) : ?>
+<?php if ( get_theme_mod('plum_hero_enable') ) : ?>
     <div id="hero" class="hero-content">
         <div class="layer"></div>
 		<div class="container hero-container">
@@ -28,7 +28,7 @@
                     </div>
                 <?php endif; ?>
                 <?php if(get_theme_mod('plum_hero1_button') != ''): ?>
-                    <a href="" class="more-button">
+                    <a href="<?php the_permalink(); ?>" class="more-button">
                         <?php echo get_theme_mod('plum_hero1_button'); ?>
                     </a>
                 <?php endif;?>

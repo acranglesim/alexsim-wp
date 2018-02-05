@@ -31,6 +31,14 @@ function plum_custom_header_setup() {
 		'flex-height'            => true,
 		'wp-head-callback'       => 'plum_header_style',
 	) ) );
+    register_default_headers( array(
+            'default-image'    => array(
+                'url'            => '%s/assets/images/header.jpg',
+                'thumbnail_url'    => '%s/assets/images/header.jpg',
+                'description'    => __('Default Header Image', 'plum')
+            )
+        )
+    );
 }
 add_action( 'after_setup_theme', 'plum_custom_header_setup' );
 

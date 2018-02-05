@@ -4,6 +4,7 @@
 	$wp_customize->add_section('plum_social_section', array(
 			'title' => __('Social Icons','plum'),
 			'priority' => 44 ,
+			'panel' => 'plum_header_panel'
 	));
 	
 	$social_networks = array( //Redefinied in Sanitization Function.
@@ -99,7 +100,7 @@
 					'vimeo-square',
 					'youtube',
 					'flickr',
-					'pinterest-p'
+					'pinterest-p',
 				);
 		if ( in_array($input, $social_networks) )
 			return $input;

@@ -2,6 +2,8 @@
 function plum_customize_register_skins( $wp_customize ) {
 	
 	$wp_customize->get_section('colors')->title = __('Theme Skin & Colors','plum');
+	$wp_customize->get_section('colors')->panel ='plum_design_panel';
+	
 	$wp_customize->get_control('header_textcolor')->label = __('Site Title Color','plum');
 	
 	$wp_customize->add_setting('plum_header_desccolor', array(

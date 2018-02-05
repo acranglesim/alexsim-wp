@@ -1,0 +1,144 @@
+.contact-us{
+  .entry-content {
+    .p-form {
+      background:lighten(@footer-bg, 5%);
+      margin-bottom:30px;
+      .wpcf7 {
+        margin-top: 12px;
+      }
+
+      .wpcf7-form{
+        p{
+          margin-bottom:0;
+          label {
+            width: 100%;
+          }
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+          width:98.5%;
+          padding: 6px 20px;
+          margin: 6px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        input[type="submit"] {
+          color: @onaccent;
+          background-color: @accent;
+          padding: 10px 35px;
+          font-size: 15px;
+          border-radius: inherit;
+          margin-bottom:10px;
+          text-decoration: none;
+          box-shadow:none !important;
+          border:1px solid @accent;
+          .transition(0.3s all ease);
+          &:hover{
+            .transition(0.3s all ease);
+            color:@accent;
+            background:@onaccent;
+            border-radius: inherit;
+            border:1px solid @accent;
+          }
+        }
+        textarea {
+          height:150px;
+        }
+      }
+    }
+    .about-address {
+      .address{
+        h3 {
+          color:@content;
+        }
+        p{
+          font-size: 17px;
+          color:lighten(@content, 30%);
+          font-weight: 600;
+        }
+      }
+      .about {
+        h3 {
+          color:@content;
+        }
+        .excerpt {
+          color:lighten(@content, 20%);
+          font-size: 15px;
+          line-height: 22px;
+        }
+      }
+      .more-button{
+        color:@accent;
+        background:@onaccent;
+        border:2px solid @accent;
+        padding: 2px 13px;
+        display: inline-block;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        .transition(0.3s all ease);
+        &:hover {
+          .transition(0.3s all ease);
+          color:@onaccent;
+          background:@accent;
+          border:2px solid @accent;
+        }
+      }
+    }
+  }
+  .site-loc {
+    margin-bottom:30px;
+    .map-img {
+      padding:0;
+      overflow:hidden;
+    }
+    .site-info {
+      text-align:center;
+      padding:0;
+      min-height:294px;
+      background:fade(@accent, 70%);
+      color:@onaccent;
+      h3 {
+        font-size:20px;
+      }
+      .social-i {
+        margin:40px;
+      }
+      .button {
+        margin:20px;
+        a{
+          padding:6px 15px;
+          border: solid 2px @accent;
+          font-size:20px;
+          transform: translateZ(0);
+          position: relative;
+          transition-property: color;
+          transition-duration: 0.3s;
+          &:hover {
+            color: @onaccent;
+          }
+          &:hover:before{
+            transform: scaleX(1);
+          }
+          &:before{
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: fade(@accent, 50%);
+            transform: scaleX(0);
+            transform-origin: 0 50%;
+            transition-property: transform;
+            transition-duration: 0.3s;
+            transition-timing-function: ease-out;
+          }
+        }
+      }
+    }
+  }
+}

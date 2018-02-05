@@ -53,7 +53,7 @@
 	<div class="mega-container">
 		
 		<?php if( class_exists('rt_slider') ) {
-		 rt_slider::render('slider', 'swiper' ); 
+		 rt_slider::render('framework/featured-components/slider', 'swiper' ); 
 	} ?>	
 			
 		<div id="content" class="site-content container">

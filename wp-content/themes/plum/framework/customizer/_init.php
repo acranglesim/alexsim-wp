@@ -29,12 +29,14 @@ add_action( 'customize_register', 'plum_customize_register' );
 require_once get_template_directory().'/framework/customizer/_googlefonts.php';
 require_once get_template_directory().'/framework/customizer/_sanitization.php';
 require_once get_template_directory().'/framework/customizer/header.php';
+require_once get_template_directory().'/framework/customizer/menu.php';
 require_once get_template_directory().'/framework/customizer/front-pagebuilder.php';
 require_once get_template_directory().'/framework/customizer/layouts.php';
 require_once get_template_directory().'/framework/customizer/posts-eta.php';
 require_once get_template_directory().'/framework/customizer/posts-zeta.php';
 require_once get_template_directory().'/framework/customizer/skins.php';
 require_once get_template_directory().'/framework/customizer/social-icons.php';
+require_once get_template_directory().'/framework/customizer/custom-page.php';
 require_once get_template_directory().'/framework/customizer/misc-scripts.php';
 
 
