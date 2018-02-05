@@ -1,4 +1,5 @@
 .plum {
+	cursor: pointer;
 	position: relative;
 	padding: 15px;
 	border-bottom: none;
@@ -41,9 +42,18 @@
 			.postdate {
 				font-weight: bolder;
 				margin-bottom: 25px;
-				.transition(0.5s all ease 0.6s);
+				@media screen and (max-width: 767px) {
+					.transition(0.5s all ease 0.6s);
+					position: absolute;
+					top: 27px;
+					left: 0;
+					right: 30px;
+					bottom: 0;
+				}
 				opacity: 1;
-				transform-origin: top;
+				@media screen and (min-width: 767px) {
+					transform-origin: top;
+				}
 				.day, .month {
 					clear: both;
 				}
@@ -69,27 +79,52 @@
 				}
 		}
 	}
-	&:hover {
+	@media screen and (max-width: 767px) {
 		.out-thumb {
-			.transform(rotate(15deg) scale(1.65) translateX(0px));
-			opacity: 1;
-			.postdate {
-				.transform(translateY(0));
+			opacity: 1 !important;
+				.transform(rotate(15deg) scale(1.65) translateX(0px));
 				opacity: 1;
-			}
-			h1.entry-title {
-				opacity: 1;
-			}
-			a:hover {
-				color: @accent;
+				.postdate {
+					.transform(translateY(0));
+					opacity: 1;
+				}
+				h1.entry-title {
+					opacity: 1;
+				}
+			@media screen and (min-width: 767px) {
+				a:hover {
+					color: @accent;
 
+				}
+			}
+			.entry-header .entry-title{
+				left: 10% !important;
 			}
 		}
-		.featured-thumb {
-			.transform(scale(1) translateX(-50px));
-			filter: brightness(0.8);
-			-webkit-filter: brightness(0.8);
-			.transition(0.6s all ease 0.2s);
+	}
+	@media screen and (min-width: 767px) {
+		&:hover {
+			.out-thumb {
+				.transform(rotate(15deg) scale(1.65) translateX(0px));
+				opacity: 1;
+				.postdate {
+					.transform(translateY(0));
+					opacity: 1;
+				}
+				h1.entry-title {
+					opacity: 1;
+				}
+				a:hover {
+					color: @accent;
+
+				}
+			}
+			.featured-thumb {
+				.transform(scale(1) translateX(-50px));
+				filter: brightness(0.8);
+				-webkit-filter: brightness(0.8);
+				.transition(0.6s all ease 0.2s);
+			}
 		}
 	}
 }

@@ -71,6 +71,12 @@
 	text-align: center;
 	vertical-align: middle;
 	padding-top: 7px;
+	@media screen and (min-width: 767px) and (max-width: 991px) {
+		width: 39px;
+		height: 39px;
+		font-size: 12px;
+		margin-right: 0px;
+	}
 }
 
 .style1 {
@@ -109,16 +115,22 @@
 }
 
 .style3 {
-	border: solid 2px @accent;
+	border: solid 2px darken(@onaccent, 20%);;
 	font-size:20px;
+	color:@onaccent;
 	transform: translateZ(0);
 	position: relative;
 	transition-property: color;
 	transition-duration: 0.3s;
+	transition:all ease 0.3s;
 	@media screen and (max-width: 600px) {
 	}
 	&:hover {
 		color: @onaccent;
+		transform:scale(1.1);
+		i {
+			transform:scale(.9);
+		}
 	}
 	&:hover:before{
 		transform: scaleX(1);
@@ -131,7 +143,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: fade(@accent, 50%);
+		background: @accent;
 		transform: scaleX(0);
 		transform-origin: 0 50%;
 		transition-property: transform;

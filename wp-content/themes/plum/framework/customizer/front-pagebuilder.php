@@ -7,11 +7,13 @@
 function plum_customize_register_front_pagebuilder($wp_customize) {
     $wp_customize->add_panel('plum_fpage_builder',
         array(
-            'title' => __('Front Page Builder', 'plum'),
+            'title' => __('Front Page Settings', 'plum'),
             'priority' => 30,
         )
     );
-
+	
+	$wp_customize->get_section('static_front_page')->panel = 'plum_fpage_builder';
+	$wp_customize->get_section('static_front_page')->priority = 0;
 
     //Basic Settings
     $wp_customize->add_section('plum_basic_settings_section',

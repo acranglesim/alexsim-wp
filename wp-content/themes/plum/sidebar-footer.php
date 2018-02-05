@@ -6,7 +6,7 @@
  ?>
  </div><!--.mega-container-->
 
-<?php if (!is_home() && is_front_page()) :
+<?php if ((!is_home() && is_front_page() ) || is_page_template( 'templates/page-hero.php' )) :
     get_template_part('modules/hero/hero-bottom');
 endif;
 ?>

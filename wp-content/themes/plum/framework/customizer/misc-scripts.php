@@ -32,7 +32,7 @@ function plum_customize_register_misc( $wp_customize ) {
 	$wp_customize->add_section(
 	    'plum_sec_pro',
 	    array(
-	        'title'     => __('-> Upgrade to Plum Pro Version','plum'),
+	        'title'     => __('-> Upgrade to Plum Plus','plum'),
 	        'priority'  => 10,
 	    )
 	);

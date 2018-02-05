@@ -9,6 +9,8 @@ function plum_customize_register_header( $wp_customize ) {
 	    )
 	);
 	
+	$wp_customize->get_section('title_tagline')->panel = 'plum_header_panel';
+	
 	$wp_customize->add_section(
 	    'plum_header_options',
 	    array(

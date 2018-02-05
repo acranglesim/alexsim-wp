@@ -69,5 +69,4 @@ jQuery(function(){
         autoplay: 2500,
         effect: 'fade'
     });		
-});		
-	
+});

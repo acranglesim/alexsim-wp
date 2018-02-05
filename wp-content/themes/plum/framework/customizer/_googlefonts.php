@@ -6,7 +6,8 @@
 	    array(
 	        'title'     => __('Google Web Fonts','plum'),
 	        'priority'  => 41,
-	        'description' => __('Defaults: Droid Serif, Ubuntu.','plum')
+	        'description' => __('Defaults: Droid Serif, Ubuntu.','plum'),
+	        'panel' => 'plum_design_panel'
 	    )
 	);
 	

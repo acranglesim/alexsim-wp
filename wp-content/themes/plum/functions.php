@@ -93,7 +93,7 @@ function plum_setup() {
 	add_theme_support('woocommerce');
 	
 	//Slider Support
-	add_theme_support('rt-slider', array( 10 , 'pages', 'front-page-only') );
+	add_theme_support('rt-slider', array( 10 ) );
 	
 	add_theme_support( 'wc-product-gallery-lightbox' );
 	
@@ -146,6 +146,15 @@ function plum_widgets_init() {
 	
 }
 add_action( 'widgets_init', 'plum_widgets_init' );
+
+function plum_custom_js() {
+    $custom_js = array (
+//        'menu_alignment'=> get_theme_mod('plum_menu_alignment_set'),
+    );
+
+    wp_localize_script('plum-custom-js', 'align', $custom_js);
+}
+add_action('wp_head', 'plum_custom_js');
 
 /**
  * Enqueue scripts and styles.
@@ -241,5 +250,10 @@ require get_template_directory() . '/inc/jetpack.php';
  * Load TGM.
  */
 require get_template_directory() . '/framework/tgmpa.php';
+
+/**
+ * Video widget
+ */
+require get_template_directory() . '/framework/widgets/plum-video.php';
 
 
