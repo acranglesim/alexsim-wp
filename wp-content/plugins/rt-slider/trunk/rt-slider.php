@@ -3,7 +3,7 @@
 /*
 Plugin Name: RT Slider
 Description: A Very Simple & Easy Slider Plugin, which helps you create sliders from Customizer, if your Theme Supports it. Originally Designed to Work with Rohitink.com & Inkhive.com Themes. 
-Version: 1.0.6
+Version: 1.0.7
 Author: Rohit Tripathi
 Author URI: http://rohitink.com
 License: GPLv3
