@@ -12,6 +12,15 @@
 class WPForms_Builder {
 
 	/**
+	 * One is the loneliest number that you'll ever do.
+	 *
+	 * @since 1.4.4.1
+	 *
+	 * @var object
+	 */
+	private static $instance;
+
+	/**
 	 * Current view (panel).
 	 *
 	 * @since 1.0.0
@@ -36,6 +45,14 @@ class WPForms_Builder {
 	public $form;
 
 	/**
+	 * Current form data.
+	 *
+	 * @since 1.4.4.1
+	 * @var array
+	 */
+	public $form_data;
+
+	/**
 	 * Current template information.
 	 *
 	 * @since 1.0.0
@@ -44,14 +61,21 @@ class WPForms_Builder {
 	public $template;
 
 	/**
-	 * Primary class constructor.
+	 * Main Instance.
 	 *
-	 * @since 1.0.0
+	 * @since 1.4.4.1
+	 *
+	 * @return WPForms_Builder
 	 */
-	public function __construct() {
+	public static function instance() {
 
-		// Maybe load form builder.
-		add_action( 'admin_init', array( $this, 'init' ) );
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof WPForms_Builder ) ) {
+
+			self::$instance = new WPForms_Builder();
+
+			add_action( 'admin_init', array( self::$instance, 'init' ), 10 );
+		}
+		return self::$instance;
 	}
 
 	/**
@@ -82,7 +106,8 @@ class WPForms_Builder {
 			wpforms()->preview->form_preview_check();
 
 			// Fetch form.
-			$this->form = wpforms()->form->get( $form_id );
+			$this->form      = wpforms()->form->get( $form_id );
+			$this->form_data = $this->form ? wpforms_decode( $this->form->post_content ) : false;
 
 			// Fetch template information.
 			$this->template = apply_filters( 'wpforms_builder_template_active', array(), $this->form );
@@ -132,7 +157,7 @@ class WPForms_Builder {
 			'fields',
 			'settings',
 			'providers',
-			'payments',
+			'payments'
 		) );
 
 		foreach ( $this->panels as $panel ) {
@@ -158,6 +183,8 @@ class WPForms_Builder {
 		wp_deregister_script( 'wpclef-ajax-settings' );
 
 		do_action( 'wpforms_builder_enqueues_before', $this->view );
+
+		$min = wpforms_get_min_suffix();
 
 		/*
 		 * CSS.
@@ -191,8 +218,15 @@ class WPForms_Builder {
 		);
 
 		wp_enqueue_style(
-			'wpforms-builder',
+			'wpforms-builder-legacy',
 			WPFORMS_PLUGIN_URL . 'assets/css/admin-builder.css',
+			null,
+			WPFORMS_VERSION
+		);
+
+		wp_enqueue_style(
+			'wpforms-builder',
+			WPFORMS_PLUGIN_URL . "assets/css/builder{$min}.css",
 			null,
 			WPFORMS_VERSION
 		);
@@ -204,13 +238,6 @@ class WPForms_Builder {
 		wp_enqueue_script( 'jquery-ui-sortable' );
 		wp_enqueue_script( 'jquery-ui-draggable' );
 		wp_enqueue_script( 'wp-util' );
-
-		wp_enqueue_script(
-			'serialize-object',
-			WPFORMS_PLUGIN_URL . 'assets/js/jquery.serialize-object.min.js',
-			array( 'jquery' ),
-			'2.5.0'
-		);
 
 		wp_enqueue_script(
 			'tooltipster',
@@ -264,7 +291,7 @@ class WPForms_Builder {
 		wp_enqueue_script(
 			'wpforms-utils',
 			WPFORMS_PLUGIN_URL . 'assets/js/admin-utils.js',
-			array( 'serialize-object' ),
+			array(),
 			WPFORMS_VERSION
 		);
 
@@ -300,6 +327,7 @@ class WPForms_Builder {
 			'fields_available'       => esc_html__( 'Available Fields', 'wpforms' ),
 			'fields_unavailable'     => esc_html__( 'No fields available', 'wpforms' ),
 			'heads_up'               => esc_html__( 'Heads up!', 'wpforms' ),
+			'image_placeholder'      => WPFORMS_PLUGIN_URL . 'assets/images/placeholder-200x125.png',
 			'nonce'                  => wp_create_nonce( 'wpforms-builder' ),
 			'no_email_fields'        => esc_html__( 'No email fields', 'wpforms' ),
 			'notification_delete'    => esc_html__( 'Are you sure you want to delete this notification?', 'wpforms' ),
@@ -349,6 +377,7 @@ class WPForms_Builder {
 			'operator_ends'          => esc_html__( 'ends with', 'wpforms' ),
 			'payments_entries_off'   => esc_html__( 'Form entries must be stored to accept payments. Please enable saving form entries in the General settings first.', 'wpforms' ),
 			'previous'               => esc_html__( 'Previous', 'wpforms' ),
+			'provider_required_flds' => esc_html__( 'Your form contains required {provider} settings that have not been configured. Please double-check and configure these settings to complete the connection setup.' ),
 			'rule_create'            => esc_html__( 'Create new rule', 'wpforms' ),
 			'rule_create_group'      => esc_html__( 'Add new group', 'wpforms' ),
 			'rule_delete'            => esc_html__( 'Delete rule', 'wpforms' ),
@@ -357,6 +386,9 @@ class WPForms_Builder {
 			'smart_tags_hide'        => esc_html__( 'Hide Smart Tags', 'wpforms' ),
 			'select_field'           => esc_html__( '-- Select Field --', 'wpforms' ),
 			'select_choice'          => esc_html__( '-- Select Choice --', 'wpforms' ),
+			'upload_image_title'     => esc_html__( 'Upload or Choose Your Image', 'wpforms' ),
+			'upload_image_button'    => esc_html__( 'Use Image', 'wpforms' ),
+			'upload_image_remove'    => esc_html__( 'Remove Image', 'wpforms' ),
 		);
 		$strings = apply_filters( 'wpforms_builder_strings', $strings, $this->form );
 
@@ -427,11 +459,10 @@ class WPForms_Builder {
 	 */
 	public function output() {
 
-		$form_id   = $this->form ? absint( $this->form->ID ) : '';
-		$form_data = $this->form ? wpforms_decode( $this->form->post_content ) : false;
+		$form_id = $this->form ? absint( $this->form->ID ) : '';
 		?>
 
-		<div id="wpforms-builder">
+		<div id="wpforms-builder" class="wpforms-admin-page">
 
 			<div id="wpforms-builder-overlay">
 
@@ -447,7 +478,7 @@ class WPForms_Builder {
 			<form name="wpforms-builder" id="wpforms-builder-form" method="post" data-id="<?php echo $form_id; ?>">
 
 				<input type="hidden" name="id" value="<?php echo $form_id; ?>">
-				<input type="hidden" value="<?php echo absint( $form_data['field_id'] ); ?>" name="field_id" id="wpforms-field-id">
+				<input type="hidden" value="<?php echo absint( $this->form_data['field_id'] ); ?>" name="field_id" id="wpforms-field-id">
 
 				<!-- Toolbar -->
 				<div class="wpforms-toolbar">
@@ -513,5 +544,4 @@ class WPForms_Builder {
 		<?php
 	}
 }
-
-new WPForms_Builder;
+WPForms_Builder::instance();

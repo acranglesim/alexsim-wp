@@ -11,7 +11,7 @@ if ( ! class_exists( 'AM_Notification' ) ) {
 	 * @author     AwesomeMotive Team
 	 * @license    GPL-2.0+
 	 * @copyright  Copyright (c) 2018, Awesome Motive LLC
-	 * @version    1.0.5
+	 * @version    1.0.6
 	 */
 	class AM_Notification {
 
@@ -186,7 +186,7 @@ if ( ! class_exists( 'AM_Notification' ) ) {
 		 * @since 1.0.0
 		 */
 		public function display_notifications() {
-			if ( ! current_user_can( apply_filters( 'am_notifications_display', is_super_admin() ) ) ) {
+			if ( ! apply_filters( 'am_notifications_display', is_super_admin() ) ) {
 				return;
 			}
 
@@ -425,7 +425,7 @@ if ( ! class_exists( 'AM_Notification' ) ) {
 		 * @since 1.0.0
 		 */
 		public function dismiss_notification() {
-			if ( ! current_user_can( apply_filters( 'am_notifications_display', is_super_admin() ) ) ) {
+			if ( ! apply_filters( 'am_notifications_display', is_super_admin() ) ) {
 				die;
 			}
 
