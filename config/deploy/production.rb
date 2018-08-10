@@ -60,4 +60,4 @@
 #     # password: 'please use keys'
 #   }
 
- server '54.72.114.191', user: 'alex', roles: %w{web app}
+ server '18.130.137.59', user: 'alex', roles: %w{web app}
