@@ -15,7 +15,9 @@
 		<div class="site-info container">
 			<?php printf( __( 'Powered by %1$s.', 'plum' ), '<a href="'.esc_url("https://inkhive.com/product/plum/").'" rel="nofollow">Plum Theme</a>' ); ?>
 			<span class="sep"></span>
-			<?php echo ( get_theme_mod('plum_footer_text') == '' ) ? ('&copy; '.date('Y').' '.get_bloginfo('name').__('. All Rights Reserved. ','plum')) : esc_html( get_theme_mod('plum_footer_text') ); ?>
+			<div class="custom-info">
+				<?php echo ( esc_html(get_theme_mod('plum_footer_text')) == '' ) ? ('&copy; '.date('Y').' '.get_bloginfo('name').__('. All Rights Reserved. ','plum')) : esc_html( get_theme_mod('plum_footer_text') ); ?>
+			</div>
 		</div><!-- .site-info -->
 	</footer><!-- #colophon -->
 

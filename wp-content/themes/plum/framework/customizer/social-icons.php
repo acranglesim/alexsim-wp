@@ -9,13 +9,12 @@
 	
 	$social_networks = array( //Redefinied in Sanitization Function.
 					'none' => __('-','plum'),
-					'facebook' => __('Facebook','plum'),
+					'facebook-f' => __('Facebook','plum'),
 					'twitter' => __('Twitter','plum'),
-					'google-plus' => __('Google Plus','plum'),
+					'google-plus-g' => __('Google Plus','plum'),
 					'instagram' => __('Instagram','plum'),
-					'rss' => __('RSS Feeds','plum'),
-					'vine' => __('Vine','plum'),
-					'vimeo-square' => __('Vimeo','plum'),
+					'linkedin-in' => __('Linked In','plum'),
+					'vimeo-v' => __('Vimeo','plum'),
 					'youtube' => __('Youtube','plum'),
 					'flickr' => __('Flickr','plum'),
 					'pinterest-p'	=> __('Pinterest', 'plum'),
@@ -30,7 +29,8 @@
 
 	$wp_customize->add_setting('plum_social_icon_style', array(
 	    'default' => 'none',
-        'sanitize_callback' => 'plum_sanitize_social_style'
+        'sanitize_callback' => 'plum_sanitize_social_style',
+        'transport'	=> 'postMessage'
     ) );
 
 	function plum_sanitize_social_style($input) {
@@ -62,7 +62,8 @@
 		$wp_customize->add_setting(
 			'plum_social_'.$x, array(
 				'sanitize_callback' => 'plum_sanitize_social',
-				'default' => 'none'
+				'default' => 'none',
+				'transport'	=> 'postMessage'
 			));
 
 		$wp_customize->add_control( 'plum_social_'.$x, array(
@@ -91,13 +92,12 @@
 	function plum_sanitize_social( $input ) {
 		$social_networks = array(
 					'none' ,
-					'facebook',
+					'facebook-f',
 					'twitter',
-					'google-plus',
+					'google-plus-g',
 					'instagram',
-					'rss',
-					'vine',
-					'vimeo-square',
+					'linkedin-in',
+					'vimeo-v',
 					'youtube',
 					'flickr',
 					'pinterest-p',

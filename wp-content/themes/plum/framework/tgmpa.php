@@ -46,6 +46,13 @@ function plum_register_required_plugins() {
 		array(
 			'name'        => __('RT Slider for Plum Theme','plum'),
 			'slug'        => 'rt-slider',
+			'required'	  => false
+		),
+		
+		array(
+			'name'		  => __('WPForms-Lite Contact Form Plugin', 'plum'),
+			'slug'		  => 'wpforms-lite',
+			'required'	  => false
 		),
 
 	);
@@ -68,14 +75,20 @@ function plum_register_required_plugins() {
 		'dismiss_msg'  => '',                      // If 'dismissable' is false, this message will be output at top of nag.
 		'is_automatic' => false,                   // Automatically activate plugins after installation or not.
 		'message'      => '',                      // Message to output right before the plugins table.
-		'strings'      => array(
+		'strings'	   => array(
 			'notice_can_install_recommended'  => _n_noop(
 				/* translators: 1: plugin name(s). */
-				'To use a Slider with Plum Theme, we recommend you to install and activate the following Plugin: %1$s.',
-				'This theme recommends the following plugins: %1$s.',
+				'We recommend the following plugin for this theme: %1$s.',
+				'We recommend the following plugins for this theme: %1$s.',
 				'plum'
 			),
-		)	
+			'notice_ask_to_update'            => _n_noop(
+				/* translators: 1: plugin name(s). */
+				'Update this plugin to its latest version to ensure maximum compatibility with this theme: %1$s.',
+				'Update these plugins to their latest version to ensure maximum compatibility with this theme: %1$s.',
+				'plum'
+			),
+		)
 	);
 
 	tgmpa( $plugins, $config );

@@ -2,650 +2,15 @@
 /**
  * Custom functions that act independently of the theme templates.
  *
- * Eventually, some of the functionality here could be replaced by core features.
+ * 1. Functions which can be used for doing some operations on the values.
+ * 2. Third party plugins compatibility functions.
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
-
-add_action( 'wp_head', 'astra_pingback_header' );
-
-/**
- * Add a pingback url auto-discovery header for singularly identifiable articles.
- */
-function astra_pingback_header() {
-	if ( is_singular() && pings_open() ) {
-		printf( '<link rel="pingback" href="%s">' . "\n", esc_url( get_bloginfo( 'pingback_url' ) ) );
-	}
-}
-
-/**
- * Schema for <body> tag.
- */
-if ( ! function_exists( 'astra_schema_body' ) ) :
-
-	/**
-	 * Adds schema tags to the body classes.
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_schema_body() {
-
-		// Check conditions.
-		$is_blog = ( is_home() || is_archive() || is_attachment() || is_tax() || is_single() ) ? true : false;
-
-		// Set up default itemtype.
-		$itemtype = 'WebPage';
-
-		// Get itemtype for the blog.
-		$itemtype = ( $is_blog ) ? 'Blog' : $itemtype;
-
-		// Get itemtype for search results.
-		$itemtype = ( is_search() ) ? 'SearchResultsPage' : $itemtype;
-		// Get the result.
-		$result = apply_filters( 'astra_schema_body_itemtype', $itemtype );
-
-		// Return our HTML.
-		echo apply_filters( 'astra_schema_body', "itemtype='http://schema.org/" . esc_html( $result ) . "' itemscope='itemscope'" );
-	}
-endif;
-
-/**
- * Adds custom classes to the array of body classes.
- */
-if ( ! function_exists( 'astra_body_classes' ) ) {
-
-	/**
-	 * Adds custom classes to the array of body classes.
-	 *
-	 * @since 1.0.0
-	 * @param array $classes Classes for the body element.
-	 * @return array
-	 */
-	function astra_body_classes( $classes ) {
-
-		if ( wp_is_mobile() ) {
-			$classes[] = 'ast-header-break-point';
-		}
-
-		// Apply separate container class to the body.
-		$content_layout = astra_get_content_layout();
-		if ( 'content-boxed-container' == $content_layout ) {
-			$classes[] = 'ast-separate-container';
-		} elseif ( 'boxed-container' == $content_layout ) {
-			$classes[] = 'ast-separate-container ast-two-container';
-		} elseif ( 'page-builder' == $content_layout ) {
-			$classes[] = 'ast-page-builder-template';
-		} elseif ( 'plain-container' == $content_layout ) {
-			$classes[] = 'ast-plain-container';
-		}
-		// Sidebar location.
-		$page_layout = 'ast-' . astra_page_layout();
-		$classes[]   = esc_attr( $page_layout );
-
-		// Current Astra verion.
-		$classes[] = esc_attr( 'astra-' . ASTRA_THEME_VERSION );
-
-		$outside_menu = astra_get_option( 'header-display-outside-menu' );
-
-		if ( $outside_menu ) {
-			$classes[] = 'ast-header-custom-item-outside';
-		} else {
-			$classes[] = 'ast-header-custom-item-inside';
-		}
-
-		return $classes;
-	}
-}// End if().
-
-add_filter( 'body_class', 'astra_body_classes' );
-
-
-/**
- * Astra Pagination
- */
-if ( ! function_exists( 'astra_number_pagination' ) ) {
-
-	/**
-	 * Astra Pagination
-	 *
-	 * @since 1.0.0
-	 * @return void            Generate & echo pagination markup.
-	 */
-	function astra_number_pagination() {
-		global $numpages;
-		$enabled = apply_filters( 'astra_pagination_enabled', true );
-
-		if ( isset( $numpages ) && $enabled ) {
-			ob_start();
-			echo "<div class='ast-pagination'>";
-			the_posts_pagination(
-				array(
-					'prev_text' => astra_default_strings( 'string-blog-navigation-previous', false ),
-					'next_text' => astra_default_strings( 'string-blog-navigation-next', false ),
-				)
-			);
-			echo '</div>';
-			$output = ob_get_clean();
-			echo apply_filters( 'astra_pagination_markup', $output ); // WPCS: XSS OK.
-		}
-	}
-}// End if().
-
-add_action( 'astra_pagination', 'astra_number_pagination' );
-
-/**
- * Return or echo site logo markup.
- */
-if ( ! function_exists( 'astra_logo' ) ) {
-
-	/**
-	 * Return or echo site logo markup.
-	 *
-	 * @since 1.0.0
-	 * @param  boolean $echo Echo markup.
-	 * @return mixed echo or return markup.
-	 */
-	function astra_logo( $echo = true ) {
-
-		$display_site_tagline = astra_get_option( 'display-site-tagline' );
-		$display_site_title   = astra_get_option( 'display-site-title' );
-		$html                 = '';
-
-		$has_custom_logo = apply_filters( 'astra_has_custom_logo', has_custom_logo() );
-
-		// Site logo.
-		if ( $has_custom_logo ) {
-
-			if ( apply_filters( 'astra_replace_logo_width', true ) ) {
-				add_filter( 'wp_get_attachment_image_src', 'astra_replace_header_logo', 10, 4 );
-			}
-
-			$html .= '<span class="site-logo-img">';
-			$html .= get_custom_logo();
-			$html .= '</span>';
-
-			if ( apply_filters( 'astra_replace_logo_width', true ) ) {
-				remove_filter( 'wp_get_attachment_image_src', 'astra_replace_header_logo', 10 );
-			}
-		}
-
-		if ( ! apply_filters( 'astra_disable_site_identity', false ) ) {
-
-			// Site Title.
-			$tag = 'span';
-			if ( is_home() || is_front_page() ) {
-				$tag = 'h1';
-			}
-			$site_title_markup = '<' . $tag . ' itemprop="name" class="site-title"> <a href="' . esc_url( home_url( '/' ) ) . '" itemprop="url" rel="home">' . get_bloginfo( 'name' ) . '</a> </' . $tag . '>';
-
-			// Site Description.
-			$site_tagline_markup = '<p class="site-description" itemprop="description">' . get_bloginfo( 'description' ) . '</p>';
-
-			if ( $display_site_title || $display_site_tagline ) {
-				/* translators: 1: Site Title Markup, 2: Site Tagline Markup */
-				$html .= sprintf(
-					'<div class="ast-site-title-wrap">
-							%1$s
-							%2$s
-						</div>',
-					( $display_site_title ) ? $site_title_markup : '',
-					( $display_site_tagline ) ? $site_tagline_markup : ''
-				);
-			}
-		}
-		$html = apply_filters( 'astra_logo', $html, $display_site_title, $display_site_tagline );
-
-		/**
-		 * Echo or Return the Logo Markup
-		 */
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
-	}
-}// End if().
-
-/**
- * Return the selected sections
- */
-if ( ! function_exists( 'astra_get_dynamic_header_content' ) ) {
-
-	/**
-	 * Return the selected sections
-	 *
-	 * @since 1.0.0
-	 * @param  string $option Custom content type. E.g. search, text-html etc.
-	 * @return array         Array of Custom contents.
-	 */
-	function astra_get_dynamic_header_content( $option ) {
-
-		$output  = array();
-		$section = astra_get_option( $option );
-
-		switch ( $section ) {
-
-			case 'search':
-					$output[] = astra_get_search( $option );
-				break;
-
-			case 'text-html':
-					$output[] = astra_get_custom_html( $option . '-html' );
-				break;
-
-			case 'widget':
-					$output[] = astra_get_custom_widget( $option );
-				break;
-
-			default:
-					$output[] = apply_filters( 'astra_get_dynamic_header_content', '', $option, $section );
-				break;
-		}
-
-		return $output;
-	}
-}
-
-
-/**
- * Adding Wrapper for Search Form.
- */
-if ( ! function_exists( 'astra_get_search' ) ) {
-
-	/**
-	 * Adding Wrapper for Search Form.
-	 *
-	 * @since 1.0.0
-	 * @param  string $option   Search Option name.
-	 * @return mixed Search HTML structure created.
-	 */
-	function astra_get_search( $option = '' ) {
-
-		$search_html  = '<div class="ast-search-icon"><a class="slide-search astra-search-icon" href="#"><span class="screen-reader-text">' . esc_html__( 'Search', 'astra' ) . '</span></a></div>
-						<div class="ast-search-menu-icon slide-search" id="ast-search-form" >';
-		$search_html .= get_search_form( false );
-		$search_html .= '</div>';
-
-		return apply_filters( 'astra_get_search', $search_html, $option );
-	}
-}
-
-/**
- * Get custom HTML added by user.
- */
-if ( ! function_exists( 'astra_get_custom_html' ) ) {
-
-	/**
-	 * Get custom HTML added by user.
-	 *
-	 * @since 1.0.0
-	 * @param  string $option_name Option name.
-	 * @return String TEXT/HTML added by user in options panel.
-	 */
-	function astra_get_custom_html( $option_name = '' ) {
-
-		$custom_html         = '';
-		$custom_html_content = astra_get_option( $option_name );
-
-		if ( ! empty( $custom_html_content ) ) {
-			$custom_html = '<div class="ast-custom-html">' . do_shortcode( $custom_html_content ) . '</div>';
-		} elseif ( current_user_can( 'edit_theme_options' ) ) {
-			$custom_html = '<a href="' . esc_url( admin_url( 'customize.php?autofocus[control]=' . ASTRA_THEME_SETTINGS . '[' . $option_name . ']' ) ) . '">' . __( 'Add Custom HTML', 'astra' ) . '</a>';
-		}
-
-		return $custom_html;
-	}
-}
-
-/**
- * Get Widget added by user.
- */
-if ( ! function_exists( 'astra_get_custom_widget' ) ) {
-
-	/**
-	 * Get custom widget added by user.
-	 *
-	 * @since  1.0.1.1
-	 * @param  string $option_name Option name.
-	 * @return Widget added by user in options panel.
-	 */
-	function astra_get_custom_widget( $option_name = '' ) {
-
-		ob_start();
-
-		if ( 'header-main-rt-section' == $option_name ) {
-			$widget_id = 'header-widget';
-		}
-		if ( 'footer-sml-section-1' == $option_name ) {
-			$widget_id = 'footer-widget-1';
-		} elseif ( 'footer-sml-section-2' == $option_name ) {
-			$widget_id = 'footer-widget-2';
-		}
-
-		echo '<div class="ast-' . esc_attr( $widget_id ) . '-area">';
-				astra_get_sidebar( $widget_id );
-		echo '</div>';
-
-		return ob_get_clean();
-	}
-}
-
-/**
- * Function to get Small Left/Right Footer
- */
-if ( ! function_exists( 'astra_get_small_footer' ) ) {
-
-	/**
-	 * Function to get Small Left/Right Footer
-	 *
-	 * @since 1.0.0
-	 * @param string $section   Sections of Small Footer.
-	 * @return mixed            Markup of sections.
-	 */
-	function astra_get_small_footer( $section = '' ) {
-
-		$small_footer_type = astra_get_option( $section );
-		$output            = null;
-
-		switch ( $small_footer_type ) {
-			case 'menu':
-					$output = astra_get_small_footer_menu();
-				break;
-
-			case 'custom':
-					$output = astra_get_small_footer_custom_text( $section . '-credit' );
-				break;
-
-			case 'widget':
-					$output = astra_get_custom_widget( $section );
-				break;
-		}
-
-		return $output;
-	}
-}// End if().
-
-/**
- * Function to get Small Footer Custom Text
- */
-if ( ! function_exists( 'astra_get_small_footer_custom_text' ) ) {
-
-	/**
-	 * Function to get Small Footer Custom Text
-	 *
-	 * @since 1.0.14
-	 * @param string $option Custom text option name.
-	 * @return mixed         Markup of custom text option.
-	 */
-	function astra_get_small_footer_custom_text( $option = '' ) {
-
-		$output = $option;
-
-		if ( '' != $option ) {
-			$output = astra_get_option( $option );
-			$output = str_replace( '[current_year]', date_i18n( __( 'Y', 'astra' ) ), $output );
-			$output = str_replace( '[site_title]', '<span class="ast-footer-site-title">' . get_bloginfo( 'name' ) . '</span>', $output );
-
-			$theme_author = apply_filters(
-				'astra_theme_author', array(
-					'theme_name'       => __( 'Astra', 'astra' ),
-					'theme_author_url' => 'http://wpastra.com/',
-				)
-			);
-
-			$output = str_replace( '[theme_author]', '<a href="' . esc_url( $theme_author['theme_author_url'] ) . '">' . $theme_author['theme_name'] . '</a>', $output );
-		}
-
-		return $output;
-	}
-}// End if().
-
-/**
- * Function to get Footer Menu
- */
-if ( ! function_exists( 'astra_get_small_footer_menu' ) ) {
-
-	/**
-	 * Function to get Footer Menu
-	 *
-	 * @since 1.0.0
-	 * @return html
-	 */
-	function astra_get_small_footer_menu() {
-
-		ob_start();
-
-		if ( has_nav_menu( 'footer_menu' ) ) {
-			wp_nav_menu(
-				array(
-					'container'       => 'div',
-					'container_class' => 'footer-primary-navigation',
-					'theme_location'  => 'footer_menu',
-					'menu_class'      => 'nav-menu',
-					'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-					'depth'           => 1,
-				)
-			);
-		} else {
-			if ( is_user_logged_in() && current_user_can( 'edit_theme_options' ) ) {
-				?>
-					<a href="<?php echo esc_url( admin_url( '/nav-menus.php?action=locations' ) ); ?>"><?php esc_html_e( 'Assign Footer Menu', 'astra' ); ?></a>
-				<?php
-			}
-		}
-
-		return ob_get_clean();
-	}
-}// End if().
-
-/**
- * Function to get site Header
- */
-if ( ! function_exists( 'astra_header_markup' ) ) {
-
-	/**
-	 * Site Header - <header>
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_header_markup() {
-		?>
-
-		<header itemtype="http://schema.org/WPHeader" itemscope="itemscope" id="masthead" <?php astra_header_classes(); ?> role="banner">
-
-			<?php astra_masthead_top(); ?>
-
-			<?php astra_masthead(); ?>
-
-			<?php astra_masthead_bottom(); ?>
-
-		</header><!-- #masthead -->
-		<?php
-	}
-}
-
-add_action( 'astra_header', 'astra_header_markup' );
-
-/**
- * Function to get site title/logo
- */
-if ( ! function_exists( 'astra_site_branding_markup' ) ) {
-
-	/**
-	 * Site Title / Logo
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_site_branding_markup() {
-		?>
-
-		<div class="site-branding">
-			<div class="ast-site-identity" itemscope="itemscope" itemtype="http://schema.org/Organization">
-				<?php astra_logo(); ?>
-			</div>
-		</div>
-		<!-- .site-branding -->
-		<?php
-	}
-}
-
-add_action( 'astra_masthead_content', 'astra_site_branding_markup', 8 );
-
-/**
- * Function to get Toggle Button Markup
- */
-if ( ! function_exists( 'astra_toggle_buttons_markup' ) ) {
-
-	/**
-	 * Toggle Button Markup
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_toggle_buttons_markup() {
-		$disable_primary_navigation = astra_get_option( 'disable-primary-nav' );
-		$custom_header_section      = astra_get_option( 'header-main-rt-section' );
-		$menu_bottons               = true;
-		if ( $disable_primary_navigation && 'none' == $custom_header_section ) {
-			$menu_bottons = false;
-		}
-		if ( apply_filters( 'astra_enable_mobile_menu_buttons', $menu_bottons ) ) {
-		?>
-		<div class="ast-mobile-menu-buttons">
-
-			<?php astra_masthead_toggle_buttons_before(); ?>
-
-			<?php astra_masthead_toggle_buttons(); ?>
-
-			<?php astra_masthead_toggle_buttons_after(); ?>
-
-		</div>
-		<?php
-		}
-	}
-}// End if().
-
-add_action( 'astra_masthead_content', 'astra_toggle_buttons_markup', 9 );
-
-/**
- * Function to get Primary navigation menu
- */
-if ( ! function_exists( 'astra_primary_navigation_markup' ) ) {
-
-	/**
-	 * Site Title / Logo
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_primary_navigation_markup() {
-
-		$disable_primary_navigation = astra_get_option( 'disable-primary-nav' );
-		$custom_header_section      = astra_get_option( 'header-main-rt-section' );
-
-		if ( $disable_primary_navigation ) {
-
-			$display_outside = astra_get_option( 'header-display-outside-menu' );
-
-			if ( 'none' != $custom_header_section && ! $display_outside ) {
-				echo '<div class="main-header-bar-navigation ast-header-custom-item ast-flex ast-justify-content-flex-end">';
-				echo astra_masthead_get_menu_items();
-				echo '</div>';
-			}
-		} else {
-
-			$submenu_class = apply_filters( 'primary_submenu_border_class', ' submenu-with-border' );
-
-			// Fallback Menu if primary menu not set.
-			$fallback_menu_args = array(
-				'theme_location' => 'primary',
-				'menu_id'        => 'primary-menu',
-				'menu_class'     => 'main-navigation',
-				'container'      => 'div',
-
-				'before'         => '<ul class="main-header-menu ast-flex ast-justify-content-flex-end' . $submenu_class . '">',
-				'after'          => '</ul>',
-			);
-
-			$items_wrap  = '<nav itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope" id="site-navigation" class="ast-flex-grow-1" role="navigation" aria-label="' . esc_attr( 'Site Navigation', 'astra' ) . '">';
-			$items_wrap .= '<div class="main-navigation">';
-			$items_wrap .= '<ul id="%1$s" class="%2$s">%3$s</ul>';
-			$items_wrap .= '</div>';
-			$items_wrap .= '</nav>';
-
-			// Primary Menu.
-			$primary_menu_args = array(
-				'theme_location'  => 'primary',
-				'menu_id'         => 'primary-menu',
-				'menu_class'      => 'main-header-menu ast-flex ast-justify-content-flex-end' . $submenu_class,
-				'container'       => 'div',
-				'container_class' => 'main-header-bar-navigation',
-				'items_wrap'      => $items_wrap,
-			);
-
-			if ( has_nav_menu( 'primary' ) ) {
-				wp_nav_menu( $primary_menu_args );
-			} else {
-
-				echo '<div class="main-header-bar-navigation">';
-					echo '<nav itemtype="http://schema.org/SiteNavigationElement" itemscope="itemscope" id="site-navigation" class="ast-flex-grow-1" role="navigation" aria-label="' . esc_attr( 'Site Navigation', 'astra' ) . '">';
-						wp_page_menu( $fallback_menu_args );
-					echo  '</nav>';
-				echo  '</div>';
-			}
-		}// End if().
-
-	}
-}// End if().
-
-add_action( 'astra_masthead_content', 'astra_primary_navigation_markup', 10 );
-
-/**
- * Function to get site Footer
- */
-if ( ! function_exists( 'astra_footer_markup' ) ) {
-
-	/**
-	 * Site Footer - <footer>
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_footer_markup() {
-		?>
-
-		<footer itemtype="http://schema.org/WPFooter" itemscope="itemscope" id="colophon" <?php astra_footer_classes(); ?> role="contentinfo">
-
-			<?php astra_footer_content_top(); ?>
-
-			<?php astra_footer_content(); ?>
-
-			<?php astra_footer_content_bottom(); ?>
-
-		</footer><!-- #colophon -->
-		<?php
-	}
-}
-
-add_action( 'astra_footer', 'astra_footer_markup' );
-
-/**
- * Function to get Header Breakpoint
- */
-if ( ! function_exists( 'astra_header_break_point' ) ) {
-
-	/**
-	 * Function to get Header Breakpoint
-	 *
-	 * @since 1.0.0
-	 * @return number
-	 */
-	function astra_header_break_point() {
-		$break_point = apply_filters( 'astra_header_break_point', 921 );
-		return absint( $break_point );
-	}
-}
 
 /**
  * Function to get Body Font Family
@@ -667,97 +32,7 @@ if ( ! function_exists( 'astra_body_font_family' ) ) {
 			$font_family = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif';
 		}
 
-		return $font_family;
-	}
-}
-
-/**
- * Function to get Edit Post Link
- */
-if ( ! function_exists( 'astra_edit_post_link' ) ) {
-
-	/**
-	 * Function to get Edit Post Link
-	 *
-	 * @since 1.0.0
-	 * @param string $text      Anchor Text.
-	 * @param string $before    Anchor Text.
-	 * @param string $after     Anchor Text.
-	 * @param int    $id           Anchor Text.
-	 * @param string $class     Anchor Text.
-	 * @return void
-	 */
-	function astra_edit_post_link( $text, $before = '', $after = '', $id = 0, $class = 'post-edit-link' ) {
-
-		if ( apply_filters( 'astra_edit_post_link', false ) ) {
-			edit_post_link( $text, $before, $after, $id, $class );
-		}
-	}
-}
-
-/**
- * Function to get Header Classes
- */
-if ( ! function_exists( 'astra_header_classes' ) ) {
-
-	/**
-	 * Function to get Header Classes
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_header_classes() {
-
-		$classes                  = array( 'site-header' );
-		$menu_logo_location       = astra_get_option( 'header-layouts' );
-		$mobile_header_alignment  = astra_get_option( 'header-main-menu-align' );
-		$primary_menu_disable     = astra_get_option( 'disable-primary-nav' );
-		$primary_menu_custom_item = astra_get_option( 'header-main-rt-section' );
-		$logo_title_inline        = astra_get_option( 'logo-title-inline' );
-
-		if ( $menu_logo_location ) {
-			$classes[] = $menu_logo_location;
-		}
-
-		if ( $primary_menu_disable ) {
-
-			$classes[] = 'ast-primary-menu-disabled';
-
-			if ( 'none' == $primary_menu_custom_item ) {
-				$classes[] = 'ast-no-menu-items';
-			}
-		}
-		// Add class if Inline Logo & Site Title.
-		if ( $logo_title_inline ) {
-			$classes[] = 'ast-logo-title-inline';
-		}
-
-		$classes[] = 'ast-mobile-header-' . $mobile_header_alignment;
-
-		$classes = array_unique( apply_filters( 'astra_header_class', $classes ) );
-
-		$classes = array_map( 'sanitize_html_class', $classes );
-
-		echo 'class="' . esc_attr( join( ' ', $classes ) ) . '"';
-	}
-}
-
-/**
- * Function to get Footer Classes
- */
-if ( ! function_exists( 'astra_footer_classes' ) ) {
-
-	/**
-	 * Function to get Footer Classes
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_footer_classes() {
-
-		$classes = array_unique( apply_filters( 'astra_footer_class', array( 'site-footer' ) ) );
-
-		$classes = array_map( 'sanitize_html_class', $classes );
-
-		echo 'class="' . esc_attr( join( ' ', $classes ) ) . '"';
+		return apply_filters( 'astra_body_font_family', $font_family );
 	}
 }
 
@@ -769,108 +44,47 @@ if ( ! function_exists( 'astra_header_breakpoint_style' ) ) {
 	/**
 	 * Function to Add Header Breakpoint Style
 	 *
+	 * @param  string $dynamic_css          Astra Dynamic CSS.
+	 * @param  string $dynamic_css_filtered Astra Dynamic CSS Filters.
+	 * @since 1.5.2 Remove ob_start, ob_get_clean and .main-header-bar-wrap::before{content} for our .ast-header-break-point class
 	 * @since 1.0.0
 	 */
-	function astra_header_breakpoint_style() {
+	function astra_header_breakpoint_style( $dynamic_css, $dynamic_css_filtered = '' ) {
 
 		// Header Break Point.
 		$header_break_point = astra_header_break_point();
-
-		ob_start();
-		?>
-		.main-header-bar-wrap {
-			content: "<?php echo esc_html( $header_break_point ); ?>";
-		}
-
-		@media all and ( min-width: <?php echo esc_html( $header_break_point ); ?>px ) {
-			.main-header-bar-wrap {
-				content: "";
-			}
-		}
-		<?php
 
 		$astra_header_width = astra_get_option( 'header-main-layout-width' );
 
 		/* Width for Header */
 		if ( 'content' != $astra_header_width ) {
 			$genral_global_responsive = array(
-				'#masthead .ast-container' => array(
+				'#masthead .ast-container, .ast-header-breadcrumb .ast-container' => array(
 					'max-width'     => '100%',
 					'padding-left'  => '35px',
 					'padding-right' => '35px',
 				),
 			);
+			$padding_below_breakpoint = array(
+				'#masthead .ast-container, .ast-header-breadcrumb .ast-container' => array(
+					'padding-left'  => '20px',
+					'padding-right' => '20px',
+				),
+			);
 
 			/* Parse CSS from array()*/
-			echo astra_parse_css( $genral_global_responsive, $header_break_point );
+			$dynamic_css .= astra_parse_css( $genral_global_responsive );
+			$dynamic_css .= astra_parse_css( $padding_below_breakpoint, '', $header_break_point );
+
+			// trim white space for faster page loading.
+			$dynamic_css .= Astra_Enqueue_Scripts::trim_css( $dynamic_css );
 		}
 
-		$dynamic_css = ob_get_clean();
-
-		// trim white space for faster page loading.
-		$dynamic_css = Astra_Enqueue_Scripts::trim_css( $dynamic_css );
-
-		wp_add_inline_style( 'astra-theme-css', $dynamic_css );
-	}
-}// End if().
-add_action( 'wp_enqueue_scripts', 'astra_header_breakpoint_style' );
-
-/**
- * Function to filter comment form's default fields
- */
-if ( ! function_exists( 'astra_comment_form_default_fields_markup' ) ) {
-
-	/**
-	 * Function filter comment form's default fields
-	 *
-	 * @since 1.0.0
-	 * @param array $fields Array of comment form's default fields.
-	 * @return array        Comment form fields.
-	 */
-	function astra_comment_form_default_fields_markup( $fields ) {
-
-		$commenter = wp_get_current_commenter();
-		$req       = get_option( 'require_name_email' );
-		$aria_req  = ( $req ? " aria-required='true'" : '' );
-
-		$fields['author'] = '<div class="ast-comment-formwrap ast-row"><p class="comment-form-author ast-col-xs-12 ast-col-sm-12 ast-col-md-4 ast-col-lg-4">' .
-					'<label for="author" class="screen-reader-text">' . esc_html( astra_default_strings( 'string-comment-label-name', false ) ) . '</label><input id="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) .
-					'" placeholder="' . esc_attr( astra_default_strings( 'string-comment-label-name', false ) ) . '" size="30"' . $aria_req . ' /></p>';
-		$fields['email']  = '<p class="comment-form-email ast-col-xs-12 ast-col-sm-12 ast-col-md-4 ast-col-lg-4">' .
-					'<label for="email" class="screen-reader-text">' . esc_html( astra_default_strings( 'string-comment-label-email', false ) ) . '</label><input id="email" name="email" type="text" value="' . esc_attr( $commenter['comment_author_email'] ) .
-					'" placeholder="' . esc_attr( astra_default_strings( 'string-comment-label-email', false ) ) . '" size="30"' . $aria_req . ' /></p>';
-		$fields['url']    = '<p class="comment-form-url ast-col-xs-12 ast-col-sm-12 ast-col-md-4 ast-col-lg-4"><label for="url">' .
-					'<label for="url" class="screen-reader-text">' . esc_html( astra_default_strings( 'string-comment-label-website', false ) ) . '</label><input id="url" name="url" type="text" value="' . esc_url( $commenter['comment_author_url'] ) .
-					'" placeholder="' . esc_attr( astra_default_strings( 'string-comment-label-website', false ) ) . '" size="30" /></label></p></div>';
-		return $fields;
+		return $dynamic_css;
 	}
 }
-add_filter( 'comment_form_default_fields', 'astra_comment_form_default_fields_markup' );
 
-/**
- * Function to filter comment form arguments
- */
-if ( ! function_exists( 'astra_comment_form_default_markup' ) ) {
-
-	/**
-	 * Function filter comment form arguments
-	 *
-	 * @since 1.0.0
-	 * @param array $args   Comment form arguments.
-	 * @return array
-	 */
-	function astra_comment_form_default_markup( $args ) {
-
-		$args['id_form']           = 'ast-commentform';
-		$args['title_reply']       = astra_default_strings( 'string-comment-title-reply', false );
-		$args['cancel_reply_link'] = astra_default_strings( 'string-comment-cancel-reply-link', false );
-		$args['label_submit']      = astra_default_strings( 'string-comment-label-submit', false );
-		$args['comment_field']     = '<div class="ast-row comment-textarea"><fieldset class="comment-form-comment"><div class="comment-form-textarea ast-col-lg-12"><label for="comment" class="screen-reader-text">' . esc_html( astra_default_strings( 'string-comment-label-message', false ) ) . '</label><textarea id="comment" name="comment" placeholder="' . esc_attr( astra_default_strings( 'string-comment-label-message', false ) ) . '" cols="45" rows="8" aria-required="true"></textarea></div></fieldset></div>';
-		return $args;
-	}
-}
-add_filter( 'comment_form_defaults', 'astra_comment_form_default_markup' );
-
+add_filter( 'astra_dynamic_theme_css', 'astra_header_breakpoint_style' );
 
 /**
  * Function to filter comment form arguments
@@ -889,9 +103,11 @@ if ( ! function_exists( 'astra_404_page_layout' ) ) {
 		if ( is_404() ) {
 			$layout = 'no-sidebar';
 		}
-		return $layout;
+
+		return apply_filters( 'astra_404_page_layout', $layout );
 	}
 }
+
 add_filter( 'astra_page_layout', 'astra_404_page_layout', 10, 1 );
 
 /**
@@ -906,8 +122,6 @@ if ( ! function_exists( 'astra_get_content_layout' ) ) {
 	 * @return boolean  content layout.
 	 */
 	function astra_get_content_layout() {
-
-		$value = false;
 
 		if ( is_singular() ) {
 
@@ -953,251 +167,7 @@ if ( ! function_exists( 'astra_get_content_layout' ) ) {
 
 		return apply_filters( 'astra_get_content_layout', $content_layout );
 	}
-}// End if().
-
-/**
- * Display Blog Post Excerpt
- */
-if ( ! function_exists( 'astra_the_excerpt' ) ) {
-
-	/**
-	 * Display Blog Post Excerpt
-	 *
-	 * @since 1.0.0
-	 */
-	function astra_the_excerpt() {
-
-		$excerpt_type = astra_get_option( 'blog-post-content' );
-
-		if ( 'full-content' == $excerpt_type ) {
-			the_content();
-		} else {
-			the_excerpt();
-		}
-	}
 }
-
-/**
- * Display Sidebars
- */
-if ( ! function_exists( 'astra_get_sidebar' ) ) {
-	/**
-	 * Get Sidebar
-	 *
-	 * @since 1.0.1.1
-	 * @param  string $sidebar_id   Sidebar Id.
-	 * @return void
-	 */
-	function astra_get_sidebar( $sidebar_id ) {
-		if ( is_active_sidebar( $sidebar_id ) ) {
-			dynamic_sidebar( $sidebar_id );
-		} elseif ( current_user_can( 'edit_theme_options' ) ) {
-		?>
-			<div class="widget ast-no-widget-row">
-				<p class='no-widget-text'>
-					<a href='<?php echo esc_url( admin_url( 'widgets.php' ) ); ?>'>
-						<?php esc_html_e( 'Add Widget', 'astra' ); ?>
-					</a>
-				</p>
-			</div>
-			<?php
-		}
-	}
-}
-
-/**
- * Filter google fonts
- */
-if ( ! function_exists( 'astra_google_fonts_callback' ) ) {
-	/**
-	 * Google Fonts
-	 *
-	 * @since 1.0.12
-	 * @param array $fonts   List of fonts.
-	 * @return array
-	 */
-	function astra_google_fonts_callback( $fonts ) {
-
-		foreach ( $fonts as $font_name => $font_weight ) {
-
-			$is_true         = false;
-			$new_font_weight = '';
-
-			switch ( $font_name ) {
-				case 'Buda':
-				case 'Open Sans Condensed':
-						$is_true         = true;
-						$new_font_weight = 300;
-					break;
-				case 'Coda Caption':
-						$is_true         = true;
-						$new_font_weight = 800;
-					break;
-				case 'UnifrakturCook':
-						$is_true         = true;
-						$new_font_weight = 700;
-					break;
-			}
-
-			if ( $is_true ) {
-				if ( in_array( 'normal', $font_weight ) ) {
-					$key                         = array_search( 'normal', $font_weight );
-					$fonts[ $font_name ][ $key ] = $new_font_weight;
-				}
-			}
-		}
-		return $fonts;
-	}
-}// End if().
-add_filter( 'astra_google_fonts', 'astra_google_fonts_callback' );
-
-/**
- * Get Footer widgets
- */
-if ( ! function_exists( 'astra_get_footer_widget' ) ) {
-
-	/**
-	 * Get Footer Default Sidebar
-	 *
-	 * @param  string $sidebar_id   Sidebar Id..
-	 * @return void
-	 */
-	function astra_get_footer_widget( $sidebar_id ) {
-
-		if ( is_active_sidebar( $sidebar_id ) ) {
-			dynamic_sidebar( $sidebar_id );
-		} elseif ( current_user_can( 'edit_theme_options' ) ) {
-
-			global $wp_registered_sidebars;
-			$sidebar_name = '';
-			if ( isset( $wp_registered_sidebars[ $sidebar_id ] ) ) {
-				$sidebar_name = $wp_registered_sidebars[ $sidebar_id ]['name'];
-			}
-			?>
-			<div class="widget ast-no-widget-row">
-				<h2 class='widget-title'><?php echo esc_html( $sidebar_name ); ?></h2>
-
-				<p class='no-widget-text'>
-					<a href='<?php echo esc_url( admin_url( 'widgets.php' ) ); ?>'>
-						<?php esc_html_e( 'Click here to assign a widget for this area.', 'astra' ); ?>
-					</a>
-				</p>
-			</div>
-			<?php
-		}
-	}
-}// End if().
-
-/**
- * Astra entry header class.
- */
-if ( ! function_exists( 'astra_entry_header_class' ) ) {
-
-	/**
-	 * Astra entry header class
-	 *
-	 * @since 1.0.15
-	 */
-	function astra_entry_header_class() {
-
-		$post_id          = astra_get_post_id();
-		$classes          = array();
-		$title_markup     = astra_the_title( '', '', $post_id, false );
-		$thumb_markup     = astra_get_post_thumbnail( '', '', false );
-		$post_meta_markup = astra_single_get_post_meta( '', '', false );
-
-		if ( empty( $title_markup ) && empty( $thumb_markup ) && ( is_page() || empty( $post_meta_markup ) ) ) {
-			$classes[] = 'ast-header-without-markup';
-		} else {
-
-			if ( empty( $title_markup ) ) {
-				$classes[] = 'ast-no-title';
-			}
-
-			if ( empty( $thumb_markup ) ) {
-				$classes[] = 'ast-no-thumbnail';
-			}
-
-			if ( is_page() || empty( $post_meta_markup ) ) {
-				$classes[] = 'ast-no-meta';
-			}
-		}
-
-		$classes = array_unique( apply_filters( 'astra_entry_header_class', $classes ) );
-		$classes = array_map( 'sanitize_html_class', $classes );
-
-		echo esc_attr( join( ' ', $classes ) );
-	}
-}// End if().
-
-/**
- * Astra get post thumbnail image.
- */
-if ( ! function_exists( 'astra_get_post_thumbnail' ) ) {
-
-	/**
-	 * Astra get post thumbnail image
-	 *
-	 * @since 1.0.15
-	 * @param string  $before Markup before thumbnail image.
-	 * @param string  $after  Markup after thumbnail image.
-	 * @param boolean $echo   Output print or return.
-	 * @return string|void
-	 */
-	function astra_get_post_thumbnail( $before = '', $after = '', $echo = true ) {
-
-		$output = '';
-
-		$check_is_singular = is_singular();
-
-		$featured_image = true;
-
-		if ( $check_is_singular ) {
-			$is_featured_image = astra_get_option_meta( 'ast-featured-img' );
-		} else {
-			$is_featured_image = astra_get_option( 'ast-featured-img' );
-		}
-
-		if ( 'disabled' === $is_featured_image ) {
-			$featured_image = false;
-		}
-
-		$featured_image = apply_filters( 'astra_featured_image_enabled', $featured_image );
-
-		$blog_post_thumb   = astra_get_option( 'blog-post-structure' );
-		$single_post_thumb = astra_get_option( 'blog-single-post-structure' );
-
-		if ( ( ( ! $check_is_singular && in_array( 'image', $blog_post_thumb ) ) || ( is_single() && in_array( 'single-image', $single_post_thumb ) ) || is_page() ) && has_post_thumbnail() ) {
-
-			if ( $featured_image && ( ! ( $check_is_singular ) || ( ! post_password_required() && ! is_attachment() && has_post_thumbnail() ) ) ) {
-
-				$post_thumb = get_the_post_thumbnail();
-
-				if ( '' != $post_thumb ) {
-					$output .= '<div class="post-thumb-img-content post-thumb">';
-					if ( ! $check_is_singular ) {
-						$output .= '<a href="' . esc_url( get_permalink() ) . '" >';
-					}
-					$output .= $post_thumb;
-					if ( ! $check_is_singular ) {
-						$output .= '</a>';
-					}
-					$output .= '</div>';
-				}
-			}
-		}
-
-		if ( ! $check_is_singular ) {
-			$output = apply_filters( 'astra_blog_post_featured_image_after', $output );
-		}
-
-		if ( $echo ) {
-			echo $before . $output . $after; // WPCS: XSS OK.
-		} else {
-			return $before . $output . $after;
-		}
-	}
-}// End if().
 
 /**
  * Function to check if it is Internet Explorer
@@ -1213,18 +183,20 @@ if ( ! function_exists( 'astra_check_is_ie' ) ) :
 
 		$is_ie = false;
 
-		$ua = htmlentities( $_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8' );
-		if ( strpos( $ua, 'Trident/7.0' ) !== false ) {
-			$is_ie = true;
+		if ( ! empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			$ua = htmlentities( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), ENT_QUOTES, 'UTF-8' );
+			if ( strpos( $ua, 'Trident/7.0' ) !== false ) {
+				$is_ie = true;
+			}
 		}
 
-		return $is_ie;
+		return apply_filters( 'astra_check_is_ie', $is_ie );
 	}
-endif; // End if().
 
+endif;
 
 /**
- * Replace heade logo.
+ * Replace header logo.
  */
 if ( ! function_exists( 'astra_replace_header_logo' ) ) :
 
@@ -1251,107 +223,580 @@ if ( ! function_exists( 'astra_replace_header_logo' ) ) :
 			}
 		}
 
-		return $image;
+		return apply_filters( 'astra_replace_header_logo', $image );
 	}
-endif; // End if().
 
-/**
- * Function to check if it is Internet Explorer
- */
-if ( ! function_exists( 'astra_replace_header_attr' ) ) :
+endif;
+
+if ( ! function_exists( 'astra_strposa' ) ) :
 
 	/**
-	 * Replace header logo.
+	 * Strpos over an array.
 	 *
-	 * @param array  $attr Image.
-	 * @param object $attachment Image obj.
-	 * @param sting  $size Size name.
+	 * @since  1.2.4
+	 * @param  String  $haystack The string to search in.
+	 * @param  Array   $needles  Array of needles to be passed to strpos().
+	 * @param  integer $offset   If specified, search will start this number of characters counted from the beginning of the string. If the offset is negative, the search will start this number of characters counted from the end of the string.
 	 *
-	 * @return array Image attr.
+	 * @return bool            True if haystack if part of any of the $needles.
 	 */
-	function astra_replace_header_attr( $attr, $attachment, $size ) {
+	function astra_strposa( $haystack, $needles, $offset = 0 ) {
 
-		$custom_logo_id = get_theme_mod( 'custom_logo' );
-		if ( $custom_logo_id == $attachment->ID ) {
+		if ( ! is_array( $needles ) ) {
+			$needles = array( $needles );
+		}
 
-			$attach_data = array();
-			if ( ! is_customize_preview() ) {
-				$attach_data = wp_get_attachment_image_src( $attachment->ID, 'ast-logo-size' );
+		foreach ( $needles as $query ) {
 
-				if ( isset( $attach_data[0] ) ) {
-					$attr['src'] = $attach_data[0];
-				}
-			}
-
-			$file_type      = wp_check_filetype( $attr['src'] );
-			$file_extension = $file_type['ext'];
-
-			if ( 'svg' == $file_extension ) {
-				$attr['class'] = 'astra-logo-svg';
-			}
-
-			$retina_logo = astra_get_option( 'ast-header-retina-logo' );
-
-			$attr['srcset'] = '';
-
-			if ( apply_filters( 'astra_main_header_retina', true ) && '' !== $retina_logo ) {
-				$cutom_logo     = wp_get_attachment_image_src( $custom_logo_id, 'full' );
-				$cutom_logo_url = $cutom_logo[0];
-
-				if ( astra_check_is_ie() ) {
-					// Replace header logo url to retina logo url.
-					$attr['src'] = $retina_logo;
-				}
-
-				$attr['srcset'] = $cutom_logo_url . ' 1x, ' . $retina_logo . ' 2x';
-
+			if ( strpos( $haystack, $query, $offset ) !== false ) {
+				// stop on first true result.
+				return true;
 			}
 		}
 
-		return $attr;
+		return false;
 	}
-endif; // End if().
 
-add_filter( 'wp_get_attachment_image_attributes', 'astra_replace_header_attr', 10, 3 );
+endif;
+
+if ( ! function_exists( 'astra_get_prop' ) ) :
+
+	/**
+	 * Get a specific property of an array without needing to check if that property exists.
+	 *
+	 * Provide a default value if you want to return a specific value if the property is not set.
+	 *
+	 * @since  1.2.7
+	 * @access public
+	 * @author Gravity Forms - Easiest Tool to Create Advanced Forms for Your WordPress-Powered Website.
+	 * @link  https://www.gravityforms.com/
+	 *
+	 * @param array  $array   Array from which the property's value should be retrieved.
+	 * @param string $prop    Name of the property to be retrieved.
+	 * @param string $default Optional. Value that should be returned if the property is not set or empty. Defaults to null.
+	 *
+	 * @return null|string|mixed The value
+	 */
+	function astra_get_prop( $array, $prop, $default = null ) {
+
+		if ( ! is_array( $array ) && ! ( is_object( $array ) && $array instanceof ArrayAccess ) ) {
+			return $default;
+		}
+
+		if ( ( isset( $array[ $prop ] ) && false === $array[ $prop ] ) ) {
+			return false;
+		}
+
+		if ( isset( $array[ $prop ] ) ) {
+			$value = $array[ $prop ];
+		} else {
+			$value = '';
+		}
+
+		return empty( $value ) && null !== $default ? $default : $value;
+	}
+
+endif;
 
 /**
- * Astra Color Palletes.
+ * Build list of attributes into a string and apply contextual filter on string.
+ *
+ * The contextual filter is of the form `astra_attr_{context}_output`.
+ *
+ * @since 1.6.2
+ * @credits - Genesis Theme By StudioPress.
+ *
+ * @param string $context    The context, to build filter name.
+ * @param array  $attributes Optional. Extra attributes to merge with defaults.
+ * @param array  $args       Optional. Custom data to pass to filter.
+ * @return string String of HTML attributes and values.
  */
-if ( ! function_exists( 'astra_color_palette' ) ) :
+function astra_attr( $context, $attributes = array(), $args = array() ) {
+	return Astra_Attr::get_instance()->astra_attr( $context, $attributes, $args );
+}
 
-	/**
-	 * Astra Color Palletes.
-	 *
-	 * @return array Color Palletes.
-	 */
-	function astra_color_palette() {
+/**
+ * Get the theme author details
+ *
+ * @since  3.1.0
+ * @return array            Return theme author URL and name.
+ */
+function astra_get_theme_author_details() {
 
-		$color_palette = array(
-			'#000000',
-			'#ffffff',
-			'#dd3333',
-			'#dd9933',
-			'#eeee22',
-			'#81d742',
-			'#1e73be',
-			'#8224e3',
+	$theme_author = apply_filters(
+		'astra_theme_author',
+		array(
+			'theme_name'       => __( 'Astra WordPress Theme', 'astra' ),
+			'theme_author_url' => 'https://wpastra.com/',
+		)
+	);
+
+	return $theme_author;
+}
+
+/**
+ * Remove Base Color > Background Color option from the customize array.
+ *
+ * @since 2.4.0
+ * @param WP_Customize_Manager $wp_customize instance of WP_Customize_Manager.
+ * @return $wp_customize
+ */
+function astra_remove_controls( $wp_customize ) {
+
+	if ( defined( 'ASTRA_EXT_VER' ) && version_compare( ASTRA_EXT_VER, '2.4.0', '<=' ) ) {
+		$layout = array(
+			array(
+				'name'      => ASTRA_THEME_SETTINGS . '[site-layout-outside-bg-obj]',
+				'type'      => 'control',
+				'transport' => 'postMessage',
+				'control'   => 'ast-hidden',
+				'section'   => 'section-colors-body',
+				'priority'  => 25,
+			),
 		);
 
-		return apply_filters( 'astra_color_palettes', $color_palette );
+		$wp_customize = array_merge( $wp_customize, $layout );
 	}
-endif; // End if().
 
-if ( ! function_exists( 'astra_get_theme_name' ) ) :
+	return $wp_customize;
+}
+
+add_filter( 'astra_customizer_configurations', 'astra_remove_controls', 99 );
+
+/**
+ * Add dropdown icon if menu item has children.
+ *
+ * @since 3.3.0
+ *
+ * @param string   $title The menu item title.
+ * @param WP_Post  $item All of our menu item data.
+ * @param stdClass $args All of our menu item args.
+ * @param int      $depth Depth of menu item.
+ * @return string The menu item.
+ */
+function astra_dropdown_icon_to_menu_link( $title, $item, $args, $depth ) {
+	$role     = 'presentation';
+	$tabindex = '0';
+	$icon     = '';
 
 	/**
-	 * Get theme name.
+	 * These menus are not overriden by the 'Astra_Custom_Nav_Walker' class present in Addon - Nav Menu module.
 	 *
-	 * @return string Theme Name.
+	 * Hence skipping these menus from getting overriden by blank SVG Icons and adding the icons from theme.
+	 *
+	 * @since 3.3.0
 	 */
-	function astra_get_theme_name() {
+	$astra_menu_locations = array(
+		'ast-hf-menu-1',        // Builder - Primary menu.
+		'ast-hf-menu-2',        // Builder - Secondary menu.
+		'ast-hf-menu-3',
+		'ast-hf-menu-4',
+		'ast-hf-menu-5',
+		'ast-hf-menu-6',
+		'ast-hf-menu-7',
+		'ast-hf-menu-8',
+		'ast-hf-menu-9',
+		'ast-hf-menu-10',           // Cloned builder menus.
+		'ast-hf-mobile-menu',       // Builder - Mobile Menu.
+		'ast-desktop-toggle-menu',  // Builder - Toggle for Desktop Menu.
+		'ast-hf-account-menu',      // Builder - Login Account Menu.
+		'primary-menu',             // Old header - Primary Menu.
+		'above_header-menu',        // Old header - Above Menu.
+		'below_header-menu',        // Old header - Below Menu.
+	);
 
-		$theme_name = __( 'Astra', 'astra' );
+	$load_svg_menu_icons = false;
 
-		return apply_filters( 'astra_theme_name', $theme_name );
+	if ( defined( 'ASTRA_EXT_VER' ) ) {
+		// Check whether Astra Pro is active + Nav menu addon is deactivate + menu registered by Astra only.
+		if ( ! Astra_Ext_Extension::is_active( 'nav-menu' ) && in_array( $args->menu_id, $astra_menu_locations ) ) {
+			$load_svg_menu_icons = true;
+		}
+	} else {
+		// Check menu registered by Astra only.
+		if ( in_array( $args->menu_id, $astra_menu_locations ) ) {
+			$load_svg_menu_icons = true;
+		}
 	}
-endif; // End if().
+
+	if ( $load_svg_menu_icons ) {
+		// Assign icons to only those menu which are registered by Astra.
+		$icon = Astra_Icons::get_icons( 'arrow' );
+	}
+	foreach ( $item->classes as $value ) {
+		if ( 'menu-item-has-children' === $value ) {
+			$title = $title . '<span role="' . esc_attr( $role ) . '" class="dropdown-menu-toggle" tabindex="' . esc_attr( $tabindex ) . '" >' . $icon . '</span>';
+		}
+	}
+	if ( 0 < $depth ) {
+		$title = $icon . $title;
+	}
+	return $title;
+}
+
+if ( Astra_Icons::is_svg_icons() ) {
+	add_filter( 'nav_menu_item_title', 'astra_dropdown_icon_to_menu_link', 10, 4 );
+}
+
+/**
+ * Is theme existing header footer configs enable.
+ *
+ * @since 3.0.0
+ *
+ * @return boolean true/false.
+ */
+function astra_existing_header_footer_configs() {
+
+	return apply_filters( 'astra_existing_header_footer_configs', true );
+}
+
+/**
+ * Get Spacing value
+ *
+ * @param  array  $value        Responsive spacing value with unit.
+ * @param  string $operation    + | - | * | /.
+ * @param  string $from         Perform operation from the value.
+ * @param  string $from_unit    Perform operation from the value of unit.
+ *
+ * @since 3.0.0
+ * @return mixed
+ */
+function astra_calculate_spacing( $value, $operation = '', $from = '', $from_unit = '' ) {
+
+	$css = '';
+	if ( ! empty( $value ) ) {
+		$css = $value;
+		if ( ! empty( $operation ) && ! empty( $from ) ) {
+			if ( ! empty( $from_unit ) ) {
+				$css = 'calc( ' . $value . ' ' . $operation . ' ' . $from . $from_unit . ' )';
+			}
+			if ( '*' === $operation || '/' === $operation ) {
+				$css = 'calc( ' . $value . ' ' . $operation . ' ' . $from . ' )';
+			}
+		}
+	}
+
+	return $css;
+}
+
+/**
+ * Generate HTML Open markup
+ *
+ * @param string $context unique markup key.
+ * @param array  $args {
+ *      Contains markup arguments.
+ *     @type array  attrs    Initial attributes to apply to `open` markup.
+ *     @type bool   echo    Flag indicating whether to echo or return the resultant string.
+ * }
+ * @since 3.3.0
+ * @return mixed
+ */
+function astra_markup_open( $context, $args = array() ) {
+	$defaults = array(
+		'open'    => '',
+		'attrs'   => array(),
+		'echo'    => true,
+		'content' => '',
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+	if ( $context ) {
+		$args     = apply_filters( "astra_markup_{$context}_open", $args );
+		$open_tag = $args['open'] ? sprintf( $args['open'], astra_attr( $context, $args['attrs'] ) ) : '';
+
+		if ( $args['echo'] ) {
+			echo $open_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		} else {
+			return $open_tag;
+		}
+	}
+	return false;
+}
+
+/**
+ * Generate HTML close markup
+ *
+ * @param string $context unique markup key.
+ * @param array  $args {
+ *      Contains markup arguments.
+ *     @type string close   Closing HTML markup.
+ *     @type array  attrs    Initial attributes to apply to `open` markup.
+ *     @type bool   echo    Flag indicating whether to echo or return the resultant string.
+ * }
+ * @since 3.3.0
+ * @return mixed
+ */
+function astra_markup_close( $context, $args = array() ) {
+	$defaults = array(
+		'close' => '',
+		'attrs' => array(),
+		'echo'  => true,
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+	if ( $context ) {
+		$args      = apply_filters( "astra_markup_{$context}_close", $args );
+		$close_tag = $args['close'];
+		if ( $args['echo'] ) {
+			echo $close_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		} else {
+			return $close_tag;
+		}
+	}
+	return false;
+}
+
+/**
+ * Provision to update display rules for visibility of Related Posts section in Astra.
+ *
+ * @since 3.4.0
+ * @return bool
+ */
+function astra_target_rules_for_related_posts() {
+
+	$allow_related_posts = false;
+	$supported_post_type = apply_filters( 'astra_related_posts_supported_post_types', 'post' );
+
+	if ( astra_get_option( 'enable-related-posts' ) && is_singular( $supported_post_type ) ) {
+		$allow_related_posts = true;
+	}
+
+	return apply_filters( 'astra_showcase_related_posts', $allow_related_posts );
+}
+
+/**
+ * Check if elementor plugin is active on the site.
+ *
+ * @since 3.7.0
+ * @return bool
+ */
+function astra_is_elemetor_active() {
+	return class_exists( '\Elementor\Plugin' );
+}
+
+/**
+ * Check the Astra addon 3.5.0 version is using or not.
+ * As this is major update and frequently we used version_compare, added a function for this for easy maintenance.
+ *
+ * @since  3.5.0
+ */
+function astra_addon_has_3_5_0_version() {
+	return defined( 'ASTRA_EXT_VER' ) && version_compare( ASTRA_EXT_VER, '3.5.0', '<' );
+}
+
+/**
+ * Get a stylesheet URL for a webfont.
+ *
+ * @since 3.6.0
+ *
+ * @param string $url    The URL of the remote webfont.
+ * @param string $format The font-format. If you need to support IE, change this to "woff".
+ *
+ * @return string Returns the CSS.
+ */
+function astra_get_webfont_url( $url, $format = 'woff2' ) {
+
+	// Check if already Google font URL present or not. Basically avoiding 'Astra_WebFont_Loader' class rendering.
+	/** @psalm-suppress InvalidArgument */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	$astra_font_url = astra_get_option( 'astra_font_url', false );
+	if ( $astra_font_url ) {
+		return json_decode( $astra_font_url );
+	}
+
+	// Now create font URL if its not present.
+	$font = astra_webfont_loader_instance( $url );
+	$font->set_font_format( $format );
+	return $font->get_url();
+}
+
+/**
+ * Get the file preloads.
+ *
+ * @param string $url    The URL of the remote webfont.
+ * @param string $format The font-format. If you need to support IE, change this to "woff".
+ */
+function astra_load_preload_local_fonts( $url, $format = 'woff2' ) {
+
+	// Check if cached font files data preset present or not. Basically avoiding 'Astra_WebFont_Loader' class rendering.
+	$astra_local_font_files = get_site_option( 'astra_local_font_files', false );
+
+	if ( is_array( $astra_local_font_files ) && ! empty( $astra_local_font_files ) ) {
+		$font_format = apply_filters( 'astra_local_google_fonts_format', $format );
+		foreach ( $astra_local_font_files as $key => $local_font ) {
+			if ( $local_font ) {
+				echo '<link rel="preload" href="' . esc_url( $local_font ) . '" as="font" type="font/' . esc_attr( $font_format ) . '" crossorigin>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+		return;
+	}
+
+	// Now preload font data after processing it, as we didn't get stored data.
+	$font = astra_webfont_loader_instance( $url );
+	$font->set_font_format( $format );
+	$font->preload_local_fonts();
+}
+
+/**
+ * Set flag to manage backward compatibility for v3.5.0 earlier users for the transparent header border bottom default value changed.
+ *
+ * @since 3.6.0
+ */
+function astra_get_transparent_header_default_value() {
+	$astra_settings                                      = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings['transparent-header-default-border'] = isset( $astra_settings['transparent-header-default-border'] ) ? false : true;
+	return apply_filters( 'astra_transparent_header_default_border', $astra_settings['transparent-header-default-border'] );
+}
+
+/**
+ * Check compatibility for content background and typography options.
+ *
+ * @since 3.7.0
+ */
+function astra_has_gcp_typo_preset_compatibility() {
+	if ( defined( 'ASTRA_EXT_VER' ) && version_compare( ASTRA_EXT_VER, '3.6.0', '<' ) ) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Check whether user is exising or new to apply the updated default values for button padding & support GB button paddings with global button padding options.
+ *
+ * @since 3.6.3
+ * @return string
+ */
+function astra_button_default_padding_updated() {
+	$astra_settings                                = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings['btn-default-padding-updated'] = isset( $astra_settings['btn-default-padding-updated'] ) ? $astra_settings['btn-default-padding-updated'] : true;
+	return apply_filters( 'astra_update_button_padding_defaults', $astra_settings['btn-default-padding-updated'] );
+}
+
+/**
+ * Check is WordPress version is greater than or equal to beta 5.8 version.
+ *
+ * @since 3.6.5
+ * @return boolean
+ */
+function astra_has_widgets_block_editor() {
+	if ( ( defined( 'GUTENBERG_VERSION' ) && version_compare( GUTENBERG_VERSION, '10.6.2', '>' ) )
+	|| version_compare( get_bloginfo( 'version' ), '5.8-alpha', '>=' ) ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Check whether user is exising or new to override the default margin space added to Elementor-TOC widget.
+ *
+ * @since 3.6.7
+ * @return boolean
+ */
+function astra_can_remove_elementor_toc_margin_space() {
+	$astra_settings                                    = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings['remove-elementor-toc-margin-css'] = isset( $astra_settings['remove-elementor-toc-margin-css'] ) ? false : true;
+	return apply_filters( 'astra_remove_elementor_toc_margin', $astra_settings['remove-elementor-toc-margin-css'] );
+}
+
+/**
+ * This will check if user is new and apply global color format. This is to manage backward compatibility for colors.
+ *
+ * @since 3.7.0
+ * @return boolean false if it is an existing user, true for new user.
+ */
+function astra_has_global_color_format_support() {
+	$astra_settings                                = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings['support-global-color-format'] = isset( $astra_settings['support-global-color-format'] ) ? false : true;
+	return apply_filters( 'astra_apply_global_color_format_support', $astra_settings['support-global-color-format'] );
+}
+
+/**
+ * Check whether widget specific config, dynamic CSS, preview JS needs to remove or not. Following cases considered while implementing this.
+ *
+ * 1. Is user is from old Astra setup.
+ * 2. Check if user is new but on lesser WordPress 5.8 versions.
+ * 3. User is new with block widget editor.
+ *
+ * @since 3.6.8
+ * @return boolean
+ */
+function astra_remove_widget_design_options() {
+	$astra_settings               = get_option( ASTRA_THEME_SETTINGS );
+	$remove_widget_design_options = isset( $astra_settings['remove-widget-design-options'] ) ? false : true;
+
+	// True -> Hide widget sections, False -> Display widget sections.
+	$is_widget_design_sections_hidden = true;
+
+	if ( ! $remove_widget_design_options ) {
+		// For old users we will show widget design options by anyways.
+		return apply_filters( 'astra_remove_widget_design_options', false );
+	}
+
+	// Considering the user is new now.
+	if ( isset( $astra_settings['remove-widget-design-options'] ) && $astra_settings['remove-widget-design-options'] ) {
+		// User was on WP-5.8 lesser version previously and he may update their WordPress to 5.8 in future. So we display the options in this case.
+		$is_widget_design_sections_hidden = false;
+	} elseif ( astra_has_widgets_block_editor() ) {
+		// User is new & having block widgets active. So we will hide those options.
+		$is_widget_design_sections_hidden = true;
+	} else {
+		// Setting up flag because user is on lesser WP versions and may update WP to 5.8.
+		astra_update_option( 'remove-widget-design-options', true );
+	}
+
+	return apply_filters( 'astra_remove_widget_design_options', $is_widget_design_sections_hidden );
+}
+
+/**
+ * Get Global Color Palettes
+ *
+ * @return array color palettes array.
+ * @since 3.7.0
+ */
+function astra_get_palette_colors() {
+	return get_option( 'astra-color-palettes', Astra_Global_Palette::get_default_color_palette() );
+}
+
+/**
+ * Get typography presets data.
+ *
+ * @return array Typography Presets data array.
+ * @since 3.7.0
+ */
+function astra_get_typography_presets() {
+	return get_option( 'astra-typography-presets', '' );
+}
+
+/**
+ * Clear Astra + Astra Pro assets cache.
+ *
+ * @since 3.6.9
+ * @return void
+ */
+function astra_clear_theme_addon_asset_cache() {
+	astra_clear_all_assets_cache();
+}
+
+add_action( 'astra_theme_update_after', 'astra_clear_theme_addon_asset_cache', 10 );
+
+/**
+ * Check if Theme Global Colors need to be disable in Elementor global color settings.
+ *
+ * @since 3.7.4
+ * @return bool
+ */
+function astra_maybe_disable_global_color_in_elementor() {
+	return apply_filters( 'astra_disable_global_colors_in_elementor', false );
+}
+
+/**
+ * Check is Elementor Pro version is greater than or equal to beta 3.5 version.
+ *
+ * @since 3.7.5
+ * @return boolean
+ */
+function astra_check_elementor_pro_3_5_version() {
+	if ( defined( 'ELEMENTOR_PRO_VERSION' ) && version_compare( ELEMENTOR_PRO_VERSION, '3.5', '>=' ) ) {
+		return true;
+	}
+	return false;
+}

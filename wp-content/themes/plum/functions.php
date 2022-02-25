@@ -36,13 +36,16 @@ function plum_setup() {
 	// Add default posts and comments RSS feed links to head.
 	add_theme_support( 'automatic-feed-links' );
 
-	/*
-	 * Let WordPress manage the document title.
-	 * By adding theme support, we declare that this theme does not use a
-	 * hard-coded <title> tag in the document head, and expect WordPress to
-	 * provide it for us.
-	 *
-	 */
+	//Guttenberg fullscreen content
+    add_theme_support( 'align-wide' );
+
+    /*
+     * Let WordPress manage the document title.
+     * By adding theme support, we declare that this theme does not use a
+     * hard-coded <title> tag in the document head, and expect WordPress to
+     * provide it for us.
+     *
+     */
 	add_theme_support( 'title-tag' );
 	
 	add_theme_support( 'custom-logo', array(
@@ -93,7 +96,7 @@ function plum_setup() {
 	add_theme_support('woocommerce');
 	
 	//Slider Support
-	add_theme_support('rt-slider', array( 10 ) );
+	add_theme_support('rt-slider', array( 10, 'pages' ) );
 	
 	add_theme_support( 'wc-product-gallery-lightbox' );
 	
@@ -113,8 +116,8 @@ function plum_widgets_init() {
 		'description'   => '',
 		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title title-font">',
-		'after_title'   => '</h1>',
+		'before_title'  => '<h3 class="widget-title title-font">',
+		'after_title'   => '</h3>',
 	) );
 	
 	register_sidebar( array(
@@ -122,8 +125,8 @@ function plum_widgets_init() {
 		'id'            => 'footer-1',
 		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title title-font">',
-		'after_title'   => '</h1>',
+		'before_title'  => '<h3 class="widget-title title-font">',
+		'after_title'   => '</h3>',
 	) );
 
 	register_sidebar( array(
@@ -131,8 +134,8 @@ function plum_widgets_init() {
 		'id'            => 'footer-2',
 		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title title-font">',
-		'after_title'   => '</h1>',
+		'before_title'  => '<h3 class="widget-title title-font">',
+		'after_title'   => '</h3>',
 	) );
 
 	register_sidebar( array(
@@ -140,8 +143,8 @@ function plum_widgets_init() {
 		'id'            => 'footer-3',
 		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title title-font">',
-		'after_title'   => '</h1>',
+		'before_title'  => '<h3 class="widget-title title-font">',
+		'after_title'   => '</h3>',
 	) );
 	
 }
@@ -162,11 +165,11 @@ add_action('wp_head', 'plum_custom_js');
 function plum_scripts() {
 	wp_enqueue_style( 'plum-style', get_stylesheet_uri() );
 	
-	wp_enqueue_style('plum-title-font', '//fonts.googleapis.com/css?family='.str_replace(" ", "+", get_theme_mod('plum_title_font', 'Lato') ).':100,300,400,700' );
+	wp_enqueue_style('plum-title-font', '//fonts.googleapis.com/css?family='.str_replace(" ", "+", get_theme_mod('plum_title_font', 'Arvo') ).':100,300,400,700' );
 	
-	wp_enqueue_style('plum-body-font', '//fonts.googleapis.com/css?family='.str_replace(" ", "+", get_theme_mod('plum_body_font', 'Open Sans') ).':100,300,400,700' );
+	wp_enqueue_style('plum-body-font', '//fonts.googleapis.com/css?family='.str_replace(" ", "+", get_theme_mod('plum_body_font', 'Ubuntu') ).':100,300,400,700' );
 	
-	wp_enqueue_style( 'fontawesome', get_template_directory_uri() . '/assets/font-awesome/css/font-awesome.min.css' );
+	wp_enqueue_style( 'fontawesome', get_template_directory_uri() . '/assets/font-awesome/css/fontawesome-all.min.css' );
 	
 	wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/assets/bootstrap/css/bootstrap.min.css' );
 	
@@ -192,6 +195,16 @@ function plum_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'plum_scripts' );
 
+/**
+ * Enqueue Scripts for Customizer Preview screen
+ */
+function raze_custom_wp_admin_style() {
+
+    wp_enqueue_style( 'plum-admin_css', get_template_directory_uri() . '/assets/ext-css/admin.css' );
+    wp_enqueue_style( 'plum-fontawesome-style', get_template_directory_uri() . '/assets/font-awesome/css/fontawesome-all.min.css' );
+
+}
+add_action( 'admin_enqueue_scripts', 'raze_custom_wp_admin_style' );
 
 //Backwards Compatibility FUnction
 function plum_logo() {	
@@ -256,4 +269,7 @@ require get_template_directory() . '/framework/tgmpa.php';
  */
 require get_template_directory() . '/framework/widgets/plum-video.php';
 
+add_filter('jpeg_quality', function($arg){return 100;});
+
+add_filter( 'wp_editor_set_quality', function($arg){return 100;} );
 

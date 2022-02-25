@@ -39,14 +39,21 @@
 		border-radius: 50%;
 		@media screen and (max-width: 600px) {
 		}
-		&:hover {
+		@media screen and (min-width: 768px) {
+			&:hover {
+				color: @onaccent;
+				border-color: @onaccent;
+				.transform(scale(1.05));
+				&:before {
+
+				}
+			}
+		}
+		@media screen and (max-width: 768px) {
 			color: @onaccent;
 			border-color: @onaccent;
-			.transform(scale(1.05));	
-			&:before {
-				
-			}		
 		}
+
 	}
 	@media screen and (max-width: 767px) {
 		margin: 0;
@@ -87,15 +94,22 @@
 	backface-visibility: hidden;
 	@media screen and (max-width: 600px) {
 	}
-	&:hover {
-		animation-name: hvr-push;
-		animation-duration: 0.4s;
-		animation-timing-function: linear;
-		animation-iteration-count: 1;
-		color: @onaccent;
+	@media screen and (min-width: 768px) {
+		&:hover {
+			animation-name: hvr-push;
+			animation-duration: 0.4s;
+			animation-timing-function: linear;
+			animation-iteration-count: 1;
+			color: @onaccent;
+			background:@accent;
+			border-color: @onaccent;
+			.transform(scale(1.05));
+		}
+	}
+	@media screen and (max-width: 768px) {
+		color: @onaccent !important;
 		background:@accent;
 		border-color: @onaccent;
-		.transform(scale(1.05));
 	}
 }
 
@@ -106,9 +120,15 @@
 	color:@onaccent;
 	@media screen and (max-width: 600px) {
 	}
-	&:hover {
-		transform:scale(1.2);
-		transition:all ease 0.5s;
+	@media screen and (min-width: 768px) {
+		&:hover {
+			transform:scale(1.2);
+			transition:all ease 0.5s;
+			background-color: @onaccent;
+			color: @accent;
+		}
+	}
+	@media screen and (max-width: 768px) {
 		background-color: @onaccent;
 		color: @accent;
 	}
@@ -125,16 +145,22 @@
 	transition:all ease 0.3s;
 	@media screen and (max-width: 600px) {
 	}
-	&:hover {
-		color: @onaccent;
-		transform:scale(1.1);
-		i {
-			transform:scale(.9);
+	@media screen and (min-width: 768px) {
+		&:hover {
+			color: @onaccent;
+			transform:scale(1.1);
+			i {
+				transform:scale(.9);
+			}
+		}
+		&:hover:before{
+			transform: scaleX(1);
 		}
 	}
-	&:hover:before{
-		transform: scaleX(1);
+	@media screen and (max-width: 768px) {
+		color: @onaccent !important;
 	}
+
 	&:before{
 		content: "";
 		position: absolute;

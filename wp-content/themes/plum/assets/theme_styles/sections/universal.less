@@ -17,9 +17,11 @@ body {
 a {
 	color: @accent;   
 	cursor: pointer;
-	&:hover {
-		text-decoration: none;
-		color: @accent;
+	@media screen and (min-width: 768px) {
+		&:hover {
+			text-decoration: none;
+			color: @accent;
+		}
 	}
 }
 .container {
@@ -59,7 +61,7 @@ a {
 .page-header {
 	margin-top: 0px;
 	border-bottom: none;
-	h1 {
+	h3 {
 	font-size: 18px;
 	font-weight: lighter;
 	border-bottom: solid 1px #e1e1e1;

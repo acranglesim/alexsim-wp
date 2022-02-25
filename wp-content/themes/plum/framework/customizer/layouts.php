@@ -20,7 +20,9 @@
 	
 	$wp_customize->add_setting(
 		'plum_blog_layout',
-		array( 'sanitize_callback' => 'plum_sanitize_blog_layout' )
+		array( 
+		'default'			=> 'plum',
+		'sanitize_callback' => 'plum_sanitize_blog_layout' )
 	);
 	
 	function plum_sanitize_blog_layout( $input ) {
@@ -82,7 +84,7 @@
 		    'label'    => __( 'Disable Sidebar on Home/Blog.','plum' ),
 		    'section'  => 'plum_sidebar_options',
 		    'type'     => 'checkbox',
-		    'active_callback' => 'plum_show_sidebar_options',
+		    //'active_callback' => 'plum_show_sidebar_options',
 		    'default'  => false
 		)
 	);
@@ -98,7 +100,7 @@
 		    'label'    => __( 'Disable Sidebar on Front Page.','plum' ),
 		    'section'  => 'plum_sidebar_options',
 		    'type'     => 'checkbox',
-		    'active_callback' => 'plum_show_sidebar_options',
+		   //'active_callback' => 'plum_show_sidebar_options',
 		    'default'  => false
 		)
 	);
@@ -118,7 +120,7 @@
 		    'description' => __('Min: 25%, Default: 33%, Max: 40%','plum'),
 		    'section'  => 'plum_sidebar_options',
 		    'type'     => 'range',
-		    'active_callback' => 'plum_show_sidebar_options',
+		    //'active_callback' => 'plum_show_sidebar_options',
 		    'input_attrs' => array(
 		        'min'   => 3,
 		        'max'   => 5,
@@ -128,14 +130,92 @@
 		    ),
 		)
 	);
-	
+
+        $wp_customize->add_setting( 'plum_blog_sidebar_layout',
+            array(
+                'default' => 'sidebarright',
+                'transport'	=> 'postMessage',
+                'sanitize_callback' => 'plum_sidebar_sanitize'
+            )
+        );
+
+        $wp_customize->add_control(
+            new Plum_Image_Radio_Custom_Control(
+                $wp_customize,
+                'plum_blog_sidebar_layout',
+                array(
+                    'label' => __( 'Blog Sidebar Layout', 'plum' ),
+                    'description'	=> __('Sidebar can be toggled from Sidebar Layout Section', 'plum'),
+                    'section' => 'plum_sidebar_options',
+                    'settings' => 'plum_blog_sidebar_layout',
+                    'priority'	=> 10,
+                    'choices' => array(
+                        'sidebarleft' => array(
+                            'image' => trailingslashit( get_template_directory_uri() ) . 'assets/images/layouts/left-sidebar.png',
+                            'name' => __( 'Left Sidebar', 'plum' )
+                        ),
+                        'sidebarright' => array(
+                            'image' => trailingslashit( get_template_directory_uri() ) . 'assets/images/layouts/right-sidebar.png',
+                            'name' => __( 'Right Sidebar', 'plum' )
+                        )
+                    )
+                )
+            )
+        );
+
+        $wp_customize->add_setting( 'plum_front_sidebar_layout',
+            array(
+                'default' => 'sidebarright',
+                'transport'	=> 'postMessage',
+                'sanitize_callback' => 'plum_sidebar_sanitize'
+            )
+        );
+
+        $wp_customize->add_control(
+            new Plum_Image_Radio_Custom_Control(
+                $wp_customize,
+                'plum_front_sidebar_layout',
+                array(
+                    'label' => __( 'Front Page Sidebar Layout', 'plum' ),
+                    'description'	=> __('Sidebar can be toggled from Sidebar Layout Section', 'plum'),
+                    'section' => 'plum_sidebar_options',
+                    'settings' => 'plum_front_sidebar_layout',
+                    'priority'	=> 11,
+                    'choices' => array(
+                        'sidebarleft' => array(
+                            'image' => trailingslashit( get_template_directory_uri() ) . 'assets/images/layouts/left-sidebar.png',
+                            'name' => __( 'Left Sidebar', 'plum' )
+                        ),
+                        'sidebarright' => array(
+                            'image' => trailingslashit( get_template_directory_uri() ) . 'assets/images/layouts/right-sidebar.png',
+                            'name' => __( 'Right Sidebar', 'plum' )
+                        )
+                    )
+                )
+            )
+        );
+
+
+        function plum_sidebar_sanitize( $input, $setting ) {
+            //get the list of possible radio box or select options
+            $choices = $setting->manager->get_control( $setting->id )->choices;
+
+            if ( array_key_exists( $input, $choices ) ) {
+                return $input;
+            } else {
+                return $setting->default;
+            }
+        }
+        
 	/* Active Callback Function */
+/*
 	function plum_show_sidebar_options($control) {
 	   
 	    $option = $control->manager->get_setting('plum_disable_sidebar');
 	    return $option->value() == false ;
 	    
 	}
+*/
 	
 	function plum_sanitize_text( $input ) {
 	    return wp_kses_post( force_balance_tags( $input ) );
@@ -155,7 +235,8 @@
 	'plum_footer_text',
 	array(
 		'default'		=> '',
-		'sanitize_callback'	=> 'sanitize_text_field'
+		'sanitize_callback'	=> 'sanitize_text_field',
+		'transport'		=> 'postMessage'
 		)
 	);
 	

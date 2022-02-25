@@ -19,7 +19,7 @@ function plum_customize_eta( $wp_customize ) {
 	$wp_customize->add_control(
 			'plum_eta_enable', array(
 		    'settings' => 'plum_eta_enable',
-		    'label'    => __( 'Enable Featured Posts', 'plum' ),
+		    'label'    => __( 'Enable this Featured Posts Area on Front Page', 'plum' ),
 		    'section'  => 'plum_eta_section',
 		    'type'     => 'checkbox',
 		)

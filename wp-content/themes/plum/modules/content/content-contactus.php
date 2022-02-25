@@ -8,7 +8,7 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class('contact-us'); ?>>
     <header class="entry-header">
-        <?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+        <?php the_title( '<h3 class="entry-title">', '</h3>' ); ?>
     </header><!-- .entry-header -->
 
     <div class="entry-content col-md-12 col-sm-12">
@@ -65,7 +65,7 @@
 
                     <?php if(get_theme_mod('plum_static_button') != ''): ?>
                         <a href="<?php the_permalink(); ?>" class="more-button">
-                            <?php echo get_theme_mod('plum_static_button'); ?>
+                            <?php echo esc_html(get_theme_mod('plum_static_button')); ?>
                         </a>
                     <?php endif;?>
                 </div>
@@ -87,18 +87,18 @@
     <div class="site-loc col-md-12 cl-sm-12">
         <?php if(get_theme_mod('plum_map_set') != ''): ?>
             <div class="map-img col-md-6 col-sm-6">
-                <a href="<?php the_permalink(); ?>"><img src="<?php echo get_theme_mod('plum_map_set'); ?> " /></a>
+                <a href="<?php the_permalink(); ?>"><img src="<?php echo esc_html(get_theme_mod('plum_map_set')); ?> "  alt="<?php the_title(); ?>"/></a>
             </div>
         <?php endif; ?>
 
         <div class="site-info col-md-6 col-sm-6">
-            <h1 cass="site-title"><?php bloginfo( 'name' ); ?></h1>
+            <h3 cass="site-title"><?php bloginfo( 'name' ); ?></h3>
             <h3 class="site-desc"><?php bloginfo( 'description' ); ?></h3>
             <div class="social-i">
                 <?php get_template_part('modules/social/social', 'fa'); ?>
             </div>
             <div class="button">
-                <a href="<?php get_theme_mod('plum_button_url'); ?>"><?php echo get_theme_mod('plum_button_text'); ?></a>
+                <a href="<?php echo esc_html(get_theme_mod('plum_button_url')); ?>"><?php echo esc_html(get_theme_mod('plum_button_text')); ?></a>
             </div>
         </div>
 

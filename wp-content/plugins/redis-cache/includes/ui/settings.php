@@ -73,26 +73,27 @@ defined( '\\ABSPATH' ) || exit;
             <div class="section-pro">
 
                 <div class="card">
-                    <h2 class="title">
-                        Object Cache Pro
+                    <h2 class="title" style="line-height: 1.4">
+                        Need more performance and reliability?<br>
+                        Check out <span style="color: #dc2626;">Object Cache Pro</span>!
                     </h2>
                     <p>
-                        <b>A business class object cache backend.</b> Truly reliable, highly-optimized and fully customizable, with a <u>dedicated engineer</u> when you most need it.
+                        <?php wp_kses_post( __( '<strong>A business class object cache backend.</strong> Truly reliable, highly-optimized and fully customizable, with a <u>dedicated engineer</u> when you most need it.', 'redis-cache' ) ); ?>
                     </p>
                     <ul>
-                        <li>Rewritten for raw performance</li>
-                        <li>100% WordPress API compliant</li>
-                        <li>Faster serialization and compression</li>
-                        <li>Easy debugging &amp; logging</li>
-                        <li>Cache analytics and preloading</li>
-                        <li>Fully unit tested (100% code coverage)</li>
-                        <li>Secure connections with TLS</li>
-                        <li>Health checks via WordPress &amp; WP CLI</li>
-                        <li>Optimized for WooCommerce, Jetpack &amp; Yoast SEO</li>
+                        <li><?php esc_html_e( 'Rewritten for raw performance', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( '100% WordPress API compliant', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Faster serialization and compression', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Easy debugging & logging', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Cache prefetching and analytics', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Fully unit tested (100% code coverage)', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Secure connections with TLS', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Health checks via WordPress & WP CLI', 'redis-cache' ); ?></li>
+                        <li><?php esc_html_e( 'Optimized for WooCommerce, Jetpack & Yoast SEO', 'redis-cache' ); ?></li>
                     </ul>
                     <p>
-                        <a class="button button-primary" target="_blank" rel="noopener" href="https://objectcache.pro/?utm_source=wp-plugin&amp;utm_medium=settings">
-                            Learn more
+                        <a class="button button-primary" target="_blank" rel="noopener" href="https://objectcache.pro/?ref=oss&amp;utm_source=wp-plugin&amp;utm_medium=settings">
+                            <?php esc_html_e( 'Learn more', 'redis-cache' ); ?>
                         </a>
                     </p>
                 </div>
@@ -103,14 +104,14 @@ defined( '\\ABSPATH' ) || exit;
 
                 <?php if ( $is_php7 && $is_phpredis311 ) : ?>
 
-                    <p class="compatiblity">
+                    <p class="compatibility">
                         <span class="dashicons dashicons-yes"></span>
                         <span><?php esc_html_e( 'Your site meets the system requirements for the Pro version.', 'redis-cache' ); ?></span>
                     </p>
 
                 <?php else : ?>
 
-                    <p class="compatiblity">
+                    <p class="compatibility">
                         <span class="dashicons dashicons-no"></span>
                         <span><?php echo wp_kses_post( __( 'Your site <i>does not</i> meet the requirements for the Pro version:', 'redis-cache' ) ); ?></span>
                     </p>

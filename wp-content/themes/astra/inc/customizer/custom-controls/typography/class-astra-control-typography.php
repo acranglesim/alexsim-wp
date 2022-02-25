@@ -4,8 +4,8 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       1.0.0
  */
 
@@ -28,6 +28,46 @@ final class Astra_Control_Typography extends WP_Customize_Control {
 	public $connect = false;
 
 	/**
+	 * Option name.
+	 *
+	 * @since 1.0.0
+	 * @var string $name
+	 */
+	public $name = '';
+
+	/**
+	 * Option label.
+	 *
+	 * @since 1.0.0
+	 * @var string $label
+	 */
+	public $label = '';
+
+	/**
+	 * Option description.
+	 *
+	 * @since 1.0.0
+	 * @var string $description
+	 */
+	public $description = '';
+
+	/**
+	 * Control type.
+	 *
+	 * @since 1.0.0
+	 * @var string $type
+	 */
+	public $type = 'ast-font';
+
+	/**
+	 * Used to connect variant controls to each other.
+	 *
+	 * @since 1.5.2
+	 * @var bool $variant
+	 */
+	public $variant = false;
+
+	/**
 	 * Used to set the mode for code controls.
 	 *
 	 * @since 1.0.0
@@ -42,6 +82,14 @@ final class Astra_Control_Typography extends WP_Customize_Control {
 	 * @var string $ast_inherit
 	 */
 	public $ast_inherit = '';
+
+	/**
+	 * All font weights
+	 *
+	 * @since 1.0.8
+	 * @var string $ast_inherit
+	 */
+	public $ast_all_font_weight = array();
 
 	/**
 	 * If true, the preview button for a control will be rendered.
@@ -60,141 +108,82 @@ final class Astra_Control_Typography extends WP_Customize_Control {
 	 * @param array                $args    Default parent's arguments.
 	 */
 	public function __construct( $manager, $id, $args = array() ) {
-		$this->ast_inherit = __( 'Inherit', 'astra' );
+		$this->ast_inherit         = __( 'Inherit', 'astra' );
+		$this->ast_all_font_weight = array(
+			'100'       => __( 'Thin 100', 'astra' ),
+			'100italic' => __( '100 Italic', 'astra' ),
+			'200'       => __( 'Extra-Light 200', 'astra' ),
+			'200italic' => __( '200 Italic', 'astra' ),
+			'300'       => __( 'Light 300', 'astra' ),
+			'300italic' => __( '300 Italic', 'astra' ),
+			'400'       => __( 'Normal 400', 'astra' ),
+			'italic'    => __( '400 Italic', 'astra' ),
+			'500'       => __( 'Medium 500', 'astra' ),
+			'500italic' => __( '500 Italic', 'astra' ),
+			'600'       => __( 'Semi-Bold 600', 'astra' ),
+			'600italic' => __( '600 Italic', 'astra' ),
+			'700'       => __( 'Bold 700', 'astra' ),
+			'700italic' => __( '700 Italic', 'astra' ),
+			'800'       => __( 'Extra-Bold 800', 'astra' ),
+			'800italic' => __( '800 Italic', 'astra' ),
+			'900'       => __( 'Ultra-Bold 900', 'astra' ),
+			'900italic' => __( '900 Italic', 'astra' ),
+		);
 		parent::__construct( $manager, $id, $args );
 	}
 
 	/**
-	 * Renders the content for a control based on the type
-	 * of control specified when this class is initialized.
+	 * Refresh the parameters passed to the JavaScript via JSON.
 	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @return void
+	 * @see WP_Customize_Control::to_json()
 	 */
-	protected function render_content() {
+	public function to_json() {
 
-		switch ( $this->type ) {
+		parent::to_json();
 
-			case 'ast-font-family':
-				$this->render_font( $this->ast_inherit );
-				break;
-
-			case 'ast-font-weight':
-				$this->render_font_weight( $this->ast_inherit );
-				break;
-		}
+		$this->json['label']               = esc_html( $this->label );
+		$this->json['description']         = $this->description;
+		$this->json['name']                = $this->name;
+		$this->json['value']               = $this->value();
+		$this->json['connect']             = $this->connect;
+		$this->json['variant']             = $this->variant;
+		$this->json['link']                = $this->get_link();
+		$this->json['ast_all_font_weight'] = $this->ast_all_font_weight;
 	}
 
 	/**
-	 * Enqueue control related scripts/styles.
+	 * An Underscore (JS) template for this control's content (but not its container).
 	 *
-	 * @access public
-	 */
-	public function enqueue() {
-
-		$js_uri = ASTRA_THEME_URI . 'inc/customizer/custom-controls/typography/';
-
-		wp_enqueue_script( 'astra-typography', $js_uri . 'typography.js', array( 'jquery', 'customize-base' ), ASTRA_THEME_VERSION, true );
-		$astra_typo_localize = array(
-			'inherit' => __( 'Inherit', 'astra' ),
-			'100'     => __( 'Thin 100', 'astra' ),
-			'200'     => __( 'Extra-Light 200', 'astra' ),
-			'300'     => __( 'Light 300', 'astra' ),
-			'400'     => __( 'Normal 400', 'astra' ),
-			'500'     => __( 'Medium 500', 'astra' ),
-			'600'     => __( 'Semi-Bold 600', 'astra' ),
-			'700'     => __( 'Bold 700', 'astra' ),
-			'800'     => __( 'Extra-Bold 800', 'astra' ),
-			'900'     => __( 'Ultra-Bold 900', 'astra' ),
-		);
-
-		wp_localize_script( 'astra-typography', 'astraTypo', $astra_typo_localize );
-	}
-	/**
-	 * Renders the title and description for a control.
+	 * Class variables for this control class are available in the `data` JS object;
+	 * export custom variables by overriding {@see WP_Customize_Control::to_json()}.
 	 *
-	 * @since 1.0.0
+	 * @see WP_Customize_Control::print_template()
+	 *
 	 * @access protected
-	 * @return void
 	 */
-	protected function render_content_title() {
-		if ( ! empty( $this->label ) ) {
-			echo '<span class="customize-control-title">' . esc_html( $this->label ) . '</span>';
-		}
-		if ( ! empty( $this->description ) ) {
-			echo '<span class="description customize-control-description">' . esc_html( $this->description ) . '</span>';
-		}
-	}
+	protected function content_template() {
 
-	/**
-	 * Renders the connect attribute for a connected control.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @return void
-	 */
-	protected function render_connect_attribute() {
-		if ( $this->connect ) {
-			echo ' data-connected-control="' . esc_attr( $this->connect ) . '"';
-			echo ' data-inherit="' . esc_attr( $this->ast_inherit ) . '"';
-		}
-	}
+		?>
 
-	/**
-	 * Renders a font control.
-	 *
-	 * @since 1.0.16 Added the action 'astra_customizer_font_list' to support custom fonts.
-	 * @since 1.0.0
-	 * @param  string $default Inherit/Default.
-	 * @access protected
-	 * @return void
-	 */
-	protected function render_font( $default ) {
-		echo '<label>';
-		$this->render_content_title();
-		echo '<select ';
-		$this->link();
-		$this->render_connect_attribute();
-		echo '>';
-		echo '<option value="inherit" ' . selected( 'inherit', $this->value(), false ) . '>' . esc_attr( $default ) . '</option>';
-		echo '<optgroup label="System">';
+		<label>
+		<# if ( data.label ) { #>
+			<span class="customize-control-title">{{{data.label}}}</span>
+		<# } #>
 
-		foreach ( Astra_Font_Families::get_system_fonts() as $name => $variants ) {
-			echo '<option value="' . esc_attr( $name ) . '" ' . selected( $name, $this->value(), false ) . '>' . esc_attr( $name ) . '</option>';
-		}
+		</label>
+		<select data-inherit="<?php echo esc_attr( $this->ast_inherit ); ?>" <?php $this->link(); ?> class={{ data.font_type }} data-name={{ data.name }}
+		data-value="{{data.value}}"
 
-		// Add Custom Font List Into Customizer.
-		do_action( 'astra_customizer_font_list', $this->value() );
+		<# if ( data.connect ) { #>
+			data-connected-control={{ data.connect }}
+		<# } #>
+		<# if ( data.variant ) { #>
+			data-connected-variant="{{data.variant}}";
+		<# } #>
 
-		echo '<optgroup label="Google">';
+		>
+		</select>
 
-		foreach ( Astra_Font_Families::get_google_fonts() as $name => $variants ) {
-			echo '<option value="' . esc_attr( $name ) . '" ' . selected( $name, $this->value(), false ) . '>' . esc_attr( $name ) . '</option>';
-		}
-
-		echo '</select>';
-		echo '</label>';
-	}
-
-	/**
-	 * Renders a font weight control.
-	 *
-	 * @since 1.0.0
-	 * @param  string $default Inherit/Default.
-	 * @access protected
-	 * @return void
-	 */
-	protected function render_font_weight( $default ) {
-		echo '<label>';
-		$this->render_content_title();
-		echo '<select ';
-		$this->link();
-		$this->render_connect_attribute();
-		echo '>';
-		echo '<option value="inherit" ' . selected( 'inherit', $this->value(), false ) . '>' . esc_attr( $default ) . '</option>';
-		echo '<option value="' . esc_attr( $this->value() ) . '" selected="selected">' . esc_attr( $this->value() ) . '</option>';
-		echo '</select>';
-		echo '</label>';
+		<?php
 	}
 }

@@ -335,19 +335,19 @@ p.demo_store {
 	display: block;
 	height: 18px;
 	overflow: hidden;
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	text-align: center;
-	margin: 1px auto 6px auto !important;
 	width: 78px;
 	&:before {
 		content: "\f005\f005\f005\f005\f005";
-		color: @content;
+		font-weight: 400;
+		color: #f29606;
 		top: 0;
 		left: 0;
 		float: left;
 		position: absolute;
 		letter-spacing: 2px;
-		font-size: 15px;
+		font-size: 12px;
 	}
 
 	span {
@@ -361,12 +361,13 @@ p.demo_store {
 
 	span:before {
 		content: "\f005\f005\f005\f005\f005";
-		color: @accent;
+		font-weight: 900;
+		color: #f29606;
 		top: 0;
 		position: absolute;
 		left: 0;
 		letter-spacing: 2px;
-		font-size: 15px;
+		font-size: 12px;
 	}
 	.rating {
 		display: none;
@@ -543,19 +544,20 @@ ol.commentlist {
 		font-family: inherit;
 		text-decoration: none;
 		overflow: visible;
-		padding: .618em 1em;
+		padding: 10px 15px;
 		font-weight: 700;
 		border-radius: 3px;
 		left: auto;
 		color: @content;
 		background-color: darken(@background,8%);
-		border: 0;
+		border: solid 1px #ddd;
 		white-space: nowrap;
 		display: inline-block;
 		background-image: none;
 		box-shadow: none;
 		-webkit-box-shadow: none;
 		text-shadow: none;
+		border-radius: 0px;
 		
 		&.loading {
 			opacity: 0.25;
@@ -1365,6 +1367,9 @@ form {
 
 		input.input-text,
 		textarea {
+			padding: 8px 4px;
+			border-radius: 0px;
+			border: solid 1px #eee;
 			width: 100%;
 			margin: 0;
 			outline: 0;
@@ -1454,6 +1459,12 @@ p.woocommerce-shipping-contents {
  */
 .woocommerce-checkout {
 	.checkout {
+		input {
+			
+		}
+		textarea {
+			border-radius:  0px;
+		}
 		.col-2 {
 			h3#ship-to-different-address {
 				float: left;
@@ -1627,8 +1638,10 @@ p.woocommerce-shipping-contents {
 		}
 	}
 	#place_order {
-		background: darken(@background,10%);
+		background: @accent;
 		font-weight: bold;
+		color: white;
+		border: 0px;
 	}
 	.select2-drop-active, .select2-drop {
 		border: solid 1px darken(@background,10px);

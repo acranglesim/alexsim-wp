@@ -61,13 +61,13 @@ Class plum_video_widget extends WP_Widget{
         ?>
 
         <p>
-            <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'plum' ); ?></label>
+            <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'plum' ); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
         </p>
 
         <p>
 <!--            <label for="--><?php //echo $this->get_field_id( 'video_id_info' ); ?><!--">--><?php //_e( 'Video ID:', 'plum' ); ?><!--</label>-->
-            <label for="<?php echo $this->get_field_id( 'video_id' ); ?>"><?php _e( 'Video ID:', 'plum' ); ?></label>
+            <label for="<?php echo $this->get_field_id( 'video_id' ); ?>"><?php esc_html_e( 'Video ID:', 'plum' ); ?></label>
             <p>Example: https://www.youtube.com/watch?v=id</p>
             <input class="widefat" id="<?php echo $this->get_field_id( 'video_id' ); ?>" name="<?php echo $this->get_field_name( 'video_id' ); ?>" type="text" value="<?php echo esc_attr( $vi ); ?>">
         </p>

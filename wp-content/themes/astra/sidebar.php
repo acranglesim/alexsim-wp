@@ -8,23 +8,34 @@
  * @since 1.0.0
  */
 
-$sidebar = apply_filters( 'astra_get_sidebar', 'sidebar-1' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
-?>
+$astra_sidebar = apply_filters( 'astra_get_sidebar', 'sidebar-1' );
 
-<div itemtype="http://schema.org/WPSideBar" itemscope="itemscope" id="secondary" <?php astra_secondary_class(); ?> role="complementary">
+echo '<div ';
+	echo astra_attr(
+		'sidebar',
+		array(
+			'id'    => 'secondary',
+			'class' => join( ' ', astra_get_secondary_class() ),
+		)
+	);
+	echo '>';
+	?>
 
-	<div class="sidebar-main">
-
+	<div class="sidebar-main" <?php /** @psalm-suppress TooManyArguments */ echo apply_filters( 'astra_sidebar_data_attrs', '', $astra_sidebar ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, Generic.Commenting.DocComment.MissingShort ?>>
 		<?php astra_sidebars_before(); ?>
 
-		<?php if ( is_active_sidebar( $sidebar ) ) : ?>
+		<?php
 
-			<?php dynamic_sidebar( $sidebar ); ?>
+		if ( is_active_sidebar( $astra_sidebar ) ) :
+				dynamic_sidebar( $astra_sidebar );
+		endif;
 
-		<?php endif; ?>
-
-		<?php astra_sidebars_after(); ?>
+		astra_sidebars_after();
+		?>
 
 	</div><!-- .sidebar-main -->
 </div><!-- #secondary -->

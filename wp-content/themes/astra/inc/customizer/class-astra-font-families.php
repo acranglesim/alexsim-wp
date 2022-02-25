@@ -4,8 +4,8 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.19
  */
 
@@ -129,31 +129,33 @@ if ( ! class_exists( 'Astra_Font_Families' ) ) :
 
 			if ( empty( self::$google_fonts ) ) {
 
-				$google_fonts_file = apply_filters( 'astra_google_fonts_json_file', ASTRA_THEME_DIR . 'assets/fonts/google-fonts.json' );
+				/**
+				 * Deprecating the Filter to change the Google Fonts JSON file path.
+				 *
+				 * @since 2.5.0
+				 * @param string $json_file File where google fonts json format added.
+				 * @return array
+				 */
+				$google_fonts_file = apply_filters( 'astra_google_fonts_php_file', ASTRA_THEME_DIR . 'inc/google-fonts.php' );
 
-				if ( ! file_exists( ASTRA_THEME_DIR . 'assets/fonts/google-fonts.json' ) ) {
+				if ( ! file_exists( $google_fonts_file ) ) {
 					return array();
 				}
 
-				global $wp_filesystem;
-				if ( empty( $wp_filesystem ) ) {
-					require_once( ABSPATH . '/wp-admin/includes/file.php' );
-					WP_Filesystem();
-				}
+				$google_fonts_arr = include $google_fonts_file;// phpcs:ignore: WPThemeReview.CoreFunctionality.FileInclude.FileIncludeFound
 
-				$file_contants     = $wp_filesystem->get_contents( $google_fonts_file );
-				$google_fonts_json = json_decode( $file_contants, 1 );
-
-				foreach ( $google_fonts_json as $key => $font ) {
+				foreach ( $google_fonts_arr as $key => $font ) {
 					$name = key( $font );
-					foreach ( $font[ $name ] as $font_key => $variant ) {
+					foreach ( $font[ $name ] as $font_key => $single_font ) {
 
-						if ( stristr( $variant, 'italic' ) ) {
-							unset( $font[ $name ][ $font_key ] );
-						}
+						if ( 'variants' === $font_key ) {
 
-						if ( 'regular' == $variant ) {
-							$font[ $name ][ $font_key ] = '400';
+							foreach ( $single_font as $variant_key => $variant ) {
+
+								if ( 'regular' == $variant ) {
+									$font[ $name ][ $font_key ][ $variant_key ] = '400';
+								}
+							}
 						}
 
 						self::$google_fonts[ $name ] = array_values( $font[ $name ] );

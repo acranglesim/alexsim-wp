@@ -5,6 +5,10 @@
  * @package Astra
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * Adds custom classes to the array of body classes.
  */
@@ -81,11 +85,13 @@ if ( ! function_exists( 'astra_single_get_post_meta' ) ) {
 	 */
 	function astra_single_get_post_meta( $echo = true ) {
 
-		$enable_meta = apply_filters( 'astra_single_post_meta_enabled', '__return_true' );
-		$post_meta   = astra_get_option( 'blog-single-meta' );
+		$enable_meta       = apply_filters( 'astra_single_post_meta_enabled', '__return_true' );
+		$post_meta         = astra_get_option( 'blog-single-meta' );
+		$current_post_type = get_post_type();
+		$post_type_array   = apply_filters( 'astra_single_post_type_meta', array( 'post' ) );
 
 		$output = '';
-		if ( is_array( $post_meta ) && 'post' == get_post_type() && $enable_meta ) {
+		if ( is_array( $post_meta ) && ( in_array( $current_post_type, $post_type_array ) || 'attachment' == $current_post_type ) && $enable_meta ) {
 
 			$output_str = astra_get_post_meta( $post_meta );
 			if ( ! empty( $output_str ) ) {
@@ -93,7 +99,7 @@ if ( ! function_exists( 'astra_single_get_post_meta' ) ) {
 			}
 		}
 		if ( $echo ) {
-			echo $output;
+			echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
 			return $output;
 		}
@@ -125,7 +131,7 @@ if ( ! function_exists( 'astra_theme_comment' ) ) {
 			case 'pingback':
 			case 'trackback':
 				// Display trackbacks differently than normal comments.
-			?>
+				?>
 				<li <?php comment_class(); ?> id="comment-<?php comment_ID(); ?>">
 					<p><?php esc_html_e( 'Pingback:', 'astra' ); ?> <?php comment_author_link(); ?> <?php edit_comment_link( __( '(Edit)', 'astra' ), '<span class="edit-link">', '</span>' ); ?></p>
 				</li>
@@ -139,30 +145,54 @@ if ( ! function_exists( 'astra_theme_comment' ) ) {
 				<li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>">
 
 					<article id="comment-<?php comment_ID(); ?>" class="ast-comment">
+					<div class= 'ast-comment-info'>
 						<div class='ast-comment-avatar-wrap'><?php echo get_avatar( $comment, 50 ); ?></div><!-- Remove 1px Space
-						--><div class="ast-comment-data-wrap">
-							<div class="ast-comment-meta-wrap">
-								<header class="ast-comment-meta ast-row ast-comment-author vcard capitalize">
-
-									<?php
+						-->
+								<?php
+								astra_markup_open( 'ast-comment-data-wrap' );
+								astra_markup_open( 'ast-comment-meta-wrap' );
+								echo '<header ';
+								echo astra_attr(
+									'commen-meta-author',
+									array(
+										'class' => 'ast-comment-meta ast-row ast-comment-author vcard capitalize',
+									)
+								);
+								echo '>';
 
 									printf(
-										'<div class="ast-comment-cite-wrap ast-col-lg-12"><cite><b class="fn">%1$s</b> %2$s</cite></div>',
+										astra_markup_open(
+											'ast-comment-cite-wrap',
+											array(
+												'open'  => '<div %s>',
+												'class' => 'ast-comment-cite-wrap',
+											)
+										) . '<cite><b class="fn">%1$s</b> %2$s</cite></div>',
 										get_comment_author_link(),
 										// If current post author is also comment author, make it known visually.
 										( $comment->user_id === $post->post_author ) ? '<span class="ast-highlight-text ast-cmt-post-author"></span>' : ''
 									);
 
+								if ( apply_filters( 'astra_single_post_comment_time_enabled', true ) ) {
 									printf(
-										'<div class="ast-comment-time ast-col-lg-12"><span  class="timendate"><a href="%1$s"><time datetime="%2$s">%3$s</time></a></span></div>',
+										esc_attr(
+											astra_markup_open(
+												'ast-comment-time',
+												array(
+													'open' => '<div %s>',
+													'class' => 'ast-comment-time',
+												)
+											)
+										) . '<span  class="timendate"><a href="%1$s"><time datetime="%2$s">%3$s</time></a></span></div>',
 										esc_url( get_comment_link( $comment->comment_ID ) ),
-										get_comment_time( 'c' ),
+										esc_attr( get_comment_time( 'c' ) ),
 										/* translators: 1: date, 2: time */
-										sprintf( esc_html__( '%1$s at %2$s', 'astra' ), get_comment_date(), get_comment_time() )
+										esc_html( sprintf( __( '%1$s at %2$s', 'astra' ), get_comment_date(), get_comment_time() ) )
 									);
+								}
 
-									?>
-
+								?>
+								<?php astra_markup_close( 'ast-comment-meta-wrap' ); ?>
 								</header> <!-- .ast-comment-meta -->
 							</div>
 							<section class="ast-comment-content comment">
@@ -172,7 +202,8 @@ if ( ! function_exists( 'astra_theme_comment' ) ) {
 									<?php
 									comment_reply_link(
 										array_merge(
-											$args, array(
+											$args,
+											array(
 												'reply_text' => astra_default_strings( 'string-comment-reply-link', false ),
 												'add_below' => 'comment',
 												'depth'  => $depth,
@@ -188,14 +219,14 @@ if ( ! function_exists( 'astra_theme_comment' ) ) {
 									<p class="ast-highlight-text comment-awaiting-moderation"><?php echo esc_html( astra_default_strings( 'string-comment-awaiting-moderation', false ) ); ?></p>
 								<?php endif; ?>
 							</section> <!-- .ast-comment-content -->
-						</div>
+							<?php astra_markup_close( 'ast-comment-data-wrap' ); ?>
 					</article><!-- #comment-## -->
-				<!-- </li> -->
+
 				<?php
 				break;
-		} // End switch().
+		}
 	}
-}// End if().
+}
 
 /**
  * Get Post Navigation
@@ -231,7 +262,8 @@ if ( ! function_exists( 'astra_single_post_navigation_markup' ) ) {
 			 */
 			the_post_navigation(
 				apply_filters(
-					'astra_single_post_navigation', array(
+					'astra_single_post_navigation',
+					array(
 						'next_text' => $next_text,
 						'prev_text' => $prev_text,
 					)

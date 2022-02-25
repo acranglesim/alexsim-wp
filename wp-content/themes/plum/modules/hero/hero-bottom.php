@@ -29,13 +29,13 @@
                     <?php endif; ?>
                     <?php if(get_theme_mod('plum_hero2_button') != ''): ?>
                         <a href="<?php the_permalink(); ?>" class="more-button">
-                            <?php echo get_theme_mod('plum_hero2_button'); ?>
+                            <?php echo esc_html(get_theme_mod('plum_hero2_button')); ?>
                         </a>
                     <?php endif;?>
                 </div>
                 <?php if (has_post_thumbnail()) : ?>
                 <div class="col-md-4 col-sm-4 f-image">
-                    <a href="<?php the_permalink(); ?>"><img src="<?php the_post_thumbnail_url(); ?>"></a>
+                    <a href="<?php the_permalink(); ?>"><img src="<?php the_post_thumbnail_url(); ?>"  alt="<?php the_title(); ?>"></a>
                 </div>
             <?php endif; ?>
                 <?php

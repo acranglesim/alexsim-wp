@@ -6,10 +6,14 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Themes and Plugins can check for astra_hooks using current_theme_supports( 'astra_hooks', $hook )
@@ -25,7 +29,8 @@
  * </code>
  */
 add_theme_support(
-	'astra_hooks', array(
+	'astra_hooks',
+	array(
 
 		/**
 		 * As a Theme developer, use the 'all' parameter, to declare support for all
@@ -247,6 +252,22 @@ function astra_content_while_before() {
 }
 
 /**
+ * Content loop
+ */
+function astra_content_loop() {
+	do_action( 'astra_content_loop' );
+}
+
+/**
+ * Conten Page Loop.
+ *
+ * Called from page.php
+ */
+function astra_content_page_loop() {
+	do_action( 'astra_content_page_loop' );
+}
+
+/**
  * Content while after
  */
 function astra_content_while_after() {
@@ -455,4 +476,24 @@ function astra_primary_content_top() {
  */
 function astra_primary_content_bottom() {
 	do_action( 'astra_primary_content_bottom' );
+}
+
+/**
+ * 404 Page content template action.
+ */
+function astra_404_content_template() {
+	do_action( 'astra_404_content_template' );
+}
+
+if ( ! function_exists( 'wp_body_open' ) ) {
+
+	/**
+	 * Fire the wp_body_open action.
+	 * Adds backward compatibility for WordPress versions < 5.2
+	 *
+	 * @since 1.8.7
+	 */
+	function wp_body_open() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+		do_action( 'wp_body_open' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
 }

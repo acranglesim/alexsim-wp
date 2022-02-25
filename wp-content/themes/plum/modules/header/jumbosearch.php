@@ -1,5 +1,5 @@
 <div id="jumbosearch">
-		<span class="fa fa-remove closeicon"></span>
+		<i class="fas fa-times closeicon"></i>
 		<div class="form">
 			<?php get_search_form(); ?>
 		</div>

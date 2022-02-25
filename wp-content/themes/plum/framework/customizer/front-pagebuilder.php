@@ -14,61 +14,42 @@ function plum_customize_register_front_pagebuilder($wp_customize) {
 	
 	$wp_customize->get_section('static_front_page')->panel = 'plum_fpage_builder';
 	$wp_customize->get_section('static_front_page')->priority = 0;
-
-    //Basic Settings
-    $wp_customize->add_section('plum_basic_settings_section',
-        array(
-            'title' => __('Basic Settings', 'plum'),
-            'priority' => 20,
-            'panel' => 'plum_fpage_builder',
-        )
-    );
+    
 
     //Basic Setting Info
     $wp_customize->add_setting(
 			'plum_fpb',
 			array( 'sanitize_callback' => 'esc_textarea' )
 		);
-			
-	$wp_customize->add_control(
-	    new Plum_WP_Customize_Upgrade_Control(
-	        $wp_customize,
-	        'plum_fpb',
-	        array(
-	            'label' => __('Note','plum'),
-	            'description' => __('You need to set your homepage to a Static Front page in order to use any of these settings.','plum'),
-	            'section' => 'plum_basic_settings_section',
-	            'settings' => 'plum_fpb',			       
-	        )
-		)
-	);
 	
     $wp_customize->add_setting('plum_page_title',
         array(
-                'sanitize_callback' => 'plum_sanitize_checkbox'
+                'sanitize_callback' => 'plum_sanitize_checkbox',
+                'transport'			=> 'postMessage'
         ));
     $wp_customize->add_control('plum_page_title',
         array(
             'setting' => 'plum_page_title',
-            'section' => 'plum_basic_settings_section',
-            'label' => __('Disable Page Title', 'plum'),
-            'description' => __('Default: Enabled. Check to Disable Page Title.', 'plum'),
+            'section' => 'static_front_page',
+            'label' => __('Disable Page Title for Static Front Page', 'plum'),
+            'description' => __('Default: Enabled.', 'plum'),
             'type' => 'checkbox'
         )
     );
 
     $wp_customize->add_setting('plum_disable_comments',
         array(
-            'sanitize_callback' => 'plum_sanitize_checkbox'
+            'sanitize_callback' => 'plum_sanitize_checkbox',
+            'transport'			=> 'postMessage'
         )
     );
 
     $wp_customize->add_control('plum_disable_comments',
         array(
             'setting' => 'plum_disable_comments',
-            'section' => 'plum_basic_settings_section',
+            'section' => 'static_front_page',
             'label' => __('Enable Comments Box', 'plum'),
-            'description' => __('Comment Box will be enabled from your Static Page', 'plum'),
+            'description' => __('Comment Box will be enabled for your Static Page', 'plum'),
             'type' => 'checkbox',
             'default' => false,
         )
@@ -106,8 +87,8 @@ function plum_customize_register_front_pagebuilder($wp_customize) {
         'plum_content_font_size', array(
             'settings' => 'plum_content_font_size',
             'label' => __( 'Content Font Size','plum' ),
-            'description' => __('Select Font Size. This is only for the content on Static Page area. Not for Blog Posts, Pages or Archives.', 'plum'),
-            'section'  => 'plum_basic_settings_section',
+            'description' => __('Select Font Size for the content on the Static Front Page.', 'plum'),
+            'section'  => 'static_front_page',
             'type'     => 'select',
             'choices' => $font_size
         )

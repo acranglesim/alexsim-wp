@@ -10,13 +10,14 @@
 	.entry-header {
 		min-width: 100px;
 		overflow: auto;
+		padding: 10px;
+		background: lighten(@accent, 48%);
 	}
-	h1.entry-title {
+	h3.entry-title {
 		font-weight: normal;
 		color: @content;
 		font-size: 34px;
 		margin-top: 0px;
-		padding: 10px;
 		padding-left: 0;
 		margin-bottom: 0px;
 		&:after {
@@ -30,7 +31,6 @@
 	}
 	.entry-meta, .entry-footer {
 		font-size: 12px;
-		padding-bottom: 7px;
 		overflow: auto;
 		a {
 			color: @content;
@@ -46,13 +46,18 @@
 		margin-left: 0;
 		font-size: 13px;
 		text-transform: uppercase;
-		margin-bottom: 6px;
 		color: @accent;
 		text-align: right;
 		a {
 			text-decoration: none;
 			color: @accent;
 			.title-font;
+		}
+	}
+	.posted-on {
+		margin-bottom: 6px;
+		i {
+			margin-right: 5px;
 		}
 	}
 	.entry-footer {
@@ -107,7 +112,7 @@
 	}
 }
 
-#primary-mono.page h1.entry-title:after {
+#primary-mono.page h3.entry-title:after {
 	display: none;
 }
 .edit-link {

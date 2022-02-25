@@ -3,10 +3,10 @@
 **Contributors:** (inkhive)  
 **Requires at least:** WordPress 4.4  
 **Tested up to:** WordPress 4.9
-**Version:** 1.3.5
+**Version:** 1.4.7
 **License:** GPL v3  
 **License URI:** http://www.gnu.org/licenses/gpl-3.0.html  
-**Tags:** custom-background, two-columns, one-column, custom-colors, flexible-header, theme-options, right-sidebar, grid-layout, custom-menu, threaded-comments, translation-ready, featured-images, blog, full-width-template, e-commerce, footer-widgets, entertainment, photography, featured-image-header
+**Tags:** custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready, blog, holiday, post-formats, custom-header, grid-layout
 
 Creative and Beautiful WordPress Theme with a Large Header
 
@@ -146,57 +146,110 @@ Source: https://pixabay.com/en/service/terms/
 
 ### 1.1.4
 
- * Another Site Title issue fixed
+* Another Site Title issue fixed
  
- ### 1.1.5
+### 1.1.5
 
- * Switched to a New Framework
- * Minor Bug Fixes
+* Switched to a New Framework
+* Minor Bug Fixes
  
- ### 1.1.8
+### 1.1.8
  
- * Added More Options for Front Page
- * Social Icon Effects
- * Minor Bug Fixes
+* Added More Options for Front Page
+* Social Icon Effects
+* Minor Bug Fixes
  
- ### 1.1.9
+### 1.1.9
  
- * More New Featured added
- * Front page Optimized
+* More New Featured added
+* Front page Optimized
+
+### 1.2.0
  
- ### 1.2.0
+* More New Page Templates
+* Customizer Now more user friendly
+* Minor Bug Fixes
+* Contact Us Page Layout Added
  
- * More New Page Templates
- * Customizer Now more user friendly
- * Minor Bug Fixes
- * Contact Us Page Layout Added
+### Version 1.3.0
  
- ### Version 1.3.0
+* Fixed Slider Issues
  
- * Fixed Slider Issues
+### Version 1.3.1
  
- ### Version 1.3.1
+* Fixed Social icons and Site title/Description issues on mobile screen.
+* Fixed Featured Posts Area CSS issues on mobile screen.
+* Fixed Featured Posts Area 2 CSS issues on mobile screen. 
+* Fixed 3-column Blog layout and Plum layout CSS issue.
  
- * Fixed Social icons and Site title/Description issues on mobile screen.
- * Fixed Featured Posts Area CSS issues on mobile screen.
- * Fixed Featured Posts Area 2 CSS issues on mobile screen. 
- * Fixed 3-column Blog layout and Plum layout CSS issue.
+### Version 1.3.2
  
- ### Version 1.3.2
+* Added Support For Footer Sidebar.
+* Minor Bug Fixes. 
  
- * Added Support For Footer Sidebar.
- * Minor Bug Fixes. 
- 
-  ### Version 1.3.3 
+### Version 1.3.3 
   
-  * Plum Theme Layout bug fixed on mobile screen.
+* Plum Theme Layout bug fixed on mobile screen.
   
-  ### Version 1.3.4
+### Version 1.3.4
   
-  * Plum Hero Button Issue Fixed
-  * Minor Bug Fixes
+* Plum Hero Button Issue Fixed
+* Minor Bug Fixes
   
-  ### Veriosn 1.3.5
+### Veriosn 1.3.5
+ 
+* Added Support For Menu Alignment
+* Minor Bug Fixes
   
-  * Added Support For Menu Alignment
-  * Minor Bug Fixes
+### Version 1.3.6
+
+* Mobile Device Issues Fixed
+* Minor Bug Fixes
+
+### Version 1.3.7
+
+* Updated Font Awesome
+
+### Version 1.3.8
+
+* Fixed Facebook Referral Link in Customizer
+* Fixed Header Image Issue
+
+### Version 1.3.9
+
+* Documentation Added
+
+### Version 1.4.0
+
+* Improved the Customizer Controls
+
+### Version 1.4.1
+
+* Font Awesome in footer Fixed
+
+### Version 1.4.2
+
+* Minor Bug Fixes
+
+### Version 1.4.3
+
+* Changed Vine Social Icon with Linked-In Social Icon
+
+### Version 1.4.4
+
+* Changed the ShareASale ID
+* Modified the Search Layout
+
+### Version 1.4.5
+
+* Sidebar Layouts Added
+* Social Icons Improved
+
+### Version 1.4.6
+
+* Hero Background Issue Fixed
+* Slabo Font Issue Fixed
+
+### Verison 1.4.7
+
+* Guttenberg Ready

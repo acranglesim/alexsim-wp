@@ -18,7 +18,7 @@ function plum_paging_nav() {
 	}
 	?>
 	<nav class="navigation paging-navigation" role="navigation">
-		<h1 class="screen-reader-text"><?php _e( 'Posts navigation', 'plum' ); ?></h1>
+		<h3 class="screen-reader-text"><?php esc_html_e( 'Posts navigation', 'plum' ); ?></h3>
 		<div class="nav-links">
 
 			<?php if ( get_next_posts_link() ) : ?>
@@ -49,12 +49,12 @@ function plum_post_nav() {
 	}
 	?>
 	<nav class="navigation post-navigation" role="navigation">
-		<h1 class="screen-reader-text"><?php _e( 'Post navigation', 'plum' ); ?></h1>
+		<h3 class="screen-reader-text"><?php esc_html_e( 'Post navigation', 'plum' ); ?></h3>
 		<div class="nav-links">
 			<?php
 			$prev_post = get_previous_post();
 			if (!empty( $prev_post )): ?>
-			  <div class="nav-previous col-md-6"><a href="<?php echo get_permalink( $prev_post->ID ); ?>"><?php echo get_the_post_thumbnail($prev_post->ID, 'thumbnail', array(120,120)); ?></a>
+			  <div class="nav-previous col-md-6"><a href="<?php echo esc_url(get_permalink( $prev_post->ID )); ?>"><?php echo get_the_post_thumbnail($prev_post->ID, 'thumbnail', array(120,120)); ?></a>
 			<?php
 				previous_post_link( '<span class="navl">%link</span></div>', _x( '<span class="meta-nav">&larr;</span>&nbsp;%title', 'Previous post link', 'plum' ) );
 			endif;
@@ -123,7 +123,7 @@ function plum_posted_on_plum() {
 
 	$byline = '<span class="author vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>';
 
-	echo '<span class="posted-on title-font">' . $posted_on . '</span><span class="byline title-font"><i class="fa fa-user"></i> ' . $byline . '</span>';
+	echo '<span class="posted-on title-font"><i class="fa fa-calendar"></i>' . $posted_on . '</span><span class="byline title-font"><i class="fa fa-user"></i> ' . $byline . '</span>';
 
 }
 
@@ -204,7 +204,7 @@ function plum_comment( $comment, $args, $depth ) {
 
 	<li id="comment-<?php comment_ID(); ?>" <?php comment_class(); ?>>
 		<div class="comment-body">
-			<?php _e( 'Pingback:', 'plum' ); ?> <?php comment_author_link(); ?> <?php edit_comment_link( __( 'Edit', 'plum' ), '<span class="edit-link">', '</span>' ); ?>
+			<?php esc_html_e( 'Pingback:', 'plum' ); ?> <?php comment_author_link(); ?> <?php edit_comment_link( __( 'Edit', 'plum' ), '<span class="edit-link">', '</span>' ); ?>
 		</div>
 
 	<?php else : ?>
@@ -225,7 +225,7 @@ function plum_comment( $comment, $args, $depth ) {
 				</div><!-- .comment-metadata -->
 
 				<?php if ( '0' == $comment->comment_approved ) : ?>
-				<p class="comment-awaiting-moderation"><?php _e( 'Your comment is awaiting moderation.', 'plum' ); ?></p>
+				<p class="comment-awaiting-moderation"><?php esc_html_e( 'Your comment is awaiting moderation.', 'plum' ); ?></p>
 				<?php endif; ?>
 			</footer><!-- .comment-meta -->
 

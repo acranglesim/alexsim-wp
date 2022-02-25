@@ -34,7 +34,7 @@ if ( ! class_exists( 'Astra_Beaver_Builder' ) ) :
 		 */
 		public static function get_instance() {
 			if ( ! isset( self::$instance ) ) {
-				self::$instance = new self;
+				self::$instance = new self();
 			}
 			return self::$instance;
 		}
@@ -45,6 +45,7 @@ if ( ! class_exists( 'Astra_Beaver_Builder' ) ) :
 		public function __construct() {
 			add_action( 'wp', array( $this, 'beaver_builder_default_setting' ), 20 );
 			add_action( 'do_meta_boxes', array( $this, 'beaver_builder_default_setting' ), 20 );
+			add_filter( 'astra_theme_assets', array( $this, 'add_styles' ) );
 		}
 
 		/**
@@ -53,18 +54,16 @@ if ( ! class_exists( 'Astra_Beaver_Builder' ) ) :
 		 * @since  1.0.13
 		 * @return void
 		 */
-		function beaver_builder_default_setting() {
+		public function beaver_builder_default_setting() {
 
-			$page_builder_compatibility = apply_filters( 'astra_enable_page_builder_compatibility', true );
-
-			if ( false == $page_builder_compatibility ) {
+			if ( false === astra_enable_page_builder_compatibility() || 'post' == get_post_type() ) {
 				return;
 			}
 
 			global $post;
 			$id = astra_get_post_id();
 
-			$do_render = apply_filters( 'fl_builder_do_render_content', true, FLBuilderModel::get_post_id() );
+			$do_render = apply_filters( 'fl_builder_do_render_content', true, FLBuilderModel::get_post_id() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			$page_builder_flag = get_post_meta( $id, '_astra_content_layout_flag', true );
 			if ( isset( $post ) && empty( $page_builder_flag ) && ( is_admin() || is_singular() ) ) {
@@ -87,6 +86,21 @@ if ( ! class_exists( 'Astra_Beaver_Builder' ) ) :
 					}
 				}
 			}
+		}
+
+		/**
+		 * Add assets in theme
+		 *
+		 * @param array $assets list of theme assets (JS & CSS).
+		 * @return array List of updated assets.
+		 * @since 3.5.0
+		 */
+		public function add_styles( $assets ) {
+
+			if ( ! empty( $assets['css'] ) ) {
+				$assets['css'] = array( 'astra-bb-builder' => 'compatibility/page-builder/bb-plugin' ) + $assets['css'];
+			}
+			return $assets;
 		}
 
 	}

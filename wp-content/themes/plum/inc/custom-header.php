@@ -26,7 +26,7 @@ function plum_custom_header_setup() {
 	add_theme_support( 'custom-header', apply_filters( 'plum_custom_header_args', array(
 		'default-image'          => get_template_directory_uri().'/assets/images/header.jpg',
 		'default-text-color'     => '#ffffff',
-		'height'				 => 600,
+		'height'				 => 650,
 		'width'					 => 1440,
 		'flex-height'            => true,
 		'wp-head-callback'       => 'plum_header_style',
@@ -68,9 +68,9 @@ function plum_header_style() {
 		#masthead {
 			display: block;
 			background-image: url(<?php header_image(); ?>);
-			background-size: <?php echo get_theme_mod('plum_himg_style','cover'); ?>;
-			background-position-x: <?php echo get_theme_mod('plum_himg_align','center'); ?>;
-			background-repeat: <?php echo  get_theme_mod('plum_himg_repeat') ? "repeat" : "no-repeat" ?>;
+			background-size: <?php echo esc_html(get_theme_mod('plum_himg_style','cover')); ?>;
+			background-position-x: <?php echo esc_html(get_theme_mod('plum_himg_align','center')); ?>;
+			background-repeat: <?php echo  esc_html(get_theme_mod('plum_himg_repeat')) ? "repeat" : "no-repeat" ?>;
 		}
 	</style> <?php
 		endif;	

@@ -6,10 +6,14 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.1.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Shop page - Products Title markup updated
@@ -26,7 +30,7 @@ if ( ! function_exists( 'astra_woo_shop_products_title' ) ) :
 	function astra_woo_shop_products_title() {
 		echo '<a href="' . esc_url( get_the_permalink() ) . '" class="woocommerce-LoopProduct-link woocommerce-loop-product__link">';
 
-		echo '<h2 class="woocommerce-loop-product__title">' . get_the_title() . '</h2>';
+		echo '<h2 class="woocommerce-loop-product__title">' . esc_html( get_the_title() ) . '</h2>';
 
 		echo '</a>';
 	}
@@ -49,15 +53,16 @@ if ( ! function_exists( 'astra_woo_shop_parent_category' ) ) :
 			<span class="ast-woo-product-category">
 				<?php
 				global $product;
-				$product_categories = function_exists( 'wc_get_product_category_list' ) ? wc_get_product_category_list( get_the_ID(), ',', '', '' ) : $product->get_categories( ',', '', '' );
+				$product_categories = function_exists( 'wc_get_product_category_list' ) ? wc_get_product_category_list( get_the_ID(), ';', '', '' ) : $product->get_categories( ';', '', '' );
 
-				$product_categories = strip_tags( $product_categories );
+				$product_categories = htmlspecialchars_decode( wp_strip_all_tags( $product_categories ) );
 				if ( $product_categories ) {
-					list( $parent_cat ) = explode( ',', $product_categories );
-					echo esc_html( $parent_cat );
+					list( $parent_cat ) = explode( ';', $product_categories );
+					echo apply_filters( 'astra_woo_shop_product_categories', esc_html( $parent_cat ), get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
+
 				?>
-			</span> 
+			</span>
 			<?php
 		endif;
 	}
@@ -78,9 +83,9 @@ if ( ! function_exists( 'astra_woo_shop_out_of_stock' ) ) :
 		$out_of_stock        = get_post_meta( get_the_ID(), '_stock_status', true );
 		$out_of_stock_string = apply_filters( 'astra_woo_shop_out_of_stock_string', __( 'Out of stock', 'astra' ) );
 		if ( 'outofstock' === $out_of_stock ) {
-		?>
+			?>
 			<span class="ast-shop-product-out-of-stock"><?php echo esc_html( $out_of_stock_string ); ?></span>
-		<?php
+			<?php
 		}
 	}
 
@@ -98,13 +103,13 @@ if ( ! function_exists( 'astra_woo_shop_product_short_description' ) ) :
 	 * @since 1.1.0
 	 */
 	function astra_woo_shop_product_short_description() {
-	?>
-	<?php if ( has_excerpt() ) { ?>
+		?>
+		<?php if ( has_excerpt() ) { ?>
 		<div class="ast-woo-shop-product-description">
 			<?php the_excerpt(); ?>
 		</div>
 	<?php } ?>
-	<?php
+		<?php
 	}
 endif;
 /**
@@ -125,12 +130,13 @@ if ( ! function_exists( 'astra_woo_product_in_stock' ) ) :
 			$product_avail  = $product->get_availability();
 			$stock_quantity = $product->get_stock_quantity();
 			$availability   = $product_avail['availability'];
+			$avail_class    = $product_avail['class'];
 			if ( ! empty( $availability ) && $stock_quantity ) {
 				ob_start();
 				?>
 				<p class="ast-stock-detail">
 					<span class="ast-stock-avail"><?php esc_html_e( 'Availability:', 'astra' ); ?></span>
-					<span class="stock in-stock"><?php echo esc_html( $availability ); ?></span>
+					<span class="stock <?php echo esc_html( $avail_class ); ?>"><?php echo esc_html( $availability ); ?></span>
 				</p>
 				<?php
 				$markup = ob_get_clean();
@@ -162,7 +168,6 @@ if ( ! function_exists( 'astra_woo_woocommerce_shop_product_content' ) ) {
 	function astra_woo_woocommerce_shop_product_content() {
 
 		$shop_structure = apply_filters( 'astra_woo_shop_product_structure', astra_get_option( 'shop-product-structure' ) );
-
 		if ( is_array( $shop_structure ) && ! empty( $shop_structure ) ) {
 
 			do_action( 'astra_woo_shop_before_summary_wrap' );
@@ -247,3 +252,48 @@ if ( ! function_exists( 'astra_woo_shop_thumbnail_wrap_end' ) ) {
 		echo '</div>';
 	}
 }
+
+
+/**
+ * Woocommerce filter - Widget Products Tags
+ */
+if ( ! function_exists( 'astra_widget_product_tag_cloud_args' ) ) {
+
+	/**
+	 * Woocommerce filter - Widget Products Tags
+	 *
+	 * @param  array $args Tag arguments.
+	 * @return array       Modified tag arguments.
+	 */
+	function astra_widget_product_tag_cloud_args( $args = array() ) {
+
+		$sidebar_link_font_size            = astra_get_option( 'font-size-body' );
+		$sidebar_link_font_size['desktop'] = ( '' != $sidebar_link_font_size['desktop'] ) ? $sidebar_link_font_size['desktop'] : 15;
+
+		$args['smallest'] = intval( $sidebar_link_font_size['desktop'] ) - 2;
+		$args['largest']  = intval( $sidebar_link_font_size['desktop'] ) + 3;
+		$args['unit']     = 'px';
+
+		return apply_filters( 'astra_widget_product_tag_cloud_args', $args );
+	}
+	add_filter( 'woocommerce_product_tag_cloud_widget_args', 'astra_widget_product_tag_cloud_args', 90 );
+
+}
+
+/**
+ * Woocommerce shop/product div close tag.
+ */
+if ( ! function_exists( 'astra_woocommerce_div_wrapper_close' ) ) :
+
+	/**
+	 * Woocommerce shop/product div close tag.
+	 *
+	 * @return void
+	 */
+	function astra_woocommerce_div_wrapper_close() {
+
+		echo '</div>';
+
+	}
+
+endif;

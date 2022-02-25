@@ -6,12 +6,12 @@
 	    array(
 	        'title'     => __('Google Web Fonts','plum'),
 	        'priority'  => 41,
-	        'description' => __('Defaults: Droid Serif, Ubuntu.','plum'),
+	        'description' => __('Defaults: Arvo, Ubuntu.','plum'),
 	        'panel' => 'plum_design_panel'
 	    )
 	);
-	
-	$font_array = array('Arvo','Source Sans Pro','Open Sans','Droid Sans','Droid Serif','Roboto','Roboto Condensed','Lato','Bree Serif','Oswald','Slabo','Lora');
+
+	$font_array = array('Arvo','Ubuntu','Source Sans Pro','Open Sans','Droid Sans','Droid Serif','Roboto','Roboto Condensed','Lato','Bree Serif','Oswald','Slabo 13px','Lora');
 	$fonts = array_combine($font_array, $font_array);
 	
 	$wp_customize->add_setting(
@@ -23,7 +23,7 @@
 	);
 	
 	function plum_sanitize_gfont( $input ) {
-		if ( in_array($input, array('Arvo','Source Sans Pro','Open Sans','Droid Sans','Droid Serif','Roboto','Roboto Condensed','Lato','Bree Serif','Oswald','Slabo','Lora',) ) )
+		if ( in_array($input, array('Arvo','Ubuntu','Source Sans Pro','Open Sans','Droid Sans','Droid Serif','Roboto','Roboto Condensed','Lato','Bree Serif','Oswald','Slabo 13px','Lora',) ) )
 			return $input;
 		else
 			return '';	
@@ -41,7 +41,7 @@
 	
 	$wp_customize->add_setting(
 		'plum_body_font',
-			array(	'default'=> 'Source Sans Pro',
+			array(	'default'=> 'Ubuntu',
 					'sanitize_callback' => 'plum_sanitize_gfont' )
 	);
 	

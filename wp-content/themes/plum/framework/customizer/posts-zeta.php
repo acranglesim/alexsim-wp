@@ -6,7 +6,7 @@ function plum_customize_zeta( $wp_customize ) {
 	    'plum_zeta_section',
 	    array(
 	        'title'     => __('Featured Posts','plum'),
-	        'priority'  => 10,
+	        'priority'  => 9,
 	        'panel'     => 'plum_a_fcp_panel'
 	    )
 	);
@@ -19,7 +19,7 @@ function plum_customize_zeta( $wp_customize ) {
 	$wp_customize->add_control(
 			'plum_zeta_enable', array(
 		    'settings' => 'plum_zeta_enable',
-		    'label'    => __( 'Enable Featured Posts', 'plum' ),
+		    'label'    => __( 'Enable this Featured Posts Area on Front Page', 'plum' ),
 		    'section'  => 'plum_zeta_section',
 		    'type'     => 'checkbox',
 		)

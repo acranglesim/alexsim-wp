@@ -135,9 +135,9 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'plum_header_add_to_cart_fragme
 function plum_header_add_to_cart_fragment( $fragments ) {
 	ob_start();
 	?>
-			<a class="cart-contents" href="<?php echo WC()->cart->get_cart_url(); ?>" title="<?php _e('View your shopping cart', 'plum'); ?>">
+			<a class="cart-contents" href="<?php echo esc_url(WC()->cart->get_cart_url()); ?>" title="<?php esc_html_e('View your shopping cart', 'plum'); ?>">
 						<div class="count"><?php echo sprintf(_n('%d item', '%d items', WC()->cart->cart_contents_count, 'plum'), WC()->cart->cart_contents_count);?></div>
-						<div class="total"> <?php echo WC()->cart->get_cart_total(); ?>
+						<div class="total"> <?php echo esc_url(WC()->cart->get_cart_total()); ?>
 						</div>
 					</a>
 	<?php

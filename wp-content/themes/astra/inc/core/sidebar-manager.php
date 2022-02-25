@@ -4,10 +4,14 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Site Sidebar
@@ -69,10 +73,10 @@ if ( ! function_exists( 'astra_page_layout' ) ) {
 					// Get the global sidebar value.
 					// NOTE: Here not used `true` in the below function call.
 					$layout = astra_get_option( 'site-sidebar-layout' );
-				}// End if().
+				}
 			}
-		}// End if().
+		}
 
 		return apply_filters( 'astra_page_layout', $layout );
 	}
-}// End if().
+}

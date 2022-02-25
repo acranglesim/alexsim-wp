@@ -4,10 +4,14 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 add_action( 'astra_masthead_toggle_buttons', 'astra_masthead_toggle_buttons_primary' );
 add_action( 'astra_masthead', 'astra_masthead_primary_template' );
@@ -58,7 +62,7 @@ if ( ! function_exists( 'astra_masthead_get_menu_items' ) ) :
 				<?php
 				foreach ( $sections as $key => $value ) {
 					if ( ! empty( $value ) ) {
-						echo $value;
+						echo $value; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 				}
 				?>
@@ -129,7 +133,6 @@ if ( ! function_exists( 'astra_masthead_custom_nav_menu_items' ) ) :
 		if ( isset( $args->theme_location ) && ! astra_get_option( 'header-display-outside-menu' ) ) {
 
 			if ( 'primary' === $args->theme_location ) {
-
 				$markup = astra_masthead_get_menu_items();
 
 				if ( $markup ) {
@@ -165,18 +168,19 @@ if ( ! function_exists( 'astra_masthead_toggle_buttons_primary' ) ) {
 
 		if ( ! $disable_primary_navigation || ( 'none' != $custom_header_section && ! $display_outside_menu ) ) {
 			$menu_title          = trim( apply_filters( 'astra_main_menu_toggle_label', astra_get_option( 'header-main-menu-label' ) ) );
-			$menu_icon           = apply_filters( 'astra_main_menu_toggle_icon', 'menu-toggle-icon' );
 			$menu_label_class    = '';
 			$screen_reader_title = __( 'Main Menu', 'astra' );
 			if ( '' !== $menu_title ) {
 				$menu_label_class    = 'ast-menu-label';
 				$screen_reader_title = $menu_title;
 			}
-		?>
+
+			$menu_label_class = apply_filters( 'astra_main_menu_toggle_classes', $menu_label_class );
+			?>
 		<div class="ast-button-wrap">
-			<button type="button" class="menu-toggle main-header-menu-toggle <?php echo esc_attr( $menu_label_class ); ?>" rel="main-menu" aria-controls='primary-menu' aria-expanded='false'>
+			<button type="button" class="menu-toggle main-header-menu-toggle <?php echo esc_attr( $menu_label_class ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" <?php echo apply_filters( 'astra_nav_toggle_data_attrs', '' ); ?> aria-controls='primary-menu' aria-expanded='false'>
 				<span class="screen-reader-text"><?php echo esc_html( $screen_reader_title ); ?></span>
-				<i class="<?php echo esc_attr( $menu_icon ); ?>"></i>
+				<?php Astra_Icons::get_icons( 'menu-bars', true, true ); ?>
 				<?php if ( '' != $menu_title ) { ?>
 
 					<span class="mobile-menu-wrap">
@@ -186,10 +190,10 @@ if ( ! function_exists( 'astra_masthead_toggle_buttons_primary' ) ) {
 				<?php } ?>
 			</button>
 		</div>
-	<?php
+			<?php
 		}
 	}
-}// End if().
+}
 
 /**
  * Small Footer
@@ -208,7 +212,7 @@ if ( ! function_exists( 'astra_footer_small_footer_template' ) ) {
 	function astra_footer_small_footer_template() {
 
 		$small_footer_layout = astra_get_option_meta( 'footer-sml-layout', 'footer-sml-layout-2' );
-		$small_footer_layout = apply_filters( 'ast_footer_sml_layout', $small_footer_layout );
+		$small_footer_layout = apply_filters( 'astra_footer_sml_layout', $small_footer_layout );
 
 		if ( 'disabled' != $small_footer_layout ) {
 
@@ -277,7 +281,7 @@ if ( ! function_exists( 'astra_entry_content_blog_template' ) ) {
 	 * @since 1.0.0
 	 */
 	function astra_entry_content_blog_template() {
-		get_template_part( 'template-parts/blog/blog-layout' );
+		get_template_part( 'template-parts/blog/blog-layout', apply_filters( 'astra_blog_template_name', '' ) );
 	}
 }
 
@@ -353,7 +357,7 @@ if ( ! function_exists( 'astra_header_custom_item_outside_menu' ) ) {
 		if ( astra_get_option( 'header-display-outside-menu' ) ) {
 			$markup = astra_masthead_get_menu_items( true );
 
-			echo $markup;
+			echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 }

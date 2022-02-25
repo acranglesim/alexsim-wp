@@ -6,6 +6,8 @@
 
 //Define all Variables.
 $count = esc_html( rt_slider::fetch('count') );
+
+
 ?>
 <div id="slider-bg">
 	<div class="container slider-container-wrapper">
@@ -19,12 +21,11 @@ $count = esc_html( rt_slider::fetch('count') );
 					$title = esc_html( rt_slider::fetch('title', $i ) );
 					$desc = esc_html( rt_slider::fetch('desc', $i) );
 					$button = esc_html( rt_slider::fetch('cta_button', $i) );
-					 
 					
 					?>
 					<div class="swiper-slide">
 		            	<a href="<?php echo $url; ?>">
-		            		<img src="<?php echo $img ?>" data-thumb="<?php echo $img ?>" title="<?php echo $title." - ".$desc ?>" />
+		            		<img src="<?php echo $img ?>" data-thumb="<?php echo $img ?>" title="<?php echo $title." - ".$desc ?>" alt="<?php echo $title; ?>" />
 		            	</a>
 		            	<div class="slidecaption">
 			                

@@ -4,7 +4,7 @@
   border-top: solid 3px @accent2;
   clear: both;
   .footer-column {
-    h1.widget-title {
+    h3.widget-title {
       font-weight: normal;
       font-size: 18px;
       text-align: center;
@@ -15,7 +15,6 @@
       margin-bottom: 10px;
     }
     .widget {
-      color: lighten(@content, 15%);
       font-size: 13px;
       background: @background;
       padding: 15px;
@@ -46,20 +45,13 @@
         }
       }
     }
-
-    .widget_calendar {
-        table {
-          color: @content;
-        }
-    }
-
     .widget_tag_cloud {
       .tagcloud a {
         background: @accent;
         font-size: 14px !important;
         text-transform: uppercase;
         font-weight: lighter;
-        color: @onaccent;
+        color: @sbg;
         padding: 7px 5px;
         margin-bottom: 5px;
         display: inline-block;
@@ -153,8 +145,9 @@
     .widget_recent_entries, .widget_recent_comments, .widget_categories, .widget_pages, .widget_archive, .widget_meta, .widget_nav_menu {
       ul li:before {
         content: "\f054";
-        font-family: "FontAwesome";
-        color: darken(@background,14%);
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        color: lighten(@content,45%);
         font-size: 10px;
         margin-right: 5px;
 

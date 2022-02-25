@@ -9,6 +9,7 @@
 		padding: 0;
 		position: relative;
 	}
+
 	.featured-thumb {
 		border-top: none;
 		overflow: hidden;
@@ -28,6 +29,11 @@
 		@media screen and (max-width: 1199px) {
 			width: 50%;
 		}
+		@media screen and (max-width: 768px) {
+			width: 35% !important;
+			background: fade(white, 85%);
+		}
+
 		border-left: solid 10px @accent;
 		opacity: 1;
 		.transform(rotate(0deg) scale(1.65) translateX(200px));
@@ -67,7 +73,7 @@
 					font-size: 11px;
 				}
 			}
-			h1.entry-title {
+			h3.entry-title {
 					font-size: 14px;
 					width: ~"calc(100% + 60px)";
 				    left: -75px;
@@ -88,7 +94,7 @@
 					.transform(translateY(0));
 					opacity: 1;
 				}
-				h1.entry-title {
+				h3.entry-title {
 					opacity: 1;
 				}
 			@media screen and (min-width: 767px) {
@@ -111,7 +117,7 @@
 					.transform(translateY(0));
 					opacity: 1;
 				}
-				h1.entry-title {
+				h3.entry-title {
 					opacity: 1;
 				}
 				a:hover {

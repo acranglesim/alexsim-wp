@@ -4,8 +4,8 @@
  *
  * @package     Astra
  * @author      Astra
- * @copyright   Copyright (c) 2018, Astra
- * @link        http://wpastra.com/
+ * @copyright   Copyright (c) 2020, Astra
+ * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
 
@@ -19,7 +19,7 @@
 
 		<?php astra_single_header_top(); ?>
 
-		<?php astra_blog_post_thumbnai_and_title_order(); ?>
+		<?php astra_blog_post_thumbnail_and_title_order(); ?>
 
 		<?php astra_single_header_bottom(); ?>
 
@@ -27,7 +27,16 @@
 
 	<?php astra_single_header_after(); ?>
 
-	<div class="entry-content clear" itemprop="text">
+	<div class="entry-content clear" 
+	<?php
+				echo astra_attr(
+					'article-entry-content-single-layout',
+					array(
+						'class' => '',
+					)
+				);
+				?>
+	>
 
 		<?php astra_entry_content_before(); ?>
 
@@ -35,7 +44,6 @@
 
 		<?php
 			astra_edit_post_link(
-
 				sprintf(
 					/* translators: %s: Name of current post */
 					esc_html__( 'Edit %s', 'astra' ),
@@ -44,7 +52,7 @@
 				'<span class="edit-link">',
 				'</span>'
 			);
-		?>
+			?>
 
 		<?php astra_entry_content_after(); ?>
 
@@ -57,6 +65,6 @@
 					'link_after'  => '</span>',
 				)
 			);
-		?>
+			?>
 	</div><!-- .entry-content .clear -->
 </div>

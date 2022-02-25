@@ -199,8 +199,6 @@ figure {
 }
 
 hr {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
   height: 0;
 }
@@ -260,8 +258,6 @@ input {
 
 input[type="checkbox"],
 input[type="radio"] {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 0;
 }
@@ -273,16 +269,19 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="search"] {
   -webkit-appearance: textfield;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
 .search .search-submit,
 #comments .submit {
   padding: 10px 15px;
-  -webkit-border-radius: 2px;
   border-radius: 2px;
+  line-height: 1.85714285714286;
+  border: 0;
+}
+
+.search .site-main .ast-search-submit {
+  display: none;
 }
 
 input[type="search"]::-webkit-search-cancel-button,
@@ -328,21 +327,8 @@ th {
 # Bootstrap Grid
 --------------------------------------------------------------*/
 /*!
- * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
+ * Bootstrap v4.0.0-alpha.2 (https://getbootstrap.com)
  */
-.ast-container {
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.ast-container::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
 @media (min-width: 544px) {
   .ast-container {
     max-width: 100%;
@@ -367,14 +353,14 @@ th {
   }
 }
 
-.ast-container-fluid {
+.ast-container-fluid, .ast-container {
   margin-left: auto;
   margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
 }
 
-.ast-container-fluid::after {
+.ast-container-fluid::after, .ast-container::after {
   content: "";
   display: table;
   clear: both;
@@ -1305,17 +1291,13 @@ h6,
 # Elements
 --------------------------------------------------------------*/
 html {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
 *,
 *:before,
 *:after {
-  /* Inherit box-sizing to make it easier to change the property for components that leverage other behavior; see http://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
-  -webkit-box-sizing: inherit;
-  -moz-box-sizing: inherit;
+  /* Inherit box-sizing to make it easier to change the property for components that leverage other behavior; see https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
   box-sizing: inherit;
 }
 
@@ -1352,7 +1334,8 @@ dd {
   margin: 0 1.5em 1.5em;
 }
 
-b, strong {
+b,
+strong {
   font-weight: bold;
 }
 
@@ -1381,10 +1364,6 @@ blockquote {
   font-style: italic;
   margin: 0 0 1.5em;
   position: relative;
-}
-
-blockquote p:last-child {
-  margin: 0;
 }
 
 address {
@@ -1455,34 +1434,8 @@ big {
 
 mark,
 ins {
-  background: #fff9c0;
+  background: transparent;
   text-decoration: none;
-}
-
-ul, ol {
-  margin: 0 0 1.5em 3em;
-}
-
-ul {
-  list-style: disc;
-}
-
-ol {
-  list-style: decimal;
-}
-
-li > ul,
-li > ol {
-  margin-bottom: 0;
-  margin-left: 1.5em;
-}
-
-dt {
-  font-weight: bold;
-}
-
-dd {
-  margin: 0 1.5em 1.5em;
 }
 
 table, th, td {
@@ -1503,7 +1456,6 @@ th {
 
 th, td {
   padding: 8px;
-  text-align: left;
   border-width: 0 1px 1px 0;
 }
 
@@ -1518,7 +1470,6 @@ input[type="reset"],
 input[type="submit"] {
   border: 1px solid;
   border-color: #eaeaea;
-  -webkit-border-radius: 2px;
   border-radius: 2px;
   background: #e6e6e6;
   padding: .6em 1em .4em;
@@ -1564,7 +1515,6 @@ input[type="tel"],
 textarea {
   color: #666;
   border: 1px solid #ccc;
-  -webkit-border-radius: 2px;
   border-radius: 2px;
   -webkit-appearance: none;
 }
@@ -1589,18 +1539,20 @@ textarea {
 --------------------------------------------------------------*/
 /* Text meant only for screen readers. */
 .screen-reader-text {
+  border: 0;
   clip: rect(1px, 1px, 1px, 1px);
-  position: absolute !important;
   height: 1px;
-  width: 1px;
+  margin: -1px;
   overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
 }
 
 .screen-reader-text:focus {
   background-color: #f1f1f1;
-  -webkit-border-radius: 2px;
   border-radius: 2px;
-  -webkit-box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
   clip: auto !important;
   color: #21759b;
@@ -1632,6 +1584,7 @@ textarea {
 
 .aligncenter {
   clear: both;
+  text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -1677,15 +1630,6 @@ textarea {
 /*--------------------------------------------------------------
 # Media
 --------------------------------------------------------------*/
-.page-content .wp-smiley,
-.entry-content .wp-smiley,
-.comment-content .wp-smiley {
-  border: none;
-  margin-bottom: 0;
-  margin-top: 0;
-  padding: 0;
-}
-
 /* Make sure embeds and iframes fit their containers. */
 embed,
 iframe,
@@ -1716,69 +1660,15 @@ object {
 }
 
 /*--------------------------------------------------------------
-## Galleries
---------------------------------------------------------------*/
-.gallery-item {
-  display: inline-block;
-  text-align: center;
-  vertical-align: top;
-  width: 100%;
-}
-
-.gallery-columns-2 .gallery-item {
-  max-width: 50%;
-}
-
-.gallery-columns-3 .gallery-item {
-  max-width: 33.33%;
-}
-
-.gallery-columns-4 .gallery-item {
-  max-width: 25%;
-}
-
-.gallery-columns-5 .gallery-item {
-  max-width: 20%;
-}
-
-.gallery-columns-6 .gallery-item {
-  max-width: 16.66%;
-}
-
-.gallery-columns-7 .gallery-item {
-  max-width: 14.28%;
-}
-
-.gallery-columns-8 .gallery-item {
-  max-width: 12.5%;
-}
-
-.gallery-columns-9 .gallery-item {
-  max-width: 11.11%;
-}
-
-.gallery-caption {
-  display: block;
-}
-
-/*--------------------------------------------------------------
 # Content
 --------------------------------------------------------------*/
 /*----------  Media Query min-width Structure   ----------*/
 /*----------  Media Query max-width Structure   ----------*/
 /*----------  Break-point min-width Structure   ----------*/
 /*----------  Break-point max-width Structure   ----------*/
-::-moz-selection {
-  color: #fff;
-  background: #0274be;
-}
 ::selection {
   color: #fff;
   background: #0274be;
-}
-
-html {
-  overflow-y: scroll;
 }
 
 body {
@@ -1803,7 +1693,6 @@ a,
 .site-header a *,
 .site-footer a *,
 .secondary a * {
-  -webkit-transition: all 0.2s linear;
   transition: all 0.2s linear;
 }
 
@@ -1830,7 +1719,6 @@ p {
 
 blockquote {
   margin: 1.5em 1em 1.5em 3em;
-  padding: 1.2em;
   font-size: 1.1em;
   line-height: inherit;
   position: relative;
@@ -1840,11 +1728,9 @@ blockquote {
 .button,
 input[type="button"],
 input[type="submit"] {
-  -webkit-border-radius: 0;
   border-radius: 0;
   padding: 18px 30px;
   border: 0;
-  -webkit-box-shadow: none;
   box-shadow: none;
   text-shadow: none;
 }
@@ -1853,7 +1739,6 @@ input[type="submit"] {
 .button:hover,
 input[type="button"]:hover,
 input[type="submit"]:hover {
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 
@@ -1864,17 +1749,10 @@ input[type="button"]:active,
 input[type="button"]:focus,
 input[type="submit"]:active,
 input[type="submit"]:focus {
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 
 .site-title {
-  -js-display: flex;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
   font-weight: normal;
 }
 
@@ -1889,7 +1767,6 @@ input[type="submit"]:focus {
 .site-description a,
 .site-description:hover a,
 .site-description:focus a {
-  -webkit-transition: all 0.2s linear;
   transition: all 0.2s linear;
 }
 
@@ -1907,37 +1784,18 @@ input[type="submit"]:focus {
   color: #999;
 }
 
-.ast-header-break-point .main-header-bar .main-header-bar-navigation .ast-search-icon {
-  display: none;
+.search-form .search-field {
+  outline: none;
 }
 
-.ast-header-break-point .ast-search-menu-icon .search-field,
-.ast-header-break-point .ast-search-menu-icon.ast-inline-search .search-field {
-  width: 100%;
-  padding-right: 5.5em;
-}
-
-.ast-header-break-point .ast-search-menu-icon .search-submit {
-  display: block;
-  position: absolute;
-  height: 100%;
-  top: 0;
-  right: 0;
-  padding: 0 1em;
-  -webkit-border-radius: 0;
-  border-radius: 0;
-}
-
-.ast-header-break-point .ast-search-menu-icon .search-form {
-  padding: 0;
-  display: block;
-  overflow: hidden;
+.ast-search-menu-icon {
+  position: relative;
+  z-index: 3;
 }
 
 /* must have higher specificity than alternative color schemes inline styles */
 .site .skip-link {
   background-color: #f1f1f1;
-  -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.2);
   color: #21759b;
   display: block;
@@ -1959,10 +1817,10 @@ input[type="submit"]:focus {
   top: 7px;
   width: auto;
   z-index: 100000;
+  outline: thin dotted;
 }
 
 .logged-in .site .skip-link {
-  -webkit-box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
   font-family: "Open Sans", sans-serif;
 }
@@ -1976,12 +1834,14 @@ body,
 button,
 input[type="button"],
 input[type="submit"],
-textarea {
+textarea,
+.ast-button,
+.ast-custom-button {
   line-height: 1.85714285714286;
 }
 
 .site-title a {
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .site-header .site-description {
@@ -1998,49 +1858,10 @@ textarea {
   font-weight: normal;
 }
 
-.single .entry-content .gallery {
-  margin-left: -10px;
-  margin-right: -10px;
-}
-
-.gallery-caption {
-  color: black;
-  padding: 10px;
-  -webkit-border-radius: 0 0 2px 2px;
-  border-radius: 0 0 2px 2px;
-  border: 1px solid #eaeaea;
-  border-top: none;
-  font-size: 0.9em;
-}
-
-.gallery-icon {
-  border-bottom: 0;
-  -webkit-border-radius: 2px 2px 0 0;
-  border-radius: 2px 2px 0 0;
-  border: 1px solid #eaeaea;
-  overflow: hidden;
-}
-
-.gallery-item {
-  margin: 0;
-  padding: 10px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-}
-
-.gallery-item:last-child {
-  margin-bottom: 2em;
-}
-
-.elementor-image-gallery .gallery-icon {
-  border: none;
-}
-
 /* Astra Respnosive oEmbed Video container */
 .ast-oembed-container {
   position: relative;
-  padding-bottom: 56.25%;
-  padding-top: 30px;
+  padding-top: 56.25%;
   height: 0;
   overflow: hidden;
   max-width: 100%;
@@ -2048,6 +1869,14 @@ textarea {
 }
 
 .ast-oembed-container iframe, .ast-oembed-container object, .ast-oembed-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body .ast-oembed-container * {
   position: absolute;
   top: 0;
   left: 0;
@@ -2092,22 +1921,16 @@ p {
 
 h1,
 .entry-content h1,
-.entry-content h1 a,
 h2,
 .entry-content h2,
-.entry-content h2 a,
 h3,
 .entry-content h3,
-.entry-content h3 a,
 h4,
 .entry-content h4,
-.entry-content h4 a,
 h5,
 .entry-content h5,
-.entry-content h5 a,
 h6,
-.entry-content h6,
-.entry-content h6 a {
+.entry-content h6 {
   color: #3a3a3a;
 }
 

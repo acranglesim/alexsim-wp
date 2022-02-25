@@ -34,7 +34,7 @@
 			
 			<?php if(is_single()) : ?>
 				<div class="in-header-title">
-					<?php the_title( '<h1 class="entry-title title-font">', '</h1>' ); ?>
+					<?php the_title( '<h3 class="entry-title title-font">', '</h3>' ); ?>
 				</div>	
 			<?php endif; ?>
 		</div>	

@@ -18,7 +18,7 @@
     .style(@style) when (@style=bold) {font-weight: @style;}
     .style(@style);
 }
-.placeholder(@color: false, @style: false){
+.placeholder(@color: false; @style: false){
     &::-webkit-input-placeholder {
         .colormixin(@color);
         .stylemixin(@style);
@@ -34,7 +34,7 @@
     &:-ms-input-placeholder {
         .colormixin(@color);
         .stylemixin(@style);
-    }
+    } 
 }
 @-moz-keyframes spin {
 	100% {

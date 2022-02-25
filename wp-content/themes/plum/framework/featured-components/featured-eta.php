@@ -21,7 +21,7 @@
 					        	$loop->the_post(); 
 					        	
 					        	if ( has_post_thumbnail() ) :
-					        		$image_data = wp_get_attachment_image_src( get_post_thumbnail_id( $loop->post->ID), 'plum-pop-thumb' ); 
+					        		$image_data = wp_get_attachment_image_src( get_post_thumbnail_id( $loop->post->ID), 'plum-pop-thumb' );
 									$image_url = $image_data[0]; 
 								else:
 								
@@ -31,8 +31,8 @@
 					        ?>
 							<div class="fg-item-container col-md-3 col-sm-3 col-xs-12">
 								<div class="fg-item">
-									<a href="<?php echo get_permalink( $loop->post->ID ) ?>" title="<?php echo esc_attr($loop->post->post_title ? $loop->post->post_title : $loop->post->ID); ?>">
-										<img src="<?php echo $image_url; ?>">
+									<a href="<?php echo esc_url(get_permalink( $loop->post->ID )) ?>" title="<?php echo esc_attr($loop->post->post_title ? $loop->post->post_title : $loop->post->ID); ?>">
+										<img src="<?php echo $image_url; ?>" alt="<?php the_title(); ?>">
 										<div class="post-details">
 											<h3><?php the_title(); ?></h3>
 										</div>

@@ -1,37 +1,33 @@
 <?php
-/**
- * Contains various functions that may be potentially used throughout
- * the WPForms plugin.
- *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
- */
 
 /**
  * Helper function to trigger displaying a form.
  *
  * @since 1.0.2
  *
- * @param mixed $form_id
- * @param bool $title
- * @param bool $desc
+ * @param mixed $form_id Form ID.
+ * @param bool  $title   Form title.
+ * @param bool  $desc    Form description.
  */
 function wpforms_display( $form_id = false, $title = false, $desc = false ) {
-
 	wpforms()->frontend->output( $form_id, $title, $desc );
 }
 
 /**
- * Performs json_decode and unslash.
+ * Perform json_decode and unslash.
+ *
+ * IMPORTANT: This function decodes the result of wpforms_encode() properly only if
+ * wp_insert_post() or wp_update_post() were used after the data is encoded.
+ * Both wp_insert_post() and wp_update_post() remove excessive slashes added by wpforms_encode().
+ *
+ * Using wpforms_decode() on wpforms_encode() result directly
+ * (without using wp_insert_post() or wp_update_post() first) always returns null or false.
  *
  * @since 1.0.0
  *
- * @param string $data
+ * @param string $data Data to decode.
  *
- * @return array|bool
+ * @return array|false|null
  */
 function wpforms_decode( $data ) {
 
@@ -43,13 +39,19 @@ function wpforms_decode( $data ) {
 }
 
 /**
- * Performs json_encode and wp_slash.
+ * Perform json_encode and wp_slash.
+ *
+ * IMPORTANT: This function adds excessive slashes to prevent data damage
+ * by wp_insert_post() or wp_update_post() that use wp_unslash() on all the incoming data.
+ *
+ * Decoding the result of this function by wpforms_decode() directly
+ * (without using wp_insert_post() or wp_update_post() first) always returns null or false.
  *
  * @since 1.3.1.3
  *
- * @param mixed $data
+ * @param mixed $data Data to encode.
  *
- * @return string
+ * @return string|false
  */
 function wpforms_encode( $data = false ) {
 
@@ -64,14 +66,19 @@ function wpforms_encode( $data = false ) {
  * Check if a string is a valid URL.
  *
  * @since 1.0.0
+ * @since 1.5.8 Changed the pattern used to validate the URL.
  *
- * @param string $url
+ * @param string $url Input URL.
  *
  * @return bool
  */
 function wpforms_is_url( $url ) {
 
-	if ( preg_match( '_^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS', trim( $url ) ) ) {
+	// The pattern taken from https://gist.github.com/dperini/729294.
+	// It is the best choice according to the https://mathiasbynens.be/demo/url-regex.
+	$pattern = '%^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\x{00a1}-\x{ffff}][a-z0-9\x{00a1}-\x{ffff}_-]{0,62})?[a-z0-9\x{00a1}-\x{ffff}]\.)+(?:[a-z\x{00a1}-\x{ffff}]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$%iu';
+
+	if ( preg_match( $pattern, trim( $url ) ) ) {
 		return true;
 	}
 
@@ -79,25 +86,25 @@ function wpforms_is_url( $url ) {
 }
 
 /**
- * Get current URL.
+ * Get the current URL.
  *
  * @since 1.0.0
+ * @since 1.7.2 Refactored based on the `home_url` function.
  *
  * @return string
  */
 function wpforms_current_url() {
 
-	$url = ( ! empty( $_SERVER['HTTPS'] ) ) ? 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] : 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-
-	return esc_url_raw( $url );
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	return esc_url_raw( home_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 }
 
 /**
- * Object to array.
+ * Convert object to an array.
  *
  * @since 1.1.7
  *
- * @param object $object
+ * @param object $object Object to convert.
  *
  * @return mixed
  */
@@ -120,7 +127,7 @@ function wpforms_object_to_array( $object ) {
  * @since 1.0.0
  *
  * @param string $key
- * @param mixed $default
+ * @param mixed  $default
  * @param string $option
  *
  * @return mixed
@@ -129,9 +136,46 @@ function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' )
 
 	$key     = wpforms_sanitize_key( $key );
 	$options = get_option( $option, false );
-	$value   = is_array( $options ) && ! empty( $options[ $key ] ) ? $options[ $key ] : $default;
+	$value   = is_array( $options ) && ! empty( $options[ $key ] ) ? wp_unslash( $options[ $key ] ) : $default;
 
 	return $value;
+}
+
+/**
+ * Update plugin settings option and allow it to be filterable.
+ *
+ * @since 1.6.6
+ *
+ * @param array $settings A plugin settings array that is saved into options table.
+ *
+ * @return bool
+ */
+function wpforms_update_settings( $settings ) {
+
+	/**
+	 * Allows plugin settings to be modified before persisting in the database.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array $settings An array of plugin settings to modify.
+	 */
+	$settings = (array) apply_filters( 'wpforms_update_settings', $settings );
+
+	$updated = update_option( 'wpforms_settings', $settings );
+
+	/**
+	 * Fires after the plugin settings were persisted in the database.
+	 *
+	 * The `$updated` parameter allows to check whether the update was actually successful.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param array  $settings An array of plugin settings.
+	 * @param bool   $updated  Whether an option was updated or not.
+	 */
+	do_action( 'wpforms_settings_updated', $settings, $updated );
+
+	return $updated;
 }
 
 /**
@@ -144,7 +188,6 @@ function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' )
  * @return string
  */
 function wpforms_sanitize_key( $key = '' ) {
-
 	return preg_replace( '/[^a-zA-Z0-9_\-\.\:\/]/', '', $key );
 }
 
@@ -154,8 +197,8 @@ function wpforms_sanitize_key( $key = '' ) {
  * @since 1.0.5
  *
  * @param array|string $type
- * @param array $form
- * @param bool $multiple
+ * @param array|object $form
+ * @param bool         $multiple
  *
  * @return bool
  */
@@ -174,27 +217,26 @@ function wpforms_has_field_type( $type, $form, $multiple = false ) {
 		}
 
 		return $field;
-	} else {
-
-		if ( is_object( $form ) && ! empty( $form->post_content ) ) {
-			$form_data = wpforms_decode( $form->post_content );
-		} elseif ( is_array( $form ) ) {
-			$form_data = $form;
-		}
-
-		if ( empty( $form_data['fields'] ) ) {
-			return false;
-		}
-
-		foreach ( $form_data['fields'] as $single_field ) {
-			if ( in_array( $single_field['type'], $type, true ) ) {
-				$field = true;
-				break;
-			}
-		}
-
-		return $field;
 	}
+
+	if ( is_object( $form ) && ! empty( $form->post_content ) ) {
+		$form_data = wpforms_decode( $form->post_content );
+	} elseif ( is_array( $form ) ) {
+		$form_data = $form;
+	}
+
+	if ( empty( $form_data['fields'] ) ) {
+		return false;
+	}
+
+	foreach ( $form_data['fields'] as $single_field ) {
+		if ( in_array( $single_field['type'], $type, true ) ) {
+			$field = true;
+			break;
+		}
+	}
+
+	return $field;
 }
 
 /**
@@ -203,8 +245,8 @@ function wpforms_has_field_type( $type, $form, $multiple = false ) {
  * @since 1.4.5
  *
  * @param string $setting
- * @param array $form
- * @param bool $multiple
+ * @param object|array  $form
+ * @param bool   $multiple
  *
  * @return bool
  */
@@ -222,40 +264,45 @@ function wpforms_has_field_setting( $setting, $form, $multiple = false ) {
 		}
 
 		return $field;
-	} else {
-
-		if ( is_object( $form ) && ! empty( $form->post_content ) ) {
-			$form_data = wpforms_decode( $form->post_content );
-		} elseif ( is_array( $form ) ) {
-			$form_data = $form;
-		}
-
-		if ( empty( $form_data['fields'] ) ) {
-			return false;
-		}
-
-		foreach ( $form_data['fields'] as $single_field ) {
-
-			if ( ! empty( $single_field[ $setting ] ) ) {
-				$field = true;
-				break;
-			}
-		}
-
-		return $field;
 	}
+
+	if ( is_object( $form ) && ! empty( $form->post_content ) ) {
+		$form_data = wpforms_decode( $form->post_content );
+	} elseif ( is_array( $form ) ) {
+		$form_data = $form;
+	}
+
+	if ( empty( $form_data['fields'] ) ) {
+		return false;
+	}
+
+	foreach ( $form_data['fields'] as $single_field ) {
+
+		if ( ! empty( $single_field[ $setting ] ) ) {
+			$field = true;
+			break;
+		}
+	}
+
+	return $field;
 }
 
 /**
- * Checks if form provided contains page breaks, if so give details.
+ * Check if form provided contains Page Break, if so give details.
  *
  * @since 1.0.0
  *
- * @param mixed $form
+ * @todo It is not used since 1.4.0. Probably, it should be deprecated and suggest using the wpforms_get_pagebreak_details() function.
  *
- * @return mixed
+ * @param WP_Post|array $form Form data.
+ *
+ * @return int|bool Pages count or false.
  */
 function wpforms_has_pagebreak( $form = false ) {
+
+	if ( ! wpforms()->pro ) {
+		return false;
+	}
 
 	$form_data = '';
 	$pagebreak = false;
@@ -274,30 +321,38 @@ function wpforms_has_pagebreak( $form = false ) {
 	$fields = $form_data['fields'];
 
 	foreach ( $fields as $field ) {
-		if ( 'pagebreak' === $field['type'] && empty( $field['position'] ) ) {
+
+		if ( $field['type'] === 'pagebreak' && empty( $field['position'] ) ) {
 			$pagebreak = true;
+
 			$pages ++;
 		}
 	}
 
 	if ( $pagebreak ) {
 		return $pages;
-	} else {
-		return false;
 	}
+
+	return false;
 }
 
 /**
- * Tries to find and return an top or bottom pagebreak.
+ * Try to find and return a top or bottom Page Break.
  *
  * @since 1.2.1
  *
- * @param mixed $form
- * @param mixed $type
+ * @todo It is not used since 1.4.0. Probably, it should be deprecated and suggest using the wpforms_get_pagebreak_details() function.
+ *
+ * @param WP_Post|array $form Form data.
+ * @param string|bool   $type Type of Page Break fields (top, bottom, pages or false).
  *
  * @return array|bool
  */
 function wpforms_get_pagebreak( $form = false, $type = false ) {
+
+	if ( ! wpforms()->pro ) {
+		return false;
+	}
 
 	$form_data = '';
 
@@ -312,16 +367,20 @@ function wpforms_get_pagebreak( $form = false, $type = false ) {
 	}
 
 	$fields = $form_data['fields'];
-	$pages  = array();
+	$pages  = [];
 
 	foreach ( $fields as $field ) {
-		if ( 'pagebreak' === $field['type'] ) {
-			$position = ! empty( $field['position'] ) ? $field['position'] : false;
-			if ( 'pages' === $type && 'bottom' !== $position ) {
-				$pages[] = $field;
-			} elseif ( $position === $type ) {
-				return $field;
-			}
+
+		if ( $field['type'] !== 'pagebreak' ) {
+			continue;
+		}
+
+		$position = ! empty( $field['position'] ) ? $field['position'] : false;
+
+		if ( $type === 'pages' && $position !== 'bottom' ) {
+			$pages[] = $field;
+		} elseif ( $position === $type ) {
+			return $field;
 		}
 	}
 
@@ -333,19 +392,22 @@ function wpforms_get_pagebreak( $form = false, $type = false ) {
 }
 
 /**
- * Returns information about pages if the form has multiple pages.
+ * Return information about pages if the form has multiple pages.
  *
  * @since 1.3.7
  *
- * @param mixed $form
+ * @param WP_Post|array $form Form data.
  *
- * @return mixed false or an array
+ * @return false|array Page Break details or false.
  */
 function wpforms_get_pagebreak_details( $form = false ) {
 
-	$form_data = '';
-	$details   = array();
-	$pages     = 1;
+	if ( ! wpforms()->pro ) {
+		return false;
+	}
+
+	$details = [];
+	$pages   = 1;
 
 	if ( is_object( $form ) && ! empty( $form->post_content ) ) {
 		$form_data = wpforms_decode( $form->post_content );
@@ -358,45 +420,44 @@ function wpforms_get_pagebreak_details( $form = false ) {
 	}
 
 	foreach ( $form_data['fields'] as $field ) {
-		if ( 'pagebreak' === $field['type'] ) {
-			if ( empty( $field['position'] ) ) {
-				$pages ++;
-				$details['total']   = $pages;
-				$details['pages'][] = $field;
-			} elseif ( 'top' === $field['position'] ) {
-				$details['top'] = $field;
-			} elseif ( 'bottom' === $field['position'] ) {
-				$details['bottom'] = $field;
-			}
+
+		if ( $field['type'] !== 'pagebreak' ) {
+			continue;
+		}
+
+		if ( empty( $field['position'] ) ) {
+			$pages ++;
+			$details['total']   = $pages;
+			$details['pages'][] = $field;
+		} elseif ( $field['position'] === 'top' ) {
+			$details['top'] = $field;
+		} elseif ( $field['position'] === 'bottom' ) {
+			$details['bottom'] = $field;
 		}
 	}
 
 	if ( ! empty( $details ) ) {
-		if ( empty( $details['top'] ) ) {
-			$details['top'] = array();
-		}
-		if ( empty( $details['bottom'] ) ) {
-			$details['bottom'] = array();
-		}
+		$details['top']     = empty( $details['top'] ) ? [] : $details['top'];
+		$details['bottom']  = empty( $details['bottom'] ) ? [] : $details['bottom'];
 		$details['current'] = 1;
 
 		return $details;
-	} else {
-		return false;
 	}
+
+	return false;
 }
 
 /**
- * Formats, sanitizes, and returns/echos HTML element ID, classes, attributes,
+ * Format, sanitize, and return/echo HTML element ID, classes, attributes,
  * and data attributes.
  *
  * @since 1.3.7
  *
  * @param string $id
- * @param array $class
- * @param array $datas
- * @param array $atts
- * @param bool $echo
+ * @param array  $class
+ * @param array  $datas
+ * @param array  $atts
+ * @param bool   $echo
  *
  * @return string
  */
@@ -427,8 +488,14 @@ function wpforms_html_attributes( $id = '', $class = array(), $datas = array(), 
 
 	if ( ! empty( $atts ) ) {
 		foreach ( $atts as $att => $val ) {
-			if ( '0' == $val || ! empty( $val ) ) {
-				$parts[] = sanitize_html_class( $att ) . '="' . esc_attr( $val ) . '"';
+			if ( '0' === (string) $val || ! empty( $val ) ) {
+				if ( $att[0] === '[' ) {
+					// Handle special case for bound attributes in AMP.
+					$escaped_att = '[' . sanitize_html_class( trim( $att, '[]' ) ) . ']';
+				} else {
+					$escaped_att = sanitize_html_class( $att );
+				}
+				$parts[] = $escaped_att . '="' . esc_attr( $val ) . '"';
 			}
 		}
 	}
@@ -436,19 +503,19 @@ function wpforms_html_attributes( $id = '', $class = array(), $datas = array(), 
 	$output = implode( ' ', $parts );
 
 	if ( $echo ) {
-		echo trim( $output );
+		echo trim( $output ); // phpcs:ignore
 	} else {
 		return trim( $output );
 	}
 }
 
 /**
- * Sanitizes string of CSS classes.
+ * Sanitize string of CSS classes.
  *
  * @since 1.2.1
  *
  * @param array|string $classes
- * @param bool $convert True will convert strings to array and vice versa.
+ * @param bool         $convert True will convert strings to array and vice versa.
  *
  * @return string|array
  */
@@ -469,16 +536,17 @@ function wpforms_sanitize_classes( $classes, $convert = false ) {
 	}
 	if ( $array ) {
 		return $convert ? implode( ' ', $css ) : $css;
-	} else {
-		return $convert ? $css : implode( ' ', $css );
 	}
+
+	return $convert ? $css : implode( ' ', $css );
 }
 
 /**
  * Convert a file size provided, such as "2M", to bytes.
  *
- * @since 1.0.0
  * @link http://stackoverflow.com/a/22500394
+ *
+ * @since 1.0.0
  *
  * @param string $size
  *
@@ -511,28 +579,11 @@ function wpforms_size_to_bytes( $size ) {
 }
 
 /**
- * Convert bytes to megabytes (or in some cases KB).
- *
- * @since 1.0.0
- *
- * @param int $bytes
- *
- * @return string
- */
-function wpforms_size_to_megabytes( $bytes ) {
-
-	if ( $bytes < 1048676 ) {
-		return number_format( $bytes / 1024, 1 ) . ' KB';
-	} else {
-		return round( number_format( $bytes / 1048576, 1 ) ) . ' MB';
-	}
-}
-
-/**
  * Convert a file size provided, such as "2M", to bytes.
  *
- * @since 1.0.0
  * @link http://stackoverflow.com/a/22500394
+ *
+ * @since 1.0.0
  *
  * @param bool $bytes
  *
@@ -543,9 +594,9 @@ function wpforms_max_upload( $bytes = false ) {
 	$max = wp_max_upload_size();
 	if ( $bytes ) {
 		return $max;
-	} else {
-		return wpforms_size_to_megabytes( $max );
 	}
+
+	return size_format( $max );
 }
 
 /**
@@ -563,7 +614,7 @@ function wpforms_max_upload( $bytes = false ) {
  */
 function wpforms_get_form_fields( $form = false, $whitelist = array() ) {
 
-	// Accept form (post) object or form ID
+	// Accept form (post) object or form ID.
 	if ( is_object( $form ) ) {
 		$form = wpforms_decode( $form->post_content );
 	} elseif ( is_numeric( $form ) ) {
@@ -575,32 +626,40 @@ function wpforms_get_form_fields( $form = false, $whitelist = array() ) {
 		);
 	}
 
+	// White list of field types to allow.
+	$allowed_form_fields = [
+		'address',
+		'checkbox',
+		'date-time',
+		'email',
+		'file-upload',
+		'gdpr-checkbox',
+		'hidden',
+		'likert_scale',
+		'name',
+		'net_promoter_score',
+		'number',
+		'number-slider',
+		'payment-checkbox',
+		'payment-multiple',
+		'payment-select',
+		'payment-single',
+		'payment-total',
+		'phone',
+		'radio',
+		'rating',
+		'richtext',
+		'select',
+		'signature',
+		'text',
+		'textarea',
+		'url',
+	];
+	$allowed_form_fields = apply_filters( 'wpforms_get_form_fields_allowed', $allowed_form_fields );
+
 	if ( ! is_array( $form ) || empty( $form['fields'] ) ) {
 		return false;
 	}
-
-	// White list of field types to allow
-	$allowed_form_fields = array(
-		'text',
-		'textarea',
-		'select',
-		'radio',
-		'checkbox',
-		'email',
-		'address',
-		'url',
-		'name',
-		'hidden',
-		'date-time',
-		'phone',
-		'number',
-		'file-upload',
-		'payment-single',
-		'payment-multiple',
-		'payment-select',
-		'payment-total',
-	);
-	$allowed_form_fields = apply_filters( 'wpforms_get_form_fields_allowed', $allowed_form_fields );
 
 	$whitelist = ! empty( $whitelist ) ? $whitelist : $allowed_form_fields;
 
@@ -616,13 +675,44 @@ function wpforms_get_form_fields( $form = false, $whitelist = array() ) {
 }
 
 /**
+ * Conditional logic form fields supported.
+ *
+ * @since 1.5.2
+ *
+ * @return array
+ */
+function wpforms_get_conditional_logic_form_fields_supported() {
+
+	$fields_supported = [
+		'checkbox',
+		'email',
+		'hidden',
+		'net_promoter_score',
+		'number',
+		'number-slider',
+		'payment-checkbox',
+		'payment-multiple',
+		'payment-select',
+		'radio',
+		'rating',
+		'richtext',
+		'select',
+		'text',
+		'textarea',
+		'url',
+	];
+
+	return apply_filters( 'wpforms_get_conditional_logic_form_fields_supported', $fields_supported );
+}
+
+/**
  * Get meta key value for a form field.
  *
  * @since 1.1.9
  *
- * @param int|string $id Field ID.
- * @param string $key Meta key.
- * @param mixed $form_data Form data array.
+ * @param int|string $id        Field ID.
+ * @param string     $key       Meta key.
+ * @param mixed      $form_data Form data array.
  *
  * @return string
  */
@@ -634,104 +724,102 @@ function wpforms_get_form_field_meta( $id = '', $key = '', $form_data = '' ) {
 
 	if ( ! empty( $form_data['fields'][ $id ]['meta'][ $key ] ) ) {
 		return $form_data['fields'][ $id ]['meta'][ $key ];
-	} else {
-		return '';
 	}
+
+	return '';
 }
 
 /**
  * Get meta key value for a form field.
  *
  * @since 1.3.1
+ * @since 1.5.0 More strict parameters. Always return an array.
  *
- * @param string $key Meta key.
- * @param string $value
- * @param mixed $form_data Form data array.
+ * @param string $key       Meta key.
+ * @param string $value     Meta value to check against.
+ * @param array  $form_data Form data array.
  *
- * @return string
+ * @return array|bool Empty array, when no data is found.
  */
-function wpforms_get_form_fields_by_meta( $key = '', $value = '', $form_data = '' ) {
-
-	if ( empty( $key ) || empty( $value ) || empty( $form_data['fields'] ) ) {
-		return false;
-	}
+function wpforms_get_form_fields_by_meta( $key, $value, $form_data ) {
 
 	$found = array();
 
+	if ( empty( $key ) || empty( $value ) || empty( $form_data['fields'] ) ) {
+		return $found;
+	}
+
 	foreach ( $form_data['fields'] as $id => $field ) {
 
-		if ( ! empty( $field['meta'][ $key ] ) && $value == $field['meta'][ $key ] ) {
+		if ( ! empty( $field['meta'][ $key ] ) && $value === $field['meta'][ $key ] ) {
 			$found[ $id ] = $field;
 		}
 	}
 
-	if ( ! empty( $found ) ) {
-		return $found;
-	} else {
-		return false;
-	}
+	return $found;
 }
 
 /**
- * US States
+ * US States.
  *
  * @since 1.0.0
+ *
  * @return array
  */
 function wpforms_us_states() {
 
 	$states = array(
-		'AL' => esc_html__( 'Alabama', 'wpforms' ),
-		'AK' => esc_html__( 'Alaska', 'wpforms' ),
-		'AZ' => esc_html__( 'Arizona', 'wpforms' ),
-		'AR' => esc_html__( 'Arkansas', 'wpforms' ),
-		'CA' => esc_html__( 'California', 'wpforms' ),
-		'CO' => esc_html__( 'Colorado', 'wpforms' ),
-		'CT' => esc_html__( 'Connecticut', 'wpforms' ),
-		'DE' => esc_html__( 'Delaware', 'wpforms' ),
-		'DC' => esc_html__( 'District of Columbia', 'wpforms' ),
-		'FL' => esc_html__( 'Florida', 'wpforms' ),
-		'GA' => esc_html_x( 'Georgia', 'US State', 'wpforms' ),
-		'HI' => esc_html__( 'Hawaii', 'wpforms' ),
-		'ID' => esc_html__( 'Idaho', 'wpforms' ),
-		'IL' => esc_html__( 'Illinois', 'wpforms' ),
-		'IN' => esc_html__( 'Indiana', 'wpforms' ),
-		'IA' => esc_html__( 'Iowa', 'wpforms' ),
-		'KS' => esc_html__( 'Kansas', 'wpforms' ),
-		'KY' => esc_html__( 'Kentucky', 'wpforms' ),
-		'LA' => esc_html__( 'Louisiana', 'wpforms' ),
-		'ME' => esc_html__( 'Maine', 'wpforms' ),
-		'MD' => esc_html__( 'Maryland', 'wpforms' ),
-		'MA' => esc_html__( 'Massachusetts', 'wpforms' ),
-		'MI' => esc_html__( 'Michigan', 'wpforms' ),
-		'MN' => esc_html__( 'Minnesota', 'wpforms' ),
-		'MS' => esc_html__( 'Mississippi', 'wpforms' ),
-		'MO' => esc_html__( 'Missouri', 'wpforms' ),
-		'MT' => esc_html__( 'Montana', 'wpforms' ),
-		'NE' => esc_html__( 'Nebraska', 'wpforms' ),
-		'NV' => esc_html__( 'Nevada', 'wpforms' ),
-		'NH' => esc_html__( 'New Hampshire', 'wpforms' ),
-		'NJ' => esc_html__( 'New Jersey', 'wpforms' ),
-		'NM' => esc_html__( 'New Mexico', 'wpforms' ),
-		'NY' => esc_html__( 'New York', 'wpforms' ),
-		'NC' => esc_html__( 'North Carolina', 'wpforms' ),
-		'ND' => esc_html__( 'North Dakota', 'wpforms' ),
-		'OH' => esc_html__( 'Ohio', 'wpforms' ),
-		'OK' => esc_html__( 'Oklahoma', 'wpforms' ),
-		'OR' => esc_html__( 'Oregon', 'wpforms' ),
-		'PA' => esc_html__( 'Pennsylvania', 'wpforms' ),
-		'RI' => esc_html__( 'Rhode Island', 'wpforms' ),
-		'SC' => esc_html__( 'South Carolina', 'wpforms' ),
-		'SD' => esc_html__( 'South Dakota', 'wpforms' ),
-		'TN' => esc_html__( 'Tennessee', 'wpforms' ),
-		'TX' => esc_html__( 'Texas', 'wpforms' ),
-		'UT' => esc_html__( 'Utah', 'wpforms' ),
-		'VT' => esc_html__( 'Vermont', 'wpforms' ),
-		'VA' => esc_html__( 'Virginia', 'wpforms' ),
-		'WA' => esc_html__( 'Washington', 'wpforms' ),
-		'WV' => esc_html__( 'West Virginia', 'wpforms' ),
-		'WI' => esc_html__( 'Wisconsin', 'wpforms' ),
-		'WY' => esc_html__( 'Wyoming', 'wpforms' ),
+		'AL' => esc_html__( 'Alabama', 'wpforms-lite' ),
+		'AK' => esc_html__( 'Alaska', 'wpforms-lite' ),
+		'AZ' => esc_html__( 'Arizona', 'wpforms-lite' ),
+		'AR' => esc_html__( 'Arkansas', 'wpforms-lite' ),
+		'CA' => esc_html__( 'California', 'wpforms-lite' ),
+		'CO' => esc_html__( 'Colorado', 'wpforms-lite' ),
+		'CT' => esc_html__( 'Connecticut', 'wpforms-lite' ),
+		'DE' => esc_html__( 'Delaware', 'wpforms-lite' ),
+		'DC' => esc_html__( 'District of Columbia', 'wpforms-lite' ),
+		'FL' => esc_html__( 'Florida', 'wpforms-lite' ),
+		'GA' => esc_html_x( 'Georgia', 'US State', 'wpforms-lite' ),
+		'HI' => esc_html__( 'Hawaii', 'wpforms-lite' ),
+		'ID' => esc_html__( 'Idaho', 'wpforms-lite' ),
+		'IL' => esc_html__( 'Illinois', 'wpforms-lite' ),
+		'IN' => esc_html__( 'Indiana', 'wpforms-lite' ),
+		'IA' => esc_html__( 'Iowa', 'wpforms-lite' ),
+		'KS' => esc_html__( 'Kansas', 'wpforms-lite' ),
+		'KY' => esc_html__( 'Kentucky', 'wpforms-lite' ),
+		'LA' => esc_html__( 'Louisiana', 'wpforms-lite' ),
+		'ME' => esc_html__( 'Maine', 'wpforms-lite' ),
+		'MD' => esc_html__( 'Maryland', 'wpforms-lite' ),
+		'MA' => esc_html__( 'Massachusetts', 'wpforms-lite' ),
+		'MI' => esc_html__( 'Michigan', 'wpforms-lite' ),
+		'MN' => esc_html__( 'Minnesota', 'wpforms-lite' ),
+		'MS' => esc_html__( 'Mississippi', 'wpforms-lite' ),
+		'MO' => esc_html__( 'Missouri', 'wpforms-lite' ),
+		'MT' => esc_html__( 'Montana', 'wpforms-lite' ),
+		'NE' => esc_html__( 'Nebraska', 'wpforms-lite' ),
+		'NV' => esc_html__( 'Nevada', 'wpforms-lite' ),
+		'NH' => esc_html__( 'New Hampshire', 'wpforms-lite' ),
+		'NJ' => esc_html__( 'New Jersey', 'wpforms-lite' ),
+		'NM' => esc_html__( 'New Mexico', 'wpforms-lite' ),
+		'NY' => esc_html__( 'New York', 'wpforms-lite' ),
+		'NC' => esc_html__( 'North Carolina', 'wpforms-lite' ),
+		'ND' => esc_html__( 'North Dakota', 'wpforms-lite' ),
+		'OH' => esc_html__( 'Ohio', 'wpforms-lite' ),
+		'OK' => esc_html__( 'Oklahoma', 'wpforms-lite' ),
+		'OR' => esc_html__( 'Oregon', 'wpforms-lite' ),
+		'PA' => esc_html__( 'Pennsylvania', 'wpforms-lite' ),
+		'RI' => esc_html__( 'Rhode Island', 'wpforms-lite' ),
+		'SC' => esc_html__( 'South Carolina', 'wpforms-lite' ),
+		'SD' => esc_html__( 'South Dakota', 'wpforms-lite' ),
+		'TN' => esc_html__( 'Tennessee', 'wpforms-lite' ),
+		'TX' => esc_html__( 'Texas', 'wpforms-lite' ),
+		'UT' => esc_html__( 'Utah', 'wpforms-lite' ),
+		'VT' => esc_html__( 'Vermont', 'wpforms-lite' ),
+		'VA' => esc_html__( 'Virginia', 'wpforms-lite' ),
+		'WA' => esc_html__( 'Washington', 'wpforms-lite' ),
+		'WV' => esc_html__( 'West Virginia', 'wpforms-lite' ),
+		'WI' => esc_html__( 'Wisconsin', 'wpforms-lite' ),
+		'WY' => esc_html__( 'Wyoming', 'wpforms-lite' ),
 	);
 
 	return apply_filters( 'wpforms_us_states', $states );
@@ -741,306 +829,311 @@ function wpforms_us_states() {
  * Countries.
  *
  * @since 1.0.0
+ *
  * @return array
  */
 function wpforms_countries() {
 
 	$countries = array(
-		'AF' => esc_html__( 'Afghanistan', 'wpforms' ),
-		'AX' => esc_html__( 'Åland Islands', 'wpforms' ),
-		'AL' => esc_html__( 'Albania', 'wpforms' ),
-		'DZ' => esc_html__( 'Algeria', 'wpforms' ),
-		'AS' => esc_html__( 'American Samoa', 'wpforms' ),
-		'AD' => esc_html__( 'Andorra', 'wpforms' ),
-		'AO' => esc_html__( 'Angola', 'wpforms' ),
-		'AI' => esc_html__( 'Anguilla', 'wpforms' ),
-		'AQ' => esc_html__( 'Antarctica', 'wpforms' ),
-		'AG' => esc_html__( 'Antigua and Barbuda', 'wpforms' ),
-		'AR' => esc_html__( 'Argentina', 'wpforms' ),
-		'AM' => esc_html__( 'Armenia', 'wpforms' ),
-		'AW' => esc_html__( 'Aruba', 'wpforms' ),
-		'AU' => esc_html__( 'Australia', 'wpforms' ),
-		'AT' => esc_html__( 'Austria', 'wpforms' ),
-		'AZ' => esc_html__( 'Azerbaijan', 'wpforms' ),
-		'BS' => esc_html__( 'Bahamas', 'wpforms' ),
-		'BH' => esc_html__( 'Bahrain', 'wpforms' ),
-		'BD' => esc_html__( 'Bangladesh', 'wpforms' ),
-		'BB' => esc_html__( 'Barbados', 'wpforms' ),
-		'BY' => esc_html__( 'Belarus', 'wpforms' ),
-		'BE' => esc_html__( 'Belgium', 'wpforms' ),
-		'BZ' => esc_html__( 'Belize', 'wpforms' ),
-		'BJ' => esc_html__( 'Benin', 'wpforms' ),
-		'BM' => esc_html__( 'Bermuda', 'wpforms' ),
-		'BT' => esc_html__( 'Bhutan', 'wpforms' ),
-		'BO' => esc_html__( 'Bolivia (Plurinational State of)', 'wpforms' ),
-		'BA' => esc_html__( 'Bosnia and Herzegovina', 'wpforms' ),
-		'BW' => esc_html__( 'Botswana', 'wpforms' ),
-		'BV' => esc_html__( 'Bouvet Island', 'wpforms' ),
-		'BR' => esc_html__( 'Brazil', 'wpforms' ),
-		'IO' => esc_html__( 'British Indian Ocean Territory', 'wpforms' ),
-		'BN' => esc_html__( 'Brunei Darussalam', 'wpforms' ),
-		'BG' => esc_html__( 'Bulgaria', 'wpforms' ),
-		'BF' => esc_html__( 'Burkina Faso', 'wpforms' ),
-		'BI' => esc_html__( 'Burundi', 'wpforms' ),
-		'CV' => esc_html__( 'Cabo Verde', 'wpforms' ),
-		'KH' => esc_html__( 'Cambodia', 'wpforms' ),
-		'CM' => esc_html__( 'Cameroon', 'wpforms' ),
-		'CA' => esc_html__( 'Canada', 'wpforms' ),
-		'KY' => esc_html__( 'Cayman Islands', 'wpforms' ),
-		'CF' => esc_html__( 'Central African Republic', 'wpforms' ),
-		'TD' => esc_html__( 'Chad', 'wpforms' ),
-		'CL' => esc_html__( 'Chile', 'wpforms' ),
-		'CN' => esc_html__( 'China', 'wpforms' ),
-		'CX' => esc_html__( 'Christmas Island', 'wpforms' ),
-		'CC' => esc_html__( 'Cocos (Keeling) Islands', 'wpforms' ),
-		'CO' => esc_html__( 'Colombia', 'wpforms' ),
-		'KM' => esc_html__( 'Comoros', 'wpforms' ),
-		'CG' => esc_html__( 'Congo', 'wpforms' ),
-		'CD' => esc_html__( 'Congo (Democratic Republic of the)', 'wpforms' ),
-		'CK' => esc_html__( 'Cook Islands', 'wpforms' ),
-		'CR' => esc_html__( 'Costa Rica', 'wpforms' ),
-		'CI' => esc_html__( 'Côte d\'Ivoire', 'wpforms' ),
-		'HR' => esc_html__( 'Croatia', 'wpforms' ),
-		'CU' => esc_html__( 'Cuba', 'wpforms' ),
-		'CW' => esc_html__( 'Curaçao', 'wpforms' ),
-		'CY' => esc_html__( 'Cyprus', 'wpforms' ),
-		'CZ' => esc_html__( 'Czech Republic', 'wpforms' ),
-		'DK' => esc_html__( 'Denmark', 'wpforms' ),
-		'DJ' => esc_html__( 'Djibouti', 'wpforms' ),
-		'DM' => esc_html__( 'Dominica', 'wpforms' ),
-		'DO' => esc_html__( 'Dominican Republic', 'wpforms' ),
-		'EC' => esc_html__( 'Ecuador', 'wpforms' ),
-		'EG' => esc_html__( 'Egypt', 'wpforms' ),
-		'SV' => esc_html__( 'El Salvador', 'wpforms' ),
-		'GQ' => esc_html__( 'Equatorial Guinea', 'wpforms' ),
-		'ER' => esc_html__( 'Eritrea', 'wpforms' ),
-		'EE' => esc_html__( 'Estonia', 'wpforms' ),
-		'ET' => esc_html__( 'Ethiopia', 'wpforms' ),
-		'FK' => esc_html__( 'Falkland Islands (Malvinas)', 'wpforms' ),
-		'FO' => esc_html__( 'Faroe Islands', 'wpforms' ),
-		'FJ' => esc_html__( 'Fiji', 'wpforms' ),
-		'FI' => esc_html__( 'Finland', 'wpforms' ),
-		'FR' => esc_html__( 'France', 'wpforms' ),
-		'GF' => esc_html__( 'French Guiana', 'wpforms' ),
-		'PF' => esc_html__( 'French Polynesia', 'wpforms' ),
-		'TF' => esc_html__( 'French Southern Territories', 'wpforms' ),
-		'GA' => esc_html__( 'Gabon', 'wpforms' ),
-		'GM' => esc_html__( 'Gambia', 'wpforms' ),
-		'GE' => esc_html_x( 'Georgia', 'Country', 'wpforms' ),
-		'DE' => esc_html__( 'Germany', 'wpforms' ),
-		'GH' => esc_html__( 'Ghana', 'wpforms' ),
-		'GI' => esc_html__( 'Gibraltar', 'wpforms' ),
-		'GR' => esc_html__( 'Greece', 'wpforms' ),
-		'GL' => esc_html__( 'Greenland', 'wpforms' ),
-		'GD' => esc_html__( 'Grenada', 'wpforms' ),
-		'GP' => esc_html__( 'Guadeloupe', 'wpforms' ),
-		'GU' => esc_html__( 'Guam', 'wpforms' ),
-		'GT' => esc_html__( 'Guatemala', 'wpforms' ),
-		'GG' => esc_html__( 'Guernsey', 'wpforms' ),
-		'GN' => esc_html__( 'Guinea', 'wpforms' ),
-		'GW' => esc_html__( 'Guinea-Bissau', 'wpforms' ),
-		'GY' => esc_html__( 'Guyana', 'wpforms' ),
-		'HT' => esc_html__( 'Haiti', 'wpforms' ),
-		'HM' => esc_html__( 'Heard Island and McDonald Islands', 'wpforms' ),
-		'HN' => esc_html__( 'Honduras', 'wpforms' ),
-		'HK' => esc_html__( 'Hong Kong', 'wpforms' ),
-		'HU' => esc_html__( 'Hungary', 'wpforms' ),
-		'IS' => esc_html__( 'Iceland', 'wpforms' ),
-		'IN' => esc_html__( 'India', 'wpforms' ),
-		'ID' => esc_html__( 'Indonesia', 'wpforms' ),
-		'IR' => esc_html__( 'Iran (Islamic Republic of)', 'wpforms' ),
-		'IQ' => esc_html__( 'Iraq', 'wpforms' ),
-		'IE' => esc_html__( 'Ireland (Republic of)', 'wpforms' ),
-		'IM' => esc_html__( 'Isle of Man', 'wpforms' ),
-		'IL' => esc_html__( 'Israel', 'wpforms' ),
-		'IT' => esc_html__( 'Italy', 'wpforms' ),
-		'JM' => esc_html__( 'Jamaica', 'wpforms' ),
-		'JP' => esc_html__( 'Japan', 'wpforms' ),
-		'JE' => esc_html__( 'Jersey', 'wpforms' ),
-		'JO' => esc_html__( 'Jordan', 'wpforms' ),
-		'KZ' => esc_html__( 'Kazakhstan', 'wpforms' ),
-		'KE' => esc_html__( 'Kenya', 'wpforms' ),
-		'KI' => esc_html__( 'Kiribati', 'wpforms' ),
-		'KP' => esc_html__( 'Korea (Democratic People\'s Republic of)', 'wpforms' ),
-		'KR' => esc_html__( 'Korea (Republic of)', 'wpforms' ),
-		'KW' => esc_html__( 'Kuwait', 'wpforms' ),
-		'KG' => esc_html__( 'Kyrgyzstan', 'wpforms' ),
-		'LA' => esc_html__( 'Lao People\'s Democratic Republic', 'wpforms' ),
-		'LV' => esc_html__( 'Latvia', 'wpforms' ),
-		'LB' => esc_html__( 'Lebanon', 'wpforms' ),
-		'LS' => esc_html__( 'Lesotho', 'wpforms' ),
-		'LR' => esc_html__( 'Liberia', 'wpforms' ),
-		'LY' => esc_html__( 'Libya', 'wpforms' ),
-		'LI' => esc_html__( 'Liechtenstein', 'wpforms' ),
-		'LT' => esc_html__( 'Lithuania', 'wpforms' ),
-		'LU' => esc_html__( 'Luxembourg', 'wpforms' ),
-		'MO' => esc_html__( 'Macao', 'wpforms' ),
-		'MK' => esc_html__( 'Macedonia (Republic of)', 'wpforms' ),
-		'MG' => esc_html__( 'Madagascar', 'wpforms' ),
-		'MW' => esc_html__( 'Malawi', 'wpforms' ),
-		'MY' => esc_html__( 'Malaysia', 'wpforms' ),
-		'MV' => esc_html__( 'Maldives', 'wpforms' ),
-		'ML' => esc_html__( 'Mali', 'wpforms' ),
-		'MT' => esc_html__( 'Malta', 'wpforms' ),
-		'MH' => esc_html__( 'Marshall Islands', 'wpforms' ),
-		'MQ' => esc_html__( 'Martinique', 'wpforms' ),
-		'MR' => esc_html__( 'Mauritania', 'wpforms' ),
-		'MU' => esc_html__( 'Mauritius', 'wpforms' ),
-		'YT' => esc_html__( 'Mayotte', 'wpforms' ),
-		'MX' => esc_html__( 'Mexico', 'wpforms' ),
-		'FM' => esc_html__( 'Micronesia (Federated States of)', 'wpforms' ),
-		'MD' => esc_html__( 'Moldova (Republic of)', 'wpforms' ),
-		'MC' => esc_html__( 'Monaco', 'wpforms' ),
-		'MN' => esc_html__( 'Mongolia', 'wpforms' ),
-		'ME' => esc_html__( 'Montenegro', 'wpforms' ),
-		'MS' => esc_html__( 'Montserrat', 'wpforms' ),
-		'MA' => esc_html__( 'Morocco', 'wpforms' ),
-		'MZ' => esc_html__( 'Mozambique', 'wpforms' ),
-		'MM' => esc_html__( 'Myanmar', 'wpforms' ),
-		'NA' => esc_html__( 'Namibia', 'wpforms' ),
-		'NR' => esc_html__( 'Nauru', 'wpforms' ),
-		'NP' => esc_html__( 'Nepal', 'wpforms' ),
-		'NL' => esc_html__( 'Netherlands', 'wpforms' ),
-		'NC' => esc_html__( 'New Caledonia', 'wpforms' ),
-		'NZ' => esc_html__( 'New Zealand', 'wpforms' ),
-		'NI' => esc_html__( 'Nicaragua', 'wpforms' ),
-		'NE' => esc_html__( 'Niger', 'wpforms' ),
-		'NG' => esc_html__( 'Nigeria', 'wpforms' ),
-		'NU' => esc_html__( 'Niue', 'wpforms' ),
-		'NF' => esc_html__( 'Norfolk Island', 'wpforms' ),
-		'MP' => esc_html__( 'Northern Mariana Islands', 'wpforms' ),
-		'NO' => esc_html__( 'Norway', 'wpforms' ),
-		'OM' => esc_html__( 'Oman', 'wpforms' ),
-		'PK' => esc_html__( 'Pakistan', 'wpforms' ),
-		'PW' => esc_html__( 'Palau', 'wpforms' ),
-		'PS' => esc_html__( 'Palestine (State of)', 'wpforms' ),
-		'PA' => esc_html__( 'Panama', 'wpforms' ),
-		'PG' => esc_html__( 'Papua New Guinea', 'wpforms' ),
-		'PY' => esc_html__( 'Paraguay', 'wpforms' ),
-		'PE' => esc_html__( 'Peru', 'wpforms' ),
-		'PH' => esc_html__( 'Philippines', 'wpforms' ),
-		'PN' => esc_html__( 'Pitcairn', 'wpforms' ),
-		'PL' => esc_html__( 'Poland', 'wpforms' ),
-		'PT' => esc_html__( 'Portugal', 'wpforms' ),
-		'PR' => esc_html__( 'Puerto Rico', 'wpforms' ),
-		'QA' => esc_html__( 'Qatar', 'wpforms' ),
-		'RE' => esc_html__( 'Réunion', 'wpforms' ),
-		'RO' => esc_html__( 'Romania', 'wpforms' ),
-		'RU' => esc_html__( 'Russian Federation', 'wpforms' ),
-		'RW' => esc_html__( 'Rwanda', 'wpforms' ),
-		'BL' => esc_html__( 'Saint Barthélemy', 'wpforms' ),
-		'SH' => esc_html__( 'Saint Helena, Ascension and Tristan da Cunha', 'wpforms' ),
-		'KN' => esc_html__( 'Saint Kitts and Nevis', 'wpforms' ),
-		'LC' => esc_html__( 'Saint Lucia', 'wpforms' ),
-		'MF' => esc_html__( 'Saint Martin (French part)', 'wpforms' ),
-		'PM' => esc_html__( 'Saint Pierre and Miquelon', 'wpforms' ),
-		'VC' => esc_html__( 'Saint Vincent and the Grenadines', 'wpforms' ),
-		'WS' => esc_html__( 'Samoa', 'wpforms' ),
-		'SM' => esc_html__( 'San Marino', 'wpforms' ),
-		'ST' => esc_html__( 'Sao Tome and Principe', 'wpforms' ),
-		'SA' => esc_html__( 'Saudi Arabia', 'wpforms' ),
-		'SN' => esc_html__( 'Senegal', 'wpforms' ),
-		'RS' => esc_html__( 'Serbia', 'wpforms' ),
-		'SC' => esc_html__( 'Seychelles', 'wpforms' ),
-		'SL' => esc_html__( 'Sierra Leone', 'wpforms' ),
-		'SG' => esc_html__( 'Singapore', 'wpforms' ),
-		'SX' => esc_html__( 'Sint Maarten (Dutch part)', 'wpforms' ),
-		'SK' => esc_html__( 'Slovakia', 'wpforms' ),
-		'SI' => esc_html__( 'Slovenia', 'wpforms' ),
-		'SB' => esc_html__( 'Solomon Islands', 'wpforms' ),
-		'SO' => esc_html__( 'Somalia', 'wpforms' ),
-		'ZA' => esc_html__( 'South Africa', 'wpforms' ),
-		'GS' => esc_html__( 'South Georgia and the South Sandwich Islands', 'wpforms' ),
-		'SS' => esc_html__( 'South Sudan', 'wpforms' ),
-		'ES' => esc_html__( 'Spain', 'wpforms' ),
-		'LK' => esc_html__( 'Sri Lanka', 'wpforms' ),
-		'SD' => esc_html__( 'Sudan', 'wpforms' ),
-		'SR' => esc_html__( 'Suriname', 'wpforms' ),
-		'SJ' => esc_html__( 'Svalbard and Jan Mayen', 'wpforms' ),
-		'SZ' => esc_html__( 'Swaziland', 'wpforms' ),
-		'SE' => esc_html__( 'Sweden', 'wpforms' ),
-		'CH' => esc_html__( 'Switzerland', 'wpforms' ),
-		'SY' => esc_html__( 'Syrian Arab Republic', 'wpforms' ),
-		'TW' => esc_html__( 'Taiwan, Province of China', 'wpforms' ),
-		'TJ' => esc_html__( 'Tajikistan', 'wpforms' ),
-		'TZ' => esc_html__( 'Tanzania (United Republic of)', 'wpforms' ),
-		'TH' => esc_html__( 'Thailand', 'wpforms' ),
-		'TL' => esc_html__( 'Timor-Leste', 'wpforms' ),
-		'TG' => esc_html__( 'Togo', 'wpforms' ),
-		'TK' => esc_html__( 'Tokelau', 'wpforms' ),
-		'TO' => esc_html__( 'Tonga', 'wpforms' ),
-		'TT' => esc_html__( 'Trinidad and Tobago', 'wpforms' ),
-		'TN' => esc_html__( 'Tunisia', 'wpforms' ),
-		'TR' => esc_html__( 'Turkey', 'wpforms' ),
-		'TM' => esc_html__( 'Turkmenistan', 'wpforms' ),
-		'TC' => esc_html__( 'Turks and Caicos Islands', 'wpforms' ),
-		'TV' => esc_html__( 'Tuvalu', 'wpforms' ),
-		'UG' => esc_html__( 'Uganda', 'wpforms' ),
-		'UA' => esc_html__( 'Ukraine', 'wpforms' ),
-		'AE' => esc_html__( 'United Arab Emirates', 'wpforms' ),
-		'GB' => esc_html__( 'United Kingdom of Great Britain and Northern Ireland', 'wpforms' ),
-		'US' => esc_html__( 'United States of America', 'wpforms' ),
-		'UM' => esc_html__( 'United States Minor Outlying Islands', 'wpforms' ),
-		'UY' => esc_html__( 'Uruguay', 'wpforms' ),
-		'UZ' => esc_html__( 'Uzbekistan', 'wpforms' ),
-		'VU' => esc_html__( 'Vanuatu', 'wpforms' ),
-		'VA' => esc_html__( 'Vatican City State', 'wpforms' ),
-		'VE' => esc_html__( 'Venezuela (Bolivarian Republic of)', 'wpforms' ),
-		'VN' => esc_html__( 'Viet Nam', 'wpforms' ),
-		'VG' => esc_html__( 'Virgin Islands (British)', 'wpforms' ),
-		'VI' => esc_html__( 'Virgin Islands (U.S.)', 'wpforms' ),
-		'WF' => esc_html__( 'Wallis and Futuna', 'wpforms' ),
-		'EH' => esc_html__( 'Western Sahara', 'wpforms' ),
-		'YE' => esc_html__( 'Yemen', 'wpforms' ),
-		'ZM' => esc_html__( 'Zambia', 'wpforms' ),
-		'ZW' => esc_html__( 'Zimbabwe', 'wpforms' ),
+		'AF' => esc_html__( 'Afghanistan', 'wpforms-lite' ),
+		'AX' => esc_html__( 'Åland Islands', 'wpforms-lite' ),
+		'AL' => esc_html__( 'Albania', 'wpforms-lite' ),
+		'DZ' => esc_html__( 'Algeria', 'wpforms-lite' ),
+		'AS' => esc_html__( 'American Samoa', 'wpforms-lite' ),
+		'AD' => esc_html__( 'Andorra', 'wpforms-lite' ),
+		'AO' => esc_html__( 'Angola', 'wpforms-lite' ),
+		'AI' => esc_html__( 'Anguilla', 'wpforms-lite' ),
+		'AQ' => esc_html__( 'Antarctica', 'wpforms-lite' ),
+		'AG' => esc_html__( 'Antigua and Barbuda', 'wpforms-lite' ),
+		'AR' => esc_html__( 'Argentina', 'wpforms-lite' ),
+		'AM' => esc_html__( 'Armenia', 'wpforms-lite' ),
+		'AW' => esc_html__( 'Aruba', 'wpforms-lite' ),
+		'AU' => esc_html__( 'Australia', 'wpforms-lite' ),
+		'AT' => esc_html__( 'Austria', 'wpforms-lite' ),
+		'AZ' => esc_html__( 'Azerbaijan', 'wpforms-lite' ),
+		'BS' => esc_html__( 'Bahamas', 'wpforms-lite' ),
+		'BH' => esc_html__( 'Bahrain', 'wpforms-lite' ),
+		'BD' => esc_html__( 'Bangladesh', 'wpforms-lite' ),
+		'BB' => esc_html__( 'Barbados', 'wpforms-lite' ),
+		'BY' => esc_html__( 'Belarus', 'wpforms-lite' ),
+		'BE' => esc_html__( 'Belgium', 'wpforms-lite' ),
+		'BZ' => esc_html__( 'Belize', 'wpforms-lite' ),
+		'BJ' => esc_html__( 'Benin', 'wpforms-lite' ),
+		'BM' => esc_html__( 'Bermuda', 'wpforms-lite' ),
+		'BT' => esc_html__( 'Bhutan', 'wpforms-lite' ),
+		'BO' => esc_html__( 'Bolivia (Plurinational State of)', 'wpforms-lite' ),
+		'BQ' => esc_html__( 'Bonaire, Saint Eustatius and Saba', 'wpforms-lite' ),
+		'BA' => esc_html__( 'Bosnia and Herzegovina', 'wpforms-lite' ),
+		'BW' => esc_html__( 'Botswana', 'wpforms-lite' ),
+		'BV' => esc_html__( 'Bouvet Island', 'wpforms-lite' ),
+		'BR' => esc_html__( 'Brazil', 'wpforms-lite' ),
+		'IO' => esc_html__( 'British Indian Ocean Territory', 'wpforms-lite' ),
+		'BN' => esc_html__( 'Brunei Darussalam', 'wpforms-lite' ),
+		'BG' => esc_html__( 'Bulgaria', 'wpforms-lite' ),
+		'BF' => esc_html__( 'Burkina Faso', 'wpforms-lite' ),
+		'BI' => esc_html__( 'Burundi', 'wpforms-lite' ),
+		'CV' => esc_html__( 'Cabo Verde', 'wpforms-lite' ),
+		'KH' => esc_html__( 'Cambodia', 'wpforms-lite' ),
+		'CM' => esc_html__( 'Cameroon', 'wpforms-lite' ),
+		'CA' => esc_html__( 'Canada', 'wpforms-lite' ),
+		'KY' => esc_html__( 'Cayman Islands', 'wpforms-lite' ),
+		'CF' => esc_html__( 'Central African Republic', 'wpforms-lite' ),
+		'TD' => esc_html__( 'Chad', 'wpforms-lite' ),
+		'CL' => esc_html__( 'Chile', 'wpforms-lite' ),
+		'CN' => esc_html__( 'China', 'wpforms-lite' ),
+		'CX' => esc_html__( 'Christmas Island', 'wpforms-lite' ),
+		'CC' => esc_html__( 'Cocos (Keeling) Islands', 'wpforms-lite' ),
+		'CO' => esc_html__( 'Colombia', 'wpforms-lite' ),
+		'KM' => esc_html__( 'Comoros', 'wpforms-lite' ),
+		'CG' => esc_html__( 'Congo', 'wpforms-lite' ),
+		'CD' => esc_html__( 'Congo (Democratic Republic of the)', 'wpforms-lite' ),
+		'CK' => esc_html__( 'Cook Islands', 'wpforms-lite' ),
+		'CR' => esc_html__( 'Costa Rica', 'wpforms-lite' ),
+		'CI' => esc_html__( 'Côte d\'Ivoire', 'wpforms-lite' ),
+		'HR' => esc_html__( 'Croatia', 'wpforms-lite' ),
+		'CU' => esc_html__( 'Cuba', 'wpforms-lite' ),
+		'CW' => esc_html__( 'Curaçao', 'wpforms-lite' ),
+		'CY' => esc_html__( 'Cyprus', 'wpforms-lite' ),
+		'CZ' => esc_html__( 'Czech Republic', 'wpforms-lite' ),
+		'DK' => esc_html__( 'Denmark', 'wpforms-lite' ),
+		'DJ' => esc_html__( 'Djibouti', 'wpforms-lite' ),
+		'DM' => esc_html__( 'Dominica', 'wpforms-lite' ),
+		'DO' => esc_html__( 'Dominican Republic', 'wpforms-lite' ),
+		'EC' => esc_html__( 'Ecuador', 'wpforms-lite' ),
+		'EG' => esc_html__( 'Egypt', 'wpforms-lite' ),
+		'SV' => esc_html__( 'El Salvador', 'wpforms-lite' ),
+		'GQ' => esc_html__( 'Equatorial Guinea', 'wpforms-lite' ),
+		'ER' => esc_html__( 'Eritrea', 'wpforms-lite' ),
+		'EE' => esc_html__( 'Estonia', 'wpforms-lite' ),
+		'ET' => esc_html__( 'Ethiopia', 'wpforms-lite' ),
+		'FK' => esc_html__( 'Falkland Islands (Malvinas)', 'wpforms-lite' ),
+		'FO' => esc_html__( 'Faroe Islands', 'wpforms-lite' ),
+		'FJ' => esc_html__( 'Fiji', 'wpforms-lite' ),
+		'FI' => esc_html__( 'Finland', 'wpforms-lite' ),
+		'FR' => esc_html__( 'France', 'wpforms-lite' ),
+		'GF' => esc_html__( 'French Guiana', 'wpforms-lite' ),
+		'PF' => esc_html__( 'French Polynesia', 'wpforms-lite' ),
+		'TF' => esc_html__( 'French Southern Territories', 'wpforms-lite' ),
+		'GA' => esc_html__( 'Gabon', 'wpforms-lite' ),
+		'GM' => esc_html__( 'Gambia', 'wpforms-lite' ),
+		'GE' => esc_html_x( 'Georgia', 'Country', 'wpforms-lite' ),
+		'DE' => esc_html__( 'Germany', 'wpforms-lite' ),
+		'GH' => esc_html__( 'Ghana', 'wpforms-lite' ),
+		'GI' => esc_html__( 'Gibraltar', 'wpforms-lite' ),
+		'GR' => esc_html__( 'Greece', 'wpforms-lite' ),
+		'GL' => esc_html__( 'Greenland', 'wpforms-lite' ),
+		'GD' => esc_html__( 'Grenada', 'wpforms-lite' ),
+		'GP' => esc_html__( 'Guadeloupe', 'wpforms-lite' ),
+		'GU' => esc_html__( 'Guam', 'wpforms-lite' ),
+		'GT' => esc_html__( 'Guatemala', 'wpforms-lite' ),
+		'GG' => esc_html__( 'Guernsey', 'wpforms-lite' ),
+		'GN' => esc_html__( 'Guinea', 'wpforms-lite' ),
+		'GW' => esc_html__( 'Guinea-Bissau', 'wpforms-lite' ),
+		'GY' => esc_html__( 'Guyana', 'wpforms-lite' ),
+		'HT' => esc_html__( 'Haiti', 'wpforms-lite' ),
+		'HM' => esc_html__( 'Heard Island and McDonald Islands', 'wpforms-lite' ),
+		'HN' => esc_html__( 'Honduras', 'wpforms-lite' ),
+		'HK' => esc_html__( 'Hong Kong', 'wpforms-lite' ),
+		'HU' => esc_html__( 'Hungary', 'wpforms-lite' ),
+		'IS' => esc_html__( 'Iceland', 'wpforms-lite' ),
+		'IN' => esc_html__( 'India', 'wpforms-lite' ),
+		'ID' => esc_html__( 'Indonesia', 'wpforms-lite' ),
+		'IR' => esc_html__( 'Iran (Islamic Republic of)', 'wpforms-lite' ),
+		'IQ' => esc_html__( 'Iraq', 'wpforms-lite' ),
+		'IE' => esc_html__( 'Ireland (Republic of)', 'wpforms-lite' ),
+		'IM' => esc_html__( 'Isle of Man', 'wpforms-lite' ),
+		'IL' => esc_html__( 'Israel', 'wpforms-lite' ),
+		'IT' => esc_html__( 'Italy', 'wpforms-lite' ),
+		'JM' => esc_html__( 'Jamaica', 'wpforms-lite' ),
+		'JP' => esc_html__( 'Japan', 'wpforms-lite' ),
+		'JE' => esc_html__( 'Jersey', 'wpforms-lite' ),
+		'JO' => esc_html__( 'Jordan', 'wpforms-lite' ),
+		'KZ' => esc_html__( 'Kazakhstan', 'wpforms-lite' ),
+		'KE' => esc_html__( 'Kenya', 'wpforms-lite' ),
+		'KI' => esc_html__( 'Kiribati', 'wpforms-lite' ),
+		'KP' => esc_html__( 'Korea (Democratic People\'s Republic of)', 'wpforms-lite' ),
+		'KR' => esc_html__( 'Korea (Republic of)', 'wpforms-lite' ),
+		'XK' => esc_html__( 'Kosovo', 'wpforms-lite' ),
+		'KW' => esc_html__( 'Kuwait', 'wpforms-lite' ),
+		'KG' => esc_html__( 'Kyrgyzstan', 'wpforms-lite' ),
+		'LA' => esc_html__( 'Lao People\'s Democratic Republic', 'wpforms-lite' ),
+		'LV' => esc_html__( 'Latvia', 'wpforms-lite' ),
+		'LB' => esc_html__( 'Lebanon', 'wpforms-lite' ),
+		'LS' => esc_html__( 'Lesotho', 'wpforms-lite' ),
+		'LR' => esc_html__( 'Liberia', 'wpforms-lite' ),
+		'LY' => esc_html__( 'Libya', 'wpforms-lite' ),
+		'LI' => esc_html__( 'Liechtenstein', 'wpforms-lite' ),
+		'LT' => esc_html__( 'Lithuania', 'wpforms-lite' ),
+		'LU' => esc_html__( 'Luxembourg', 'wpforms-lite' ),
+		'MO' => esc_html__( 'Macao', 'wpforms-lite' ),
+		'MK' => esc_html__( 'North Macedonia (Republic of)', 'wpforms-lite' ),
+		'MG' => esc_html__( 'Madagascar', 'wpforms-lite' ),
+		'MW' => esc_html__( 'Malawi', 'wpforms-lite' ),
+		'MY' => esc_html__( 'Malaysia', 'wpforms-lite' ),
+		'MV' => esc_html__( 'Maldives', 'wpforms-lite' ),
+		'ML' => esc_html__( 'Mali', 'wpforms-lite' ),
+		'MT' => esc_html__( 'Malta', 'wpforms-lite' ),
+		'MH' => esc_html__( 'Marshall Islands', 'wpforms-lite' ),
+		'MQ' => esc_html__( 'Martinique', 'wpforms-lite' ),
+		'MR' => esc_html__( 'Mauritania', 'wpforms-lite' ),
+		'MU' => esc_html__( 'Mauritius', 'wpforms-lite' ),
+		'YT' => esc_html__( 'Mayotte', 'wpforms-lite' ),
+		'MX' => esc_html__( 'Mexico', 'wpforms-lite' ),
+		'FM' => esc_html__( 'Micronesia (Federated States of)', 'wpforms-lite' ),
+		'MD' => esc_html__( 'Moldova (Republic of)', 'wpforms-lite' ),
+		'MC' => esc_html__( 'Monaco', 'wpforms-lite' ),
+		'MN' => esc_html__( 'Mongolia', 'wpforms-lite' ),
+		'ME' => esc_html__( 'Montenegro', 'wpforms-lite' ),
+		'MS' => esc_html__( 'Montserrat', 'wpforms-lite' ),
+		'MA' => esc_html__( 'Morocco', 'wpforms-lite' ),
+		'MZ' => esc_html__( 'Mozambique', 'wpforms-lite' ),
+		'MM' => esc_html__( 'Myanmar', 'wpforms-lite' ),
+		'NA' => esc_html__( 'Namibia', 'wpforms-lite' ),
+		'NR' => esc_html__( 'Nauru', 'wpforms-lite' ),
+		'NP' => esc_html__( 'Nepal', 'wpforms-lite' ),
+		'NL' => esc_html__( 'Netherlands', 'wpforms-lite' ),
+		'NC' => esc_html__( 'New Caledonia', 'wpforms-lite' ),
+		'NZ' => esc_html__( 'New Zealand', 'wpforms-lite' ),
+		'NI' => esc_html__( 'Nicaragua', 'wpforms-lite' ),
+		'NE' => esc_html__( 'Niger', 'wpforms-lite' ),
+		'NG' => esc_html__( 'Nigeria', 'wpforms-lite' ),
+		'NU' => esc_html__( 'Niue', 'wpforms-lite' ),
+		'NF' => esc_html__( 'Norfolk Island', 'wpforms-lite' ),
+		'MP' => esc_html__( 'Northern Mariana Islands', 'wpforms-lite' ),
+		'NO' => esc_html__( 'Norway', 'wpforms-lite' ),
+		'OM' => esc_html__( 'Oman', 'wpforms-lite' ),
+		'PK' => esc_html__( 'Pakistan', 'wpforms-lite' ),
+		'PW' => esc_html__( 'Palau', 'wpforms-lite' ),
+		'PS' => esc_html__( 'Palestine (State of)', 'wpforms-lite' ),
+		'PA' => esc_html__( 'Panama', 'wpforms-lite' ),
+		'PG' => esc_html__( 'Papua New Guinea', 'wpforms-lite' ),
+		'PY' => esc_html__( 'Paraguay', 'wpforms-lite' ),
+		'PE' => esc_html__( 'Peru', 'wpforms-lite' ),
+		'PH' => esc_html__( 'Philippines', 'wpforms-lite' ),
+		'PN' => esc_html__( 'Pitcairn', 'wpforms-lite' ),
+		'PL' => esc_html__( 'Poland', 'wpforms-lite' ),
+		'PT' => esc_html__( 'Portugal', 'wpforms-lite' ),
+		'PR' => esc_html__( 'Puerto Rico', 'wpforms-lite' ),
+		'QA' => esc_html__( 'Qatar', 'wpforms-lite' ),
+		'RE' => esc_html__( 'Réunion', 'wpforms-lite' ),
+		'RO' => esc_html__( 'Romania', 'wpforms-lite' ),
+		'RU' => esc_html__( 'Russian Federation', 'wpforms-lite' ),
+		'RW' => esc_html__( 'Rwanda', 'wpforms-lite' ),
+		'BL' => esc_html__( 'Saint Barthélemy', 'wpforms-lite' ),
+		'SH' => esc_html__( 'Saint Helena, Ascension and Tristan da Cunha', 'wpforms-lite' ),
+		'KN' => esc_html__( 'Saint Kitts and Nevis', 'wpforms-lite' ),
+		'LC' => esc_html__( 'Saint Lucia', 'wpforms-lite' ),
+		'MF' => esc_html__( 'Saint Martin (French part)', 'wpforms-lite' ),
+		'PM' => esc_html__( 'Saint Pierre and Miquelon', 'wpforms-lite' ),
+		'VC' => esc_html__( 'Saint Vincent and the Grenadines', 'wpforms-lite' ),
+		'WS' => esc_html__( 'Samoa', 'wpforms-lite' ),
+		'SM' => esc_html__( 'San Marino', 'wpforms-lite' ),
+		'ST' => esc_html__( 'Sao Tome and Principe', 'wpforms-lite' ),
+		'SA' => esc_html__( 'Saudi Arabia', 'wpforms-lite' ),
+		'SN' => esc_html__( 'Senegal', 'wpforms-lite' ),
+		'RS' => esc_html__( 'Serbia', 'wpforms-lite' ),
+		'SC' => esc_html__( 'Seychelles', 'wpforms-lite' ),
+		'SL' => esc_html__( 'Sierra Leone', 'wpforms-lite' ),
+		'SG' => esc_html__( 'Singapore', 'wpforms-lite' ),
+		'SX' => esc_html__( 'Sint Maarten (Dutch part)', 'wpforms-lite' ),
+		'SK' => esc_html__( 'Slovakia', 'wpforms-lite' ),
+		'SI' => esc_html__( 'Slovenia', 'wpforms-lite' ),
+		'SB' => esc_html__( 'Solomon Islands', 'wpforms-lite' ),
+		'SO' => esc_html__( 'Somalia', 'wpforms-lite' ),
+		'ZA' => esc_html__( 'South Africa', 'wpforms-lite' ),
+		'GS' => esc_html__( 'South Georgia and the South Sandwich Islands', 'wpforms-lite' ),
+		'SS' => esc_html__( 'South Sudan', 'wpforms-lite' ),
+		'ES' => esc_html__( 'Spain', 'wpforms-lite' ),
+		'LK' => esc_html__( 'Sri Lanka', 'wpforms-lite' ),
+		'SD' => esc_html__( 'Sudan', 'wpforms-lite' ),
+		'SR' => esc_html__( 'Suriname', 'wpforms-lite' ),
+		'SJ' => esc_html__( 'Svalbard and Jan Mayen', 'wpforms-lite' ),
+		'SZ' => esc_html__( 'Eswatini (Kingdom of)', 'wpforms-lite' ),
+		'SE' => esc_html__( 'Sweden', 'wpforms-lite' ),
+		'CH' => esc_html__( 'Switzerland', 'wpforms-lite' ),
+		'SY' => esc_html__( 'Syrian Arab Republic', 'wpforms-lite' ),
+		'TW' => esc_html__( 'Taiwan, Republic of China', 'wpforms-lite' ),
+		'TJ' => esc_html__( 'Tajikistan', 'wpforms-lite' ),
+		'TZ' => esc_html__( 'Tanzania (United Republic of)', 'wpforms-lite' ),
+		'TH' => esc_html__( 'Thailand', 'wpforms-lite' ),
+		'TL' => esc_html__( 'Timor-Leste', 'wpforms-lite' ),
+		'TG' => esc_html__( 'Togo', 'wpforms-lite' ),
+		'TK' => esc_html__( 'Tokelau', 'wpforms-lite' ),
+		'TO' => esc_html__( 'Tonga', 'wpforms-lite' ),
+		'TT' => esc_html__( 'Trinidad and Tobago', 'wpforms-lite' ),
+		'TN' => esc_html__( 'Tunisia', 'wpforms-lite' ),
+		'TR' => esc_html__( 'Turkey', 'wpforms-lite' ),
+		'TM' => esc_html__( 'Turkmenistan', 'wpforms-lite' ),
+		'TC' => esc_html__( 'Turks and Caicos Islands', 'wpforms-lite' ),
+		'TV' => esc_html__( 'Tuvalu', 'wpforms-lite' ),
+		'UG' => esc_html__( 'Uganda', 'wpforms-lite' ),
+		'UA' => esc_html__( 'Ukraine', 'wpforms-lite' ),
+		'AE' => esc_html__( 'United Arab Emirates', 'wpforms-lite' ),
+		'GB' => esc_html__( 'United Kingdom of Great Britain and Northern Ireland', 'wpforms-lite' ),
+		'US' => esc_html__( 'United States of America', 'wpforms-lite' ),
+		'UM' => esc_html__( 'United States Minor Outlying Islands', 'wpforms-lite' ),
+		'UY' => esc_html__( 'Uruguay', 'wpforms-lite' ),
+		'UZ' => esc_html__( 'Uzbekistan', 'wpforms-lite' ),
+		'VU' => esc_html__( 'Vanuatu', 'wpforms-lite' ),
+		'VA' => esc_html__( 'Vatican City State', 'wpforms-lite' ),
+		'VE' => esc_html__( 'Venezuela (Bolivarian Republic of)', 'wpforms-lite' ),
+		'VN' => esc_html__( 'Vietnam', 'wpforms-lite' ),
+		'VG' => esc_html__( 'Virgin Islands (British)', 'wpforms-lite' ),
+		'VI' => esc_html__( 'Virgin Islands (U.S.)', 'wpforms-lite' ),
+		'WF' => esc_html__( 'Wallis and Futuna', 'wpforms-lite' ),
+		'EH' => esc_html__( 'Western Sahara', 'wpforms-lite' ),
+		'YE' => esc_html__( 'Yemen', 'wpforms-lite' ),
+		'ZM' => esc_html__( 'Zambia', 'wpforms-lite' ),
+		'ZW' => esc_html__( 'Zimbabwe', 'wpforms-lite' ),
 	);
 
 	return apply_filters( 'wpforms_countries', $countries );
 }
 
 /**
- * Calendar Months
+ * Calendar Months.
  *
  * @since 1.3.7
+ *
  * @return array
  */
 function wpforms_months() {
 
 	$months = array(
-		'Jan' => esc_html__( 'January', 'wpforms' ),
-		'Feb' => esc_html__( 'February', 'wpforms' ),
-		'Mar' => esc_html__( 'March', 'wpforms' ),
-		'Apr' => esc_html__( 'April', 'wpforms' ),
-		'May' => esc_html__( 'May', 'wpforms' ),
-		'Jun' => esc_html__( 'June', 'wpforms' ),
-		'Jul' => esc_html__( 'July', 'wpforms' ),
-		'Aug' => esc_html__( 'August', 'wpforms' ),
-		'Sep' => esc_html__( 'September', 'wpforms' ),
-		'Oct' => esc_html__( 'October', 'wpforms' ),
-		'Nov' => esc_html__( 'November', 'wpforms' ),
-		'Dec' => esc_html__( 'December', 'wpforms' ),
+		'Jan' => esc_html__( 'January', 'wpforms-lite' ),
+		'Feb' => esc_html__( 'February', 'wpforms-lite' ),
+		'Mar' => esc_html__( 'March', 'wpforms-lite' ),
+		'Apr' => esc_html__( 'April', 'wpforms-lite' ),
+		'May' => esc_html__( 'May', 'wpforms-lite' ),
+		'Jun' => esc_html__( 'June', 'wpforms-lite' ),
+		'Jul' => esc_html__( 'July', 'wpforms-lite' ),
+		'Aug' => esc_html__( 'August', 'wpforms-lite' ),
+		'Sep' => esc_html__( 'September', 'wpforms-lite' ),
+		'Oct' => esc_html__( 'October', 'wpforms-lite' ),
+		'Nov' => esc_html__( 'November', 'wpforms-lite' ),
+		'Dec' => esc_html__( 'December', 'wpforms-lite' ),
 	);
 
 	return apply_filters( 'wpforms_months', $months );
 }
 
 /**
- * Calendar Days
+ * Calendar Days.
  *
  * @since 1.3.7
+ *
  * @return array
  */
 function wpforms_days() {
 
 	$days = array(
-		'Sun' => esc_html__( 'Sunday', 'wpforms' ),
-		'Mon' => esc_html__( 'Monday', 'wpforms' ),
-		'Tue' => esc_html__( 'Tuesday', 'wpforms' ),
-		'Wed' => esc_html__( 'Wednesday', 'wpforms' ),
-		'Thu' => esc_html__( 'Thursday', 'wpforms' ),
-		'Fri' => esc_html__( 'Friday', 'wpforms' ),
-		'Sat' => esc_html__( 'Saturday', 'wpforms' ),
+		'Sun' => esc_html__( 'Sunday', 'wpforms-lite' ),
+		'Mon' => esc_html__( 'Monday', 'wpforms-lite' ),
+		'Tue' => esc_html__( 'Tuesday', 'wpforms-lite' ),
+		'Wed' => esc_html__( 'Wednesday', 'wpforms-lite' ),
+		'Thu' => esc_html__( 'Thursday', 'wpforms-lite' ),
+		'Fri' => esc_html__( 'Friday', 'wpforms-lite' ),
+		'Sat' => esc_html__( 'Saturday', 'wpforms-lite' ),
 	);
 
 	return apply_filters( 'wpforms_days', $days );
@@ -1053,28 +1146,40 @@ function wpforms_days() {
  * https://github.com/easydigitaldownloads/easy-digital-downloads/blob/master/includes/misc-functions.php#L163
  *
  * @since 1.2.5
+ *
  * @return string
  */
 function wpforms_get_ip() {
 
-	$ip = '127.0.0.1';
+	$ip = false;
 
-	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	if ( ! empty( $_SERVER['HTTP_X_REAL_IP'] ) ) {
+		$ip = filter_var( wp_unslash( $_SERVER['HTTP_X_REAL_IP'] ), FILTER_VALIDATE_IP );
+	} elseif ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		// Check ip from share internet.
+		$ip = filter_var( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ), FILTER_VALIDATE_IP );
 	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		// To check ip is pass from proxy.
+		// Can include more than 1 ip, first is the public one.
+		// WPCS: sanitization ok.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$ips = explode( ',', wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		if ( is_array( $ips ) ) {
+			$ip = filter_var( $ips[0], FILTER_VALIDATE_IP );
+		}
 	} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-		$ip = $_SERVER['REMOTE_ADDR'];
+		$ip = filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP );
 	}
 
-	// Fix potential CSV returned from $_SERVER variables
-	$ip_array = array_map( 'trim', explode( ',', $ip ) );
+	$ip       = false !== $ip ? $ip : '127.0.0.1';
+	$ip_array = explode( ',', $ip );
+	$ip_array = array_map( 'trim', $ip_array );
 
-	return $ip_array[0];
+	return sanitize_text_field( apply_filters( 'wpforms_get_ip', $ip_array[0] ) );
 }
 
 /**
- * Sanitizes hex color.
+ * Sanitize hex color.
  *
  * @since 1.2.1
  *
@@ -1097,7 +1202,7 @@ function wpforms_sanitize_hex_color( $color ) {
 }
 
 /**
- * Sanitizes error message, primarily used during form frontend output.
+ * Sanitize error message, primarily used during form frontend output.
  *
  * @since 1.3.7
  *
@@ -1122,33 +1227,167 @@ function wpforms_sanitize_error( $error = '' ) {
 }
 
 /**
- * Sanitizes a string, that can be a multiline.
- * If WP core `sanitize_textarea_field()` exists (after 4.7.0) - use it.
- * Otherwise - split onto separate lines, sanitize each one, merge again.
+ * Sanitize a string, that can be a multiline.
+ *
+ * @uses wpforms_sanitize_text_deeply()
  *
  * @since 1.4.1
  *
- * @param string $string
+ * @param string $string String to deeply sanitize.
  *
- * @return string If empty var is passed, or not a string - return unmodified. Otherwise - sanitize.
+ * @return string Sanitized string, or empty string if not a string provided.
  */
 function wpforms_sanitize_textarea_field( $string ) {
 
-	if ( empty( $string ) || ! is_string( $string ) ) {
-		return $string;
-	}
-
-	if ( function_exists( 'sanitize_textarea_field' ) ) {
-		$string = sanitize_textarea_field( $string );
-	} else {
-		$string = implode( "\n", array_map( 'sanitize_text_field', explode( "\n", $string ) ) );
-	}
-
-	return $string;
+	return wpforms_sanitize_text_deeply( $string, true );
 }
 
 /**
- * Sanitizes an array, that consists of values as strings.
+ * Deeply sanitize the string, preserve newlines if needed.
+ * Prevent maliciously prepared strings from containing HTML tags.
+ *
+ * @since 1.6.0
+ *
+ * @param string $string        String to deeply sanitize.
+ * @param bool   $keep_newlines Whether to keep newlines. Default: false.
+ *
+ * @return string Sanitized string, or empty string if not a string provided.
+ */
+function wpforms_sanitize_text_deeply( $string, $keep_newlines = false ) {
+
+	if ( is_object( $string ) || is_array( $string ) ) {
+		return '';
+	}
+
+	$string        = (string) $string;
+	$keep_newlines = (bool) $keep_newlines;
+
+	$new_value = _sanitize_text_fields( $string, $keep_newlines );
+
+	if ( strlen( $new_value ) !== strlen( $string ) ) {
+		$new_value = wpforms_sanitize_text_deeply( $new_value, $keep_newlines );
+	}
+
+	return $new_value;
+}
+
+/**
+ * Sanitize an HTML string with a set of allowed HTML tags.
+ *
+ * @since 1.7.0
+ *
+ * @param string $value String to sanitize.
+ *
+ * @return string Sanitized string.
+ */
+function wpforms_sanitize_richtext_field( $value ) {
+
+	$count = 1;
+	$value = convert_invalid_entities( $value );
+
+	// Remove 'script' and 'style' tags recursively.
+	while ( $count ) {
+		$value = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $value, - 1, $count );
+	}
+
+	// Make sure we have allowed tags only.
+	$value = wp_kses( $value, wpforms_get_allowed_html_tags_for_richtext_field() );
+
+	// Make sure that all tags are balanced.
+	return force_balance_tags( $value );
+}
+
+/**
+ * Escaping for Rich Text field values.
+ *
+ * @since 1.7.0
+ *
+ * @param string $value Text to escape.
+ *
+ * @return string Escaped text.
+ */
+function wpforms_esc_richtext_field( $value ) {
+
+	return wpautop( wpforms_sanitize_richtext_field( $value ) );
+}
+
+/**
+ * Retrieve allowed HTML tags for Rich Text field.
+ *
+ * @since 1.7.0
+ *
+ * @return array Array of allowed tags.
+ */
+function wpforms_get_allowed_html_tags_for_richtext_field() {
+
+	$allowed_tags = array_fill_keys(
+		[
+			'img',
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6',
+			'p',
+			'a',
+			'ul',
+			'ol',
+			'li',
+			'dl',
+			'dt',
+			'dd',
+			'hr',
+			'br',
+			'code',
+			'pre',
+			'strong',
+			'b',
+			'em',
+			'i',
+			'blockquote',
+			'cite',
+			'q',
+			'del',
+			'span',
+			'small',
+			'table',
+			'th',
+			'tr',
+			'td',
+			'abbr',
+			'address',
+			'sub',
+			'sup',
+			'ins',
+			'figure',
+			'figcaption',
+			'div',
+		],
+		array_fill_keys(
+			[ 'align', 'class', 'id', 'style', 'src', 'rel', 'href', 'target', 'width', 'height', 'title', 'cite', 'start', 'reversed', 'datetime' ],
+			[]
+		)
+	);
+
+	/**
+	 * Allowed HTML tags for Rich Text field.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $allowed_tags Allowed HTML tags.
+	 */
+	$tags = (array) apply_filters( 'wpforms_get_allowed_html_tags_for_richtext_field', $allowed_tags );
+
+	// Force unset iframes, script and style no matter when we get back
+	// from apply_filters, as they are a huge security risk.
+	unset( $tags['iframe'], $tags['script'], $tags['style'] );
+
+	return $tags;
+}
+
+/**
+ * Sanitize an array, that consists of values as strings.
  * After that - merge all array values into multiline string.
  *
  * @since 1.4.1
@@ -1192,54 +1431,60 @@ function wpforms_light_or_dark( $color, $dark = '#000000', $light = '#FFFFFF' ) 
 }
 
 /**
- * Builds and returns either a taxonomy or post type object that is
- * nests to accommodate any hierarchy.
+ * Build and return either a taxonomy or post type object that is
+ * nested to accommodate any hierarchy.
  *
  * @since 1.3.9
+ * @since 1.5.0 Return array only. Empty array of no data.
  *
- * @param array $args
- * @param bool $flat
+ * @param array $args Object arguments to pass to data retrieval function.
+ * @param bool  $flat Preserve hierarchy or not. False by default - preserve it.
  *
- * @return bool|array
+ * @return array
  */
-function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
+function wpforms_get_hierarchical_object( $args = [], $flat = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 	if ( empty( $args['taxonomy'] ) && empty( $args['post_type'] ) ) {
-		return false;
+		return [];
 	}
 
-	$children   = array();
-	$parents    = array();
+	$children   = [];
+	$parents    = [];
 	$ref_parent = '';
 	$ref_name   = '';
+	$number     = 0;
 
 	if ( ! empty( $args['post_type'] ) ) {
 
-		$defaults   = array(
+		$defaults   = [
 			'posts_per_page' => - 1,
 			'orderby'        => 'title',
 			'order'          => 'ASC',
-		);
+		];
 		$args       = wp_parse_args( $args, $defaults );
 		$items      = get_posts( $args );
 		$ref_parent = 'post_parent';
 		$ref_id     = 'ID';
 		$ref_name   = 'post_title';
+		$number     = ! empty( $args['posts_per_page'] ) ? $args['posts_per_page'] : 0;
 
 	} elseif ( ! empty( $args['taxonomy'] ) ) {
 
-		$defaults   = array(
+		$defaults   = [
 			'hide_empty' => false,
-		);
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		];
 		$args       = wp_parse_args( $args, $defaults );
 		$items      = get_terms( $args );
 		$ref_parent = 'parent';
 		$ref_id     = 'term_id';
 		$ref_name   = 'name';
+		$number     = ! empty( $args['number'] ) ? $args['number'] : 0;
 	}
 
 	if ( empty( $items ) || is_wp_error( $items ) ) {
-		return false;
+		return [];
 	}
 
 	foreach ( $items as $item ) {
@@ -1253,33 +1498,108 @@ function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
 	}
 
 	$children_count = count( $children );
+	$is_limited     = $number > 1;
+
+	// We can't guarantee that all children have a parent if there is a limit in the request.
+	// Hence, we have to make sure that there is a parent for every child.
+	if ( $is_limited && $children_count ) {
+		foreach ( $children as $child ) {
+			if ( ! empty( $parents[ $child->{$ref_parent} ] ) || ! empty( $children[ $child->{$ref_parent} ] ) ) {
+				continue;
+			}
+
+			do {
+				$current_parent = ! empty( $args['post_type'] ) ? get_post( $child->{$ref_parent} ) : get_term( $child->{$ref_parent} );
+
+				if ( $current_parent->{$ref_parent} === 0 ) {
+					$parents[ $current_parent->{$ref_id} ]     = $current_parent;
+					$parents[ $current_parent->{$ref_id} ]->ID = (int) $current_parent->{$ref_id};
+				} else {
+					$children[ $current_parent->{$ref_id} ]     = $current_parent;
+					$children[ $current_parent->{$ref_id} ]->ID = (int) $current_parent->{$ref_id};
+				}
+			} while ( $current_parent->{$ref_parent} > 0 );
+		}
+	}
+
 	while ( $children_count >= 1 ) {
 		foreach ( $children as $child ) {
 			_wpforms_get_hierarchical_object_search( $child, $parents, $children, $ref_parent );
+
 			// $children is modified by reference, so we need to recount to make sure we met the limits.
 			$children_count = count( $children );
 		}
 	}
 
-	if ( $flat ) {
-		$parents_flat = array();
-		_wpforms_get_hierarchical_object_flatten( $parents, $parents_flat, $ref_name );
-
-		return $parents_flat;
+	// Sort nested child objects alphabetically using natural order, applies only
+	// to ordering by entry title or term name.
+	if ( in_array( $args['orderby'], [ 'title', 'name' ], true ) ) {
+		_wpforms_sort_hierarchical_object( $parents, $args['orderby'], $args['order'] );
 	}
 
-	return $parents;
+	if ( $flat ) {
+		$parents_flat = [];
+
+		_wpforms_get_hierarchical_object_flatten( $parents, $parents_flat, $ref_name );
+
+		$parents = $parents_flat;
+	}
+
+	return $is_limited ? array_slice( $parents, 0, $number ) : $parents;
 }
 
 /**
- * Searches a given array and finds the parent of the provided object.
+ * Sort a nested array of objects.
+ *
+ * @since 1.6.5
+ *
+ * @param array  $objects An array of objects to sort.
+ * @param string $orderby The object field to order by.
+ * @param string $order   Order direction.
+ */
+function _wpforms_sort_hierarchical_object( &$objects, $orderby, $order ) {
+
+	// Map WP_Query/WP_Term_Query orderby to WP_Post/WP_Term property.
+	$map = [
+		'title' => 'post_title',
+		'name'  => 'name',
+	];
+
+	foreach ( $objects as $object ) {
+		if ( ! isset( $object->children ) ) {
+			continue;
+		}
+
+		uasort(
+			$object->children,
+			static function ( $a, $b ) use ( $map, $orderby, $order ) {
+
+				/**
+				 * This covers most cases and works for most languages. For some – e.g. European languages
+				 * that use extended latin charset (Polish, German etc) it will sort the objects into 2
+				 * groups – base and extended, properly sorted within each group. Making it even more
+				 * robust requires either additional PHP extensions to be installed on the server
+				 * or using heavy (and slow) conversions and computations.
+				 */
+				return $order === 'ASC' ?
+					strnatcasecmp( $a->{$map[ $orderby ]}, $b->{$map[ $orderby ]} ) :
+					strnatcasecmp( $b->{$map[ $orderby ]}, $a->{$map[ $orderby ]} );
+			}
+		);
+
+		_wpforms_sort_hierarchical_object( $object->children, $orderby, $order );
+	}
+}
+
+/**
+ * Search a given array and find the parent of the provided object.
  *
  * @since 1.3.9
  *
- * @param object $child
- * @param array $parents
- * @param array $children
- * @param string $ref_parent
+ * @param object $child      Current child.
+ * @param array  $parents    Parents list.
+ * @param array  $children   Children list.
+ * @param string $ref_parent Parent reference.
  */
 function _wpforms_get_hierarchical_object_search( $child, &$parents, &$children, $ref_parent ) {
 
@@ -1305,14 +1625,14 @@ function _wpforms_get_hierarchical_object_search( $child, &$parents, &$children,
 }
 
 /**
- * Flattens a hierarchical object.
+ * Flatten a hierarchical object.
  *
  * @since 1.3.9
  *
- * @param array $array
- * @param array $output
- * @param string $ref_name
- * @param int $level
+ * @param array  $array    Array to process.
+ * @param array  $output   Processed output.
+ * @param string $ref_name Name reference.
+ * @param int    $level    Nesting level.
  */
 function _wpforms_get_hierarchical_object_flatten( $array, &$output, $ref_name = 'name', $level = 0 ) {
 
@@ -1332,13 +1652,13 @@ function _wpforms_get_hierarchical_object_flatten( $array, &$output, $ref_name =
 }
 
 /**
- * Returns field choice properties for field configured with dynamic choices.
+ * Return field choice properties for field configured with dynamic choices.
  *
  * @since 1.4.5
  *
  * @param array $field     Field settings.
  * @param int   $form_id   Form ID.
- * @param array $form_data Form data.
+ * @param array $form_data Form data and settings.
  *
  * @return false|array
  */
@@ -1378,7 +1698,6 @@ function wpforms_get_field_dynamic_choices( $field, $form_id, $form_data = array
 				'depth' => isset( $post->depth ) ? absint( $post->depth ) : 1,
 			);
 		}
-
 	} elseif ( 'taxonomy' === $field['dynamic_choices'] ) {
 
 		if ( empty( $field['dynamic_taxonomy'] ) ) {
@@ -1413,12 +1732,13 @@ function wpforms_get_field_dynamic_choices( $field, $form_id, $form_data = array
 /**
  * Insert an array into another array before/after a certain key.
  *
- * @since 1.3.9
- * @link https://gist.github.com/scribu/588429
+ * @link  https://gist.github.com/scribu/588429
  *
- * @param array $array The initial array.
- * @param array $pairs The array to insert.
- * @param string $key The certain key.
+ * @since 1.3.9
+ *
+ * @param array  $array    The initial array.
+ * @param array  $pairs    The array to insert.
+ * @param string $key      The certain key.
  * @param string $position Where to insert the array - before or after the key.
  *
  * @return array
@@ -1466,7 +1786,7 @@ function wpforms_array_remove_empty_strings( $data ) {
 }
 
 /**
- * Debug mode bool.
+ * Check whether plugin works in a debug mode.
  *
  * @since 1.2.3
  *
@@ -1480,15 +1800,6 @@ function wpforms_debug() {
 		$debug = true;
 	}
 
-	$debug_option = get_option( 'wpforms_debug' );
-
-	if ( $debug_option ) {
-		$current_user = wp_get_current_user();
-		if ( $current_user->user_login === $debug_option ) {
-			$debug = true;
-		}
-	}
-
 	return apply_filters( 'wpforms_debug', $debug );
 }
 
@@ -1497,29 +1808,39 @@ function wpforms_debug() {
  *
  * @since 1.0.0
  *
- * @param mixed $data
- * @param bool $echo
+ * @param mixed $data What to dump, can be any type.
+ * @param bool  $echo Whether to print or return. Default is to print.
  *
  * @return string
  */
 function wpforms_debug_data( $data, $echo = true ) {
 
+	/**
+	 * Allow developers to determine whether the debug data should be displayed.
+	 * Works only in debug mode (`WPFORMS_DEBUG` constant is `true`).
+	 *
+	 * @since 1.6.8
+	 *
+	 * @param bool $allow_display True by default.
+	 */
+	$allow_display = apply_filters( 'wpforms_debug_data_allow_display', true );
+
 	if ( wpforms_debug() ) {
 
-		$output = '<textarea style="background:#fff;margin: 20px 0;width:100%;height:500px;font-size:12px;font-family: Consolas,Monaco,monospace;direction: ltr;unicode-bidi: embed;line-height: 1.4;padding: 4px 6px 1px;" readonly>';
+		$output = '<div><textarea style="background:#fff;margin: 20px 0;width:100%;height:500px;font-size:12px;font-family: Consolas,Monaco,monospace;direction: ltr;unicode-bidi: embed;line-height: 1.4;padding: 4px 6px 1px;" readonly>';
 
 		$output .= "=================== WPFORMS DEBUG ===================\n\n";
 
 		if ( is_array( $data ) || is_object( $data ) ) {
-			$output .= ( print_r( $data, true ) );
+			$output .= print_r( $data, true ); // phpcs:ignore
 		} else {
 			$output .= $data;
 		}
 
-		$output .= '</textarea>';
+		$output .= '</textarea></div>';
 
-		if ( $echo ) {
-			echo $output;
+		if ( $echo && $allow_display ) {
+			echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
 			return $output;
 		}
@@ -1531,109 +1852,90 @@ function wpforms_debug_data( $data, $echo = true ) {
  *
  * @since 1.0.0
  *
- * @param string $title
- * @param string $message
- * @param array $args
+ * @param string $title   Title of a log message.
+ * @param mixed  $message Content of a log message.
+ * @param array  $args    Expected keys: form_id, meta, parent.
  */
 function wpforms_log( $title = '', $message = '', $args = array() ) {
 
-	// Require log title
+	// Skip if logs disabled in Tools -> Logs.
+	if ( ! wpforms_setting( 'logs-enable', false ) ) {
+		return;
+	}
+
+	// Require log title.
 	if ( empty( $title ) ) {
 		return;
 	}
 
-	// Force logging everything when in debug mode
-	if ( ! wpforms_debug() ) {
-
-		/**
-		 * Compare error levels to determine if we should log.
-		 * Current supported levels:
-		 * - Errors (error)
-		 * - Spam (spam)
-		 * - Entries (entry)
-		 * - Payments (payment)
-		 * - Providers (provider)
-		 * - Conditional Logic (conditional_logic)
-		 */
-		$type   = ! empty( $args['type'] ) ? (array) $args['type'] : array( 'error' );
-		$levels = array_intersect( $type, get_option( 'wpforms_logging', array() ) );
-		if ( empty( $levels ) ) {
-			return;
-		}
-	}
-
-	// Meta.
-	if ( ! empty( $args['form_id'] ) ) {
-		$meta = array(
-			'form' => absint( $args['form_id'] ),
-		);
-	} elseif ( ! empty( $args['meta'] ) ) {
-		$meta = $args['meta'];
-	} else {
-		$meta = '';
-	}
-
-	// Parent.
-	$parent = ! empty( $args['parent'] ) ? $args['parent'] : 0;
-
-	// Make arrays and objects look nice
-	if ( is_array( $message ) || is_object( $message ) ) {
-		$message = '<pre>' . print_r( $message, true ) . '</pre>';
-	}
-
-	// Create log entry
-	wpforms()->logs->add( $title, $message, $parent, $parent, $meta );
-}
-
-/**
- * Array replace recursive, for PHP 5.2.
- */
-if ( ! function_exists( 'array_replace_recursive' ) ) :
 	/**
-	 * PHP-agnostic version of {@link array_replace_recursive()}.
-	 *
-	 * The array_replace_recursive() function is a PHP 5.3 function. WordPress
-	 * currently supports down to PHP 5.2, so this method is a workaround
-	 * for PHP 5.2.
-	 *
-	 * Note: array_replace_recursive() supports infinite arguments, but for our use-
-	 * case, we only need to support two arguments.
-	 *
-	 * Subject to removal once WordPress makes PHP 5.3.0 the minimum requirement.
-	 *
-	 * @since 1.2.3
-	 * @see http://php.net/manual/en/function.array-replace-recursive.php#109390
-	 *
-	 * @param  array $base Array with keys needing to be replaced.
-	 * @param  array $replacements Array with the replaced keys.
-	 *
-	 * @return array
+	 * Compare error levels to determine if we should log.
+	 * Current supported levels:
+	 * - Conditional Logic (conditional_logic)
+	 * - Entries (entry)
+	 * - Errors (error)
+	 * - Payments (payment)
+	 * - Providers (provider)
+	 * - Security (security)
+	 * - Spam (spam)
 	 */
-	function array_replace_recursive( $base = array(), $replacements = array() ) {
-		// PHP 5.2-compatible version
-		// http://php.net/manual/en/function.array-replace-recursive.php#109390.
-		foreach ( array_slice( func_get_args(), 1 ) as $replacements ) {
-			$bref_stack = array( &$base );
-			$head_stack = array( $replacements );
-			do {
-				end( $bref_stack );
-				$bref = &$bref_stack[ key( $bref_stack ) ];
-				$head = array_pop( $head_stack );
-				unset( $bref_stack[ key( $bref_stack ) ] );
-				foreach ( array_keys( $head ) as $key ) {
-					if ( isset( $key, $bref ) && is_array( $bref[ $key ] ) && is_array( $head[ $key ] ) ) {
-						$bref_stack[] = &$bref[ $key ];
-						$head_stack[] = $head[ $key ];
-					} else {
-						$bref[ $key ] = $head[ $key ];
-					}
-				}
-			} while ( count( $head_stack ) );
-		}
+	$types = ! empty( $args['type'] ) ? (array) $args['type'] : [ 'error' ];
 
-		return $base;
+	// Skip invalid logs types.
+	$log_types = \WPForms\Logger\Log::get_log_types();
+	foreach ( $types as $key => $type ) {
+		if ( ! isset( $log_types[ $type ] ) ) {
+			unset( $types[ $key ] );
+		}
 	}
-endif;
+	if ( empty( $types ) ) {
+		return;
+	}
+
+	// Make arrays and objects look nice.
+	if ( is_array( $message ) || is_object( $message ) ) {
+		$message = '<pre>' . print_r( $message, true ) . '</pre>'; // phpcs:ignore
+	}
+
+	// Filter logs types from Tools -> Logs page.
+	$logs_types = wpforms_setting( 'logs-types', false );
+
+	if ( $logs_types && empty( array_intersect( $logs_types, $types ) ) ) {
+		return;
+	}
+
+	// Filter user roles from Tools -> Logs page.
+	$current_user       = function_exists( 'wp_get_current_user' ) ? wp_get_current_user() : null;
+	$current_user_id    = $current_user ? $current_user->ID : 0;
+	$current_user_roles = $current_user ? $current_user->roles : [];
+	$logs_user_roles    = wpforms_setting( 'logs-user-roles', false );
+
+	if ( $logs_user_roles && empty( array_intersect( $logs_user_roles, $current_user_roles ) ) ) {
+		return;
+	}
+
+	// Filter logs users from Tools -> Logs page.
+	$logs_users = wpforms_setting( 'logs-users', false );
+
+	if ( $logs_users && ! in_array( $current_user_id, $logs_users, true ) ) {
+		return;
+	}
+
+	$log = wpforms()->get( 'log' );
+
+	if ( ! method_exists( $log, 'add' ) ) {
+		return;
+	}
+	// Create log entry.
+	$log->add(
+		$title,
+		$message,
+		$types,
+		isset( $args['form_id'] ) ? absint( $args['form_id'] ) : 0,
+		isset( $args['parent'] ) ? absint( $args['parent'] ) : 0,
+		$current_user_id
+	);
+}
 
 /**
  * Check whether the current page is in AMP mode or not.
@@ -1641,19 +1943,25 @@ endif;
  *
  * @since 1.4.1
  *
+ * @param bool $check_theme_support Whether theme support should be checked. Defaults to true.
+ *
  * @return bool
  */
-function wpforms_is_amp() {
+function wpforms_is_amp( $check_theme_support = true ) {
 
 	$is_amp = false;
 
 	if (
-		// AMP by Automattic; ampforwp
+		// AMP by Automattic; ampforwp.
 		( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) ||
-		// Better AMP
+		// Better AMP.
 		( function_exists( 'is_better_amp' ) && is_better_amp() )
 	) {
 		$is_amp = true;
+	}
+
+	if ( $is_amp && $check_theme_support ) {
+		$is_amp = current_theme_supports( 'amp' );
 	}
 
 	return apply_filters( 'wpforms_is_amp', $is_amp );
@@ -1661,23 +1969,34 @@ function wpforms_is_amp() {
 
 /**
  * Decode special characters, both alpha- (<) and numeric-based (').
+ * Sanitize recursively, preserve new lines.
+ * Handle all the possible mixed variations of < and `&lt;` that can be processed into tags.
  *
  * @since 1.4.1
+ * @since 1.6.0 Sanitize recursively, preserve new lines.
  *
- * @param string $string
+ * @param string $string Raw string to decode.
  *
  * @return string
  */
 function wpforms_decode_string( $string ) {
 
-	if ( ! is_string( $string) ) {
+	if ( ! is_string( $string ) ) {
 		return $string;
 	}
 
-	return wp_kses_decode_entities( html_entity_decode( $string, ENT_QUOTES ) );
-}
+	/*
+	 * Sanitization should be done first, so tags are stripped and < is converted to &lt; etc.
+	 * This iteration may do nothing when the string already comes with &lt; and &gt; only.
+	 */
+	$string = wpforms_sanitize_text_deeply( $string, true );
 
-add_filter( 'wpforms_email_message', 'wpforms_decode_string' );
+	// Now we need to convert the string without tags: &lt; back to < (same for quotes).
+	$string = wp_kses_decode_entities( html_entity_decode( $string, ENT_QUOTES ) );
+
+	// And now we need to sanitize AGAIN, to avoid unwanted tags that appeared after decoding.
+	return wpforms_sanitize_text_deeply( $string, true );
+}
 
 /**
  * Get a suffix for assets, `.min` if debug is disabled.
@@ -1698,7 +2017,26 @@ function wpforms_get_min_suffix() {
  * @return string
  */
 function wpforms_get_required_label() {
-	return apply_filters( 'wpforms_required_label', esc_html__( 'This field is required.', 'wpforms' ) );
+	return apply_filters( 'wpforms_required_label', esc_html__( 'This field is required.', 'wpforms-lite' ) );
+}
+
+/**
+ * Get the required field label HTML, with a filter.
+ *
+ * @since 1.4.8
+ *
+ * @return string
+ */
+function wpforms_get_field_required_label() {
+
+	$label_html = apply_filters_deprecated(
+		'wpforms_field_required_label',
+		array( ' <span class="wpforms-required-label">*</span>' ),
+		'1.4.8 of WPForms plugin',
+		'wpforms_get_field_required_label'
+	);
+
+	return apply_filters( 'wpforms_get_field_required_label', $label_html );
 }
 
 /**
@@ -1713,31 +2051,96 @@ function wpforms_get_capability_manage_options() {
 }
 
 /**
- * Check permissions for currently logged in user.
+ * Check WPForms permissions for currently logged in user.
+ * Both short (e.g. 'view_own_forms') or long (e.g. 'wpforms_view_own_forms') capability name can be used.
+ * Only WPForms capabilities get processed.
  *
  * @since 1.4.4
  *
+ * @param array|string $caps Capability name(s).
+ * @param int          $id   ID of the specific object to check against if `$capability` is a "meta" cap.
+ *                           "Meta" capabilities, e.g. 'edit_post', 'edit_user', etc., are capabilities used
+ *                           by map_meta_cap() to map to other "primitive" capabilities, e.g. 'edit_posts',
+ *                           'edit_others_posts', etc. Accessed via func_get_args() and passed to WP_User::has_cap(),
+ *                           then map_meta_cap().
+ *
  * @return bool
  */
-function wpforms_current_user_can() {
+function wpforms_current_user_can( $caps = [], $id = 0 ) {
 
-	$capability = wpforms_get_capability_manage_options();
+	$access = wpforms()->get( 'access' );
 
-	return apply_filters( 'wpforms_current_user_can', current_user_can( $capability ), $capability );
+	if ( ! method_exists( $access, 'current_user_can' ) ) {
+		return false;
+	}
+
+	$user_can = $access->current_user_can( $caps , $id );
+
+	return apply_filters( 'wpforms_current_user_can', $user_can, $caps, $id );
+}
+
+/**
+ * Return date and time formatted as expected.
+ *
+ * @since 1.6.3
+ *
+ * @param string|int $date       Date to format.
+ * @param string     $format     Optional. Format for the date and time.
+ * @param bool       $gmt_offset Optional. GTM offset.
+ *
+ * @return string
+ */
+function wpforms_datetime_format( $date, $format = '', $gmt_offset = false ) {
+
+	if ( '' === $format ) {
+		$format = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
+	}
+
+	if ( is_string( $date ) ) {
+		$date = strtotime( $date );
+	}
+
+	if ( $gmt_offset ) {
+		$date += (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+	}
+
+	return date_i18n( $format, $date );
+}
+
+/**
+ * Return date formatted as expected.
+ *
+ * @since 1.6.3
+ *
+ * @param string|int $date       Date to format.
+ * @param string     $format     Optional. Format for the date.
+ * @param bool       $gmt_offset Optional. GTM offset.
+ *
+ * @return string
+ */
+function wpforms_date_format( $date, $format = '', $gmt_offset = false ) {
+
+	if ( '' === $format ) {
+		$format = get_option( 'date_format' );
+	}
+
+	return wpforms_datetime_format( $date, $format, $gmt_offset );
 }
 
 /**
  * Get the certain date of a specified day in a specified format.
  *
  * @since 1.4.4
+ * @since 1.6.3 Added $use_gmt_offset parameter.
  *
- * @param string $period Supported values: start, end.
- * @param string $timestamp Default is the current timestamp, if left empty.
- * @param string $format Default is a MySQL format.
+ * @param string $period         Supported values: start, end.
+ * @param string $timestamp      Default is the current timestamp, if left empty.
+ * @param string $format         Default is a MySQL format.
+ * @param bool   $use_gmt_offset Use GTM offset.
  *
  * @return string
  */
-function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d H:i:s' ) {
+function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d H:i:s', $use_gmt_offset = false ) {
 
 	$date = '';
 
@@ -1745,16 +2148,949 @@ function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d
 		$timestamp = time();
 	}
 
+	$offset_sec = $use_gmt_offset ? get_option( 'gmt_offset' ) * 3600 : 0;
+
 	switch ( $period ) {
 		case 'start_of_day':
-			$date = date( $format, strtotime( 'today', $timestamp ) );
+			$date = gmdate( $format, strtotime( 'today', $timestamp ) - $offset_sec );
 			break;
 
 		case 'end_of_day':
-			$date = date( $format, strtotime( 'tomorrow', $timestamp ) - 1 );
+			$date = gmdate( $format, strtotime( 'tomorrow', $timestamp ) - 1 - $offset_sec );
 			break;
-
 	}
 
 	return $date;
+}
+
+/**
+ * Get an array of all possible provider addons.
+ *
+ * @since 1.5.5
+ *
+ * @return array
+ */
+function wpforms_get_providers_all() {
+
+	return [
+		[
+			'name'        => 'ActiveCampaign',
+			'slug'        => 'activecampaign',
+			'img'         => 'addon-icon-activecampaign.png',
+			'plugin'      => 'wpforms-activecampaign/wpforms-activecampaign.php',
+			'plugin_slug' => 'wpforms-activecampaign',
+			'license'     => 'elite',
+		],
+		[
+			'name'        => 'AWeber',
+			'slug'        => 'aweber',
+			'img'         => 'addon-icon-aweber.png',
+			'plugin'      => 'wpforms-aweber/wpforms-aweber.php',
+			'plugin_slug' => 'wpforms-aweber',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Campaign Monitor',
+			'slug'        => 'campaign-monitor',
+			'img'         => 'addon-icon-campaign-monitor.png',
+			'plugin'      => 'wpforms-campaign-monitor/wpforms-campaign-monitor.php',
+			'plugin_slug' => 'wpforms-campaign-monitor',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Drip',
+			'slug'        => 'drip',
+			'img'         => 'addon-icon-drip.png',
+			'plugin'      => 'wpforms-drip/wpforms-drip.php',
+			'plugin_slug' => 'wpforms-drip',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'GetResponse',
+			'slug'        => 'getresponse',
+			'img'         => 'addon-icon-getresponse.png',
+			'plugin'      => 'wpforms-getresponse/wpforms-getresponse.php',
+			'plugin_slug' => 'wpforms-getresponse',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Mailchimp',
+			'slug'        => 'mailchimp',
+			'img'         => 'addon-icon-mailchimp.png',
+			'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
+			'plugin_slug' => 'wpforms-mailchimp',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Salesforce',
+			'slug'        => 'salesforce',
+			'img'         => 'addon-icon-salesforce.png',
+			'plugin'      => 'wpforms-salesforce/wpforms-salesforce.php',
+			'plugin_slug' => 'wpforms-salesforce',
+			'license'     => 'elite',
+		],
+		[
+			'name'        => 'Sendinblue',
+			'slug'        => 'sendinblue',
+			'img'         => 'addon-icon-sendinblue.png',
+			'plugin'      => 'wpforms-sendinblue/wpforms-sendinblue.php',
+			'plugin_slug' => 'wpforms-sendinblue',
+			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Zapier',
+			'slug'        => 'zapier',
+			'img'         => 'addon-icon-zapier.png',
+			'plugin'      => 'wpforms-zapier/wpforms-zapier.php',
+			'plugin_slug' => 'wpforms-zapier',
+			'license'     => 'pro',
+		],
+	];
+}
+
+/**
+ * Get an array of all the active provider addons.
+ *
+ * @since 1.4.7
+ *
+ * @return array
+ */
+function wpforms_get_providers_available() {
+	return (array) apply_filters( 'wpforms_providers_available', array() );
+}
+
+/**
+ * Get options for all providers.
+ *
+ * @since 1.4.7
+ *
+ * @param string $provider Define a single provider to get options for this one only.
+ *
+ * @return array
+ */
+function wpforms_get_providers_options( $provider = '' ) {
+
+	$options  = get_option( 'wpforms_providers', [] );
+	$provider = sanitize_key( $provider );
+	$data     = $options;
+
+	if ( ! empty( $provider ) && isset( $options[ $provider ] ) ) {
+		$data = $options[ $provider ];
+	}
+
+	return (array) apply_filters( 'wpforms_get_providers_options', $data, $provider );
+}
+
+/**
+ * Update options for all providers.
+ *
+ * @since 1.4.7
+ *
+ * @param string      $provider Provider slug.
+ * @param array|false $options  If false is passed - provider will be removed. Otherwise saved.
+ * @param string      $key      Optional key to identify which connection to update. If empty - generate a new one.
+ */
+function wpforms_update_providers_options( $provider, $options, $key = '' ) {
+
+	$providers = wpforms_get_providers_options();
+	$id        = ! empty( $key ) ? $key : uniqid();
+	$provider  = sanitize_key( $provider );
+
+	if ( $options ) {
+		$providers[ $provider ][ $id ] = (array) $options;
+	} else {
+		unset( $providers[ $provider ] );
+	}
+
+	update_option( 'wpforms_providers', $providers );
+}
+
+/**
+ * Helper function to determine if loading an WPForms related admin page.
+ *
+ * Here we determine if the current administration page is owned/created by
+ * WPForms. This is done in compliance with WordPress best practices for
+ * development, so that we only load required WPForms CSS and JS files on pages
+ * we create. As a result we do not load our assets admin wide, where they might
+ * conflict with other plugins needlessly, also leading to a better, faster user
+ * experience for our users.
+ *
+ * @since 1.3.9
+ *
+ * @param string $slug Slug identifier for a specific WPForms admin page.
+ * @param string $view Slug identifier for a specific WPForms admin page view ("subpage").
+ *
+ * @return bool
+ */
+function wpforms_is_admin_page( $slug = '', $view = '' ) {
+
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	// Check against basic requirements.
+	if (
+		! is_admin() ||
+		empty( $_REQUEST['page'] ) ||
+		strpos( $_REQUEST['page'], 'wpforms' ) === false
+	) {
+		return false;
+	}
+
+	// Check against page slug identifier.
+	if (
+		( ! empty( $slug ) && 'wpforms-' . $slug !== $_REQUEST['page'] ) ||
+		( empty( $slug ) && 'wpforms-builder' === $_REQUEST['page'] )
+	) {
+		return false;
+	}
+
+	// Check against sub-level page view.
+	if (
+		! empty( $view ) &&
+		( empty( $_REQUEST['view'] ) || $view !== $_REQUEST['view'] )
+	) {
+		return false;
+	}
+	// phpcs:enable
+
+	return true;
+}
+
+/**
+ * Get the ISO 639-2 Language Code from user/site locale.
+ *
+ * @see http://www.loc.gov/standards/iso639-2/php/code_list.php
+ *
+ * @since 1.5.0
+ *
+ * @return string
+ */
+function wpforms_get_language_code() {
+
+	$default_lang = 'en';
+	$locale       = get_user_locale();
+
+	if ( ! empty( $locale ) ) {
+		$lang = explode( '_', $locale );
+		if ( ! empty( $lang ) && is_array( $lang ) ) {
+			$default_lang = strtolower( $lang[0] );
+		}
+	}
+
+	return $default_lang;
+}
+
+/**
+ * Determine if we should show the "Show Values" toggle for checkbox, radio, or
+ * select fields in form builder. Legacy.
+ *
+ * @since 1.5.0
+ *
+ * @return bool
+ */
+function wpforms_show_fields_options_setting() {
+
+	return apply_filters( 'wpforms_fields_show_options_setting', false );
+}
+
+/**
+ * Check if a string is empty.
+ *
+ * @since 1.5.0
+ *
+ * @param string $string String to test.
+ *
+ * @return bool
+ */
+function wpforms_is_empty_string( $string ) {
+
+	return is_string( $string ) && '' === $string;
+}
+
+/**
+ * Return URL to form preview page.
+ *
+ * @since 1.5.1
+ *
+ * @param int  $form_id    Form ID.
+ * @param bool $new_window New window flag.
+ *
+ * @return string
+ */
+function wpforms_get_form_preview_url( $form_id, $new_window = false ) {
+
+	$url = add_query_arg(
+		array(
+			'wpforms_form_preview' => absint( $form_id ),
+		),
+		home_url()
+	);
+
+	if ( $new_window ) {
+		$url = add_query_arg(
+			array(
+				'new_window' => 1,
+			),
+			$url
+		);
+	}
+
+	return $url;
+}
+
+/**
+ * Include a template - alias to \WPForms\Helpers\Template::get_html.
+ * Use 'require' if $args are passed or 'load_template' if not.
+ *
+ * @since 1.5.6
+ *
+ * @param string $template_name Template name.
+ * @param array  $args          Arguments.
+ * @param bool   $extract       Extract arguments.
+ *
+ * @throws \RuntimeException If extract() tries to modify the scope.
+ *
+ * @return string Compiled HTML.
+ */
+function wpforms_render( $template_name, $args = array(), $extract = false ) {
+
+	return \WPForms\Helpers\Templates::get_html( $template_name, $args, $extract );
+}
+
+/**
+ * Chain monad, useful for chaining certain array or string related functions.
+ *
+ * @since 1.5.6
+ *
+ * @param mixed $value Any data.
+ *
+ * @return \WPForms\Helpers\Chain
+ */
+function wpforms_chain( $value ) {
+
+	return \WPForms\Helpers\Chain::of( $value );
+}
+
+/**
+ * Get the current installation license type (always lowercase).
+ *
+ * @since 1.5.6
+ *
+ * @return string|false
+ */
+function wpforms_get_license_type() {
+
+	$type = \wpforms_setting( 'type', '', 'wpforms_license' );
+
+	if ( empty( $type ) || ! \wpforms()->pro ) {
+		return false;
+	}
+
+	return strtolower( $type );
+}
+
+/**
+ * Get the current installation license key.
+ *
+ * @since 1.6.2.3
+ *
+ * @return string
+ */
+function wpforms_get_license_key() {
+
+	// Check for license key.
+	$key = wpforms_setting( 'key', '', 'wpforms_license' );
+
+	// Allow wp-config constant to pass key.
+	if ( empty( $key ) && defined( 'WPFORMS_LICENSE_KEY' ) ) {
+		$key = WPFORMS_LICENSE_KEY;
+	}
+
+	return $key;
+}
+
+/**
+ * Get when WPForms was first installed.
+ *
+ * @since 1.6.0
+ *
+ * @param string $type Specific install type to check for.
+ *
+ * @return int|false
+ */
+function wpforms_get_activated_timestamp( $type = '' ) {
+
+	$activated = get_option( 'wpforms_activated', [] );
+	$types     = ! empty( $type ) ? [ $type ] : [ 'lite', 'pro' ];
+
+	foreach ( $types as $type ) {
+		if ( ! empty( $activated[ $type ] ) ) {
+			return absint( $activated[ $type ] );
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Detect if AJAX frontend form submit is being processed.
+ *
+ * @since 1.5.8.2
+ * @since 1.6.5 Added filterable frontend ajax actions list as a fallback to missing referer cases.
+ * @since 1.6.7.1 Removed a requirement for an AJAX action to be a WPForms action if referer is not missing.
+ *
+ * @return bool
+ */
+function wpforms_is_frontend_ajax() {
+
+	if ( ! wp_doing_ajax() ) {
+		return false;
+	}
+
+	// Additional check to make sure the request targets admin-ajax.php.
+	if ( isset( $_SERVER['SCRIPT_FILENAME'] ) && basename( sanitize_text_field( wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) ) ) !== 'admin-ajax.php' ) {
+		return false;
+	}
+
+	$ref = wp_get_raw_referer();
+
+	if ( ! $ref ) {
+
+		// Try to detect a frontend AJAX call indirectly by comparing the current action
+		// with a known frontend actions list in case there's no HTTP referer.
+		$frontend_actions = [
+			'wpforms_submit',
+			'wpforms_file_upload_speed_test',
+			'wpforms_upload_chunk_init',
+			'wpforms_upload_chunk',
+			'wpforms_file_chunks_uploaded',
+			'wpforms_remove_file',
+			'wpforms_restricted_email',
+			'wpforms_form_locker_unique_answer',
+			'wpforms_form_abandonment',
+		];
+
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( $_REQUEST['action'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// This filter may be running as early as "plugins_loaded" hook. Please mind the hooks order when using it.
+		$frontend_actions = (array) apply_filters( 'wpforms_is_frontend_ajax_frontend_actions', $frontend_actions );
+
+		return in_array( $action, $frontend_actions, true );
+	}
+
+	$path       = wp_parse_url( $ref, PHP_URL_PATH );
+	$admin_path = wp_parse_url( admin_url(), PHP_URL_PATH );
+
+	// It's a frontend AJAX call if HTTP referer doesn't contain an admin path.
+	return strpos( $path, $admin_path ) === false;
+}
+
+/**
+ * Dequeue enqueues by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string           $uris     List of URIs or individual URI to dequeue.
+ * @param \WP_Scripts|\WP_Styles $enqueues Enqueues list to dequeue from.
+ */
+function wpforms_dequeue_by_uri( $uris, $enqueues ) {
+
+	if ( empty( $enqueues->queue ) ) {
+		return;
+	}
+
+	foreach ( $enqueues->queue as $handle ) {
+
+		if ( empty( $enqueues->registered[ $handle ]->src ) ) {
+			continue;
+		}
+
+		$src = wp_make_link_relative( $enqueues->registered[ $handle ]->src );
+
+		// Support full URLs.
+		$src = site_url( $src );
+
+		foreach ( (array) $uris as $uri ) {
+			if ( strpos( $src, $uri ) !== false ) {
+				wp_dequeue_script( $handle );
+				break;
+			}
+		}
+	}
+}
+
+/**
+ * Dequeue scripts by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string $uris List of URIs or individual URI to dequeue.
+ */
+function wpforms_dequeue_scripts_by_uri( $uris ) {
+
+	wpforms_dequeue_by_uri( $uris, wp_scripts() );
+}
+
+/**
+ * Dequeue styles by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string $uris List of URIs or individual URI to dequeue.
+ */
+function wpforms_dequeue_styles_by_uri( $uris ) {
+
+	wpforms_dequeue_by_uri( $uris, wp_styles() );
+}
+
+/**
+ * Count words in the string.
+ *
+ * @since 1.6.2
+ *
+ * @param string $string String value.
+ *
+ * @return integer Words count.
+ */
+function wpforms_count_words( $string ) {
+
+	if ( ! is_string( $string ) ) {
+		return 0;
+	}
+
+	$patterns = [
+		'/([A-Z]+),([A-Z]+)/i',
+		'/([0-9]+),([A-Z]+)/i',
+		'/([A-Z]+),([0-9]+)/i',
+	];
+
+	foreach ( $patterns as $pattern ) {
+		$string = preg_replace_callback(
+			$pattern,
+			function( $matches ) {
+				return $matches[1] . ', ' . $matches[2];
+			},
+			$string
+		);
+	}
+
+	$words = preg_split( '/[\s]+/', $string );
+
+	return is_array( $words ) ? count( $words ) : 0;
+}
+
+/**
+ * Get WPForms upload root path (e.g. /wp-content/uploads/wpforms).
+ *
+ * As of 1.7.0, you can pass in your own value that matches the output of wp_upload_dir()
+ * in order to use this function inside of a filter without infinite looping.
+ *
+ * @since 1.6.1
+ *
+ * @return array WPForms upload root path (no trailing slash).
+ */
+function wpforms_upload_dir() {
+
+	$upload_dir = wp_upload_dir();
+
+	if ( ! empty( $upload_dir['error'] ) ) {
+		return [ 'error' => $upload_dir['error'] ];
+	}
+
+	$basedir             = wp_is_stream( $upload_dir['basedir'] ) ? $upload_dir['basedir'] : realpath( $upload_dir['basedir'] );
+	$wpforms_upload_root = trailingslashit( $basedir ) . 'wpforms';
+
+	/**
+	 * Allow developers to change a directory where cache and uploaded files will be stored.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param string $wpforms_upload_root WPForms upload root directory.
+	 */
+	$custom_uploads_root = apply_filters( 'wpforms_upload_root', $wpforms_upload_root );
+
+	if ( is_dir( $custom_uploads_root ) && wp_is_writable( $custom_uploads_root ) ) {
+		$wpforms_upload_root = wp_is_stream( $custom_uploads_root )
+			? $custom_uploads_root
+			: realpath( $custom_uploads_root );
+	}
+
+	return [
+		'path'  => $wpforms_upload_root,
+		'url'   => trailingslashit( $upload_dir['baseurl'] ) . 'wpforms',
+		'error' => false,
+	];
+}
+
+/**
+ * Create index.html file in the specified directory if it doesn't exist.
+ *
+ * @since 1.6.1
+ *
+ * @param string $path Path to the directory.
+ *
+ * @return int|false Number of bytes that were written to the file, or false on failure.
+ */
+function wpforms_create_index_html_file( $path ) {
+
+	if ( ! is_dir( $path ) || is_link( $path ) ) {
+		return false;
+	}
+
+	$index_file = wp_normalize_path( trailingslashit( $path ) . 'index.html' );
+
+	// Do nothing if index.html exists in the directory.
+	if ( file_exists( $index_file ) ) {
+		return false;
+	}
+
+	// Create empty index.html.
+	return file_put_contents( $index_file, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+}
+
+/**
+ * Create .htaccess file in the WPForms upload directory.
+ *
+ * @since 1.6.1
+ *
+ * @return bool True when the .htaccess file exists, false on failure.
+ */
+function wpforms_create_upload_dir_htaccess_file() {
+
+	if ( ! apply_filters( 'wpforms_create_upload_dir_htaccess_file', true ) ) {
+		return false;
+	}
+
+	$upload_dir = wpforms_upload_dir();
+
+	if ( ! empty( $upload_dir['error'] ) ) {
+		return false;
+	}
+
+	$htaccess_file = wp_normalize_path( trailingslashit( $upload_dir['path'] ) . '.htaccess' );
+	$cache_key     = 'wpforms_htaccess_file';
+
+	if ( is_file( $htaccess_file ) ) {
+		$cached_stat = get_transient( $cache_key );
+		$stat        = array_intersect_key(
+			stat( $htaccess_file ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		if ( $cached_stat === $stat ) {
+			return true;
+		}
+
+		@unlink( $htaccess_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	if ( ! function_exists( 'insert_with_markers' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+	}
+
+	$contents = apply_filters(
+		'wpforms_create_upload_dir_htaccess_file_content',
+		'# Disable PHP and Python scripts parsing.
+<Files *>
+  SetHandler none
+  SetHandler default-handler
+  RemoveHandler .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
+  RemoveType .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
+</Files>
+<IfModule mod_php5.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+<IfModule headers_module>
+  Header set X-Robots-Tag "noindex"
+</IfModule>'
+	);
+
+	$created = insert_with_markers( $htaccess_file, 'WPForms', $contents );
+
+	if ( $created ) {
+		clearstatcache( true, $htaccess_file );
+		$stat = array_intersect_key(
+			stat( $htaccess_file ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		set_transient( $cache_key, $stat );
+	}
+
+	return $created;
+}
+
+/**
+ * Check if Gutenberg is active.
+ *
+ * @since 1.6.2
+ *
+ * @return bool True if Gutenberg is active.
+ */
+function wpforms_is_gutenberg_active() {
+
+	$gutenberg    = false;
+	$block_editor = false;
+
+	if ( has_filter( 'replace_editor', 'gutenberg_init' ) ) {
+		// Gutenberg is installed and activated.
+		$gutenberg = true;
+	}
+
+	if ( version_compare( $GLOBALS['wp_version'], '5.0-beta', '>' ) ) {
+		// Block editor.
+		$block_editor = true;
+	}
+
+	if ( ! $gutenberg && ! $block_editor ) {
+		return false;
+	}
+
+	include_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+	if ( is_plugin_active( 'disable-gutenberg/disable-gutenberg.php' ) ) {
+
+		return ! disable_gutenberg();
+	}
+
+	if ( is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
+
+		return get_option( 'classic-editor-replace' ) === 'block';
+	}
+
+	return true;
+}
+
+/**
+ * Determine if the plugin/addon installations are allowed.
+ *
+ * @since 1.6.2.3
+ *
+ * @param string $type Should be `plugin` or `addon`.
+ *
+ * @return bool
+ */
+function wpforms_can_install( $type ) {
+
+	if ( ! in_array( $type, [ 'plugin', 'addon' ], true ) ) {
+		return false;
+	}
+
+	if ( ! current_user_can( 'install_plugins' ) ) {
+		return false;
+	}
+
+	// Determine whether file modifications are allowed.
+	if ( ! wp_is_file_mod_allowed( 'wpforms_can_install' ) ) {
+		return false;
+	}
+
+	// All plugin checks are done.
+	if ( 'plugin' === $type ) {
+		return true;
+	}
+
+	// Addons require additional license checks.
+	$license = get_option( 'wpforms_license', [] );
+
+	// Allow addons installation if license is not expired, enabled and valid.
+	return empty( $license['is_expired'] ) && empty( $license['is_disabled'] ) && empty( $license['is_invalid'] );
+}
+
+/**
+ * Retrieve the full config for CAPTCHA.
+ *
+ * @since 1.6.4
+ *
+ * @return array
+ */
+function wpforms_get_captcha_settings() {
+
+	$allowed_captcha_list = [ 'hcaptcha', 'recaptcha' ];
+	$captcha_provider     = wpforms_setting( 'captcha-provider', 'recaptcha' );
+
+	if ( ! in_array( $captcha_provider, $allowed_captcha_list, true ) ) {
+		return [
+			'provider' => 'none',
+		];
+	}
+
+	return [
+		'provider'       => $captcha_provider,
+		'site_key'       => sanitize_text_field( wpforms_setting( "{$captcha_provider}-site-key", '' ) ),
+		'secret_key'     => sanitize_text_field( wpforms_setting( "{$captcha_provider}-secret-key", '' ) ),
+		'recaptcha_type' => wpforms_setting( 'recaptcha-type', 'v2' ),
+	];
+}
+
+/**
+ * Wrapper for set_time_limit to see if it is enabled.
+ *
+ * @since 1.6.4
+ *
+ * @param int $limit Time limit.
+ */
+function wpforms_set_time_limit( $limit = 0 ) {
+
+	if ( function_exists( 'set_time_limit' ) && false === strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) { // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.safe_modeDeprecatedRemoved
+		@set_time_limit( $limit ); // @codingStandardsIgnoreLine
+	}
+}
+
+/**
+ * Determine if collecting user's IP is allowed by GDPR setting (globally or per form).
+ * Majority of our users have GDPR disabled.
+ * So we remove this data from the request only when it's not needed:
+ * 1) when GDPR is enabled AND globally disabled user details storage;
+ * 2) when GDPR is enabled AND IP address processing is disabled on per form basis.
+ *
+ * @since 1.6.6
+ *
+ * @param array $form_data Form settings.
+ *
+ * @return bool
+ */
+function wpforms_is_collecting_ip_allowed( $form_data = [] ) {
+
+	if (
+		wpforms_setting( 'gdpr', false ) &&
+		(
+			wpforms_setting( 'gdpr-disable-details', false ) ||
+			( ! empty( $form_data ) && ! empty( $form_data['settings']['disable_ip'] ) )
+		)
+	) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Retrieve a timezone from the site settings as a `DateTimeZone` object.
+ *
+ * Timezone can be based on a PHP timezone string or a ±HH:MM offset.
+ *
+ * @since 1.6.6
+ *
+ * @return DateTimeZone Timezone object.
+ */
+function wpforms_get_timezone() {
+
+	if ( function_exists( 'wp_timezone' ) ) {
+		return wp_timezone();
+	}
+
+	// Fallback for WordPress version < 5.3.
+	$timezone_string = get_option( 'timezone_string' );
+
+	if ( ! $timezone_string ) {
+		$offset  = (float) get_option( 'gmt_offset' );
+		$hours   = (int) $offset;
+		$minutes = ( $offset - $hours );
+
+		$sign     = ( $offset < 0 ) ? '-' : '+';
+		$abs_hour = abs( $hours );
+		$abs_mins = abs( $minutes * 60 );
+
+		$timezone_string = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
+	}
+
+	return timezone_open( $timezone_string );
+}
+
+/**
+ * Alias for default readonly function.
+ *
+ * @since 1.6.9
+ *
+ * @param mixed $readonly One of the values to compare.
+ * @param mixed $current  The other value to compare if not just true.
+ * @param bool  $echo     Whether to echo or just return the string.
+ *
+ * @return string HTML attribute or empty string.
+ */
+function wpforms_readonly( $readonly, $current = true, $echo = true ) {
+
+	if ( function_exists( 'wp_readonly' ) ) {
+		return wp_readonly( $readonly, $current, $echo );
+	}
+
+	return __checked_selected_helper( $readonly, $current, $echo, 'readonly' );
+}
+
+/**
+ * Process smart tags.
+ *
+ * @since 1.7.1
+ *
+ * @param string $content   Content.
+ * @param array  $form_data Form data.
+ * @param array  $fields    List of fields.
+ * @param string $entry_id  Entry ID.
+ *
+ * @return string
+ */
+function wpforms_process_smart_tags( $content, $form_data, $fields = [], $entry_id = '' ) {
+
+	// Skip it if variables have invalid format.
+	if ( ! is_string( $content ) || ! is_array( $form_data ) || ! is_array( $fields ) ) {
+		return $content;
+	}
+
+	/**
+	 * Process smart tags.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $content   Content.
+	 * @param array  $form_data Form data.
+	 * @param array  $fields    List of fields.
+	 * @param string $entry_id  Entry ID.
+	 *
+	 * @return string
+	 */
+	return apply_filters( 'wpforms_process_smart_tags',  $content, $form_data, $fields, $entry_id );
+}
+
+/**
+ * Get formatted [ id => title ] pages list.
+ *
+ * @since 1.7.2
+ *
+ * @param array|string $args Array or string of arguments to retrieve pages.
+ *
+ * @return array
+ */
+function wpforms_get_pages_list( $args = [] ) {
+
+	$pages = get_pages( $args );
+	$list  = [];
+
+	if ( empty( $pages ) ) {
+		return $list;
+	}
+
+	foreach ( $pages as $page ) {
+		/* translators: %d - a page ID. */
+		$title             = ! empty( $page->post_title ) ? $page->post_title : sprintf( __( '#%d (no title)', 'wpforms-lite' ), $page->ID );
+		$depth             = count( $page->ancestors );
+		$list[ $page->ID ] = str_repeat( '&nbsp;', $depth * 3 ) . $title;
+	}
+
+	return $list;
 }
