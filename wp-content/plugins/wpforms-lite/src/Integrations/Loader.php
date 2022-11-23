@@ -33,6 +33,8 @@ class Loader {
 	public function __construct() {
 
 		$core_class_names = [
+			'SMTP\Notifications',
+			'LiteConnect\LiteConnect',
 			'Divi\Divi',
 			'Elementor\Elementor',
 			'Gutenberg\FormSelector',

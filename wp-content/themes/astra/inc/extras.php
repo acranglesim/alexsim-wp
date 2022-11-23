@@ -584,6 +584,18 @@ function astra_addon_has_3_5_0_version() {
 }
 
 /**
+ * Check the Astra addon version.
+ * For  major update and frequently we used version_compare, added a function for this for easy maintenance.
+ *
+ * @param string $version Astra addon version.
+ * @param string $compare Compare symbols.
+ * @since  3.9.2
+ */
+function astra_addon_check_version( $version, $compare ) {
+	return defined( 'ASTRA_EXT_VER' ) && version_compare( ASTRA_EXT_VER, $version, $compare );
+}
+
+/**
  * Get a stylesheet URL for a webfont.
  *
  * @since 3.6.0
@@ -623,7 +635,7 @@ function astra_load_preload_local_fonts( $url, $format = 'woff2' ) {
 		$font_format = apply_filters( 'astra_local_google_fonts_format', $format );
 		foreach ( $astra_local_font_files as $key => $local_font ) {
 			if ( $local_font ) {
-				echo '<link rel="preload" href="' . esc_url( $local_font ) . '" as="font" type="font/' . esc_attr( $font_format ) . '" crossorigin>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<link rel="preload" href="' . esc_url( $local_font ) . '" as="font" type="font/' . esc_attr( $font_format ) . '" crossorigin>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Preparing HTML link tag.
 			}
 		}
 		return;
@@ -816,4 +828,156 @@ function astra_apply_content_background_fullwidth_layouts() {
 	$astra_apply_content_background = astra_get_option( 'apply-content-background-fullwidth-layouts', true );
 
 	return ( $astra_apply_content_background && 'ast-box-layout' !== $astra_site_layout && 'ast-padded-layout' !== $astra_site_layout );
+}
+
+/**
+ * Search Component static CSS.
+ *
+ * @return string
+ * @since 3.5.0
+ */
+function astra_search_static_css() {
+	$search_css = '
+	.main-header-bar .main-header-bar-navigation .ast-search-icon {
+		display: block;
+		z-index: 4;
+		position: relative;
+	}
+	.ast-search-icon .ast-icon {
+		z-index: 4;
+	}
+	.ast-search-icon {
+		z-index: 4;
+		position: relative;
+		line-height: normal;
+	}
+	.main-header-bar .ast-search-menu-icon .search-form {
+		background-color: #ffffff;
+	}
+	.ast-search-menu-icon.ast-dropdown-active.slide-search .search-form {
+		visibility: visible;
+		opacity: 1;
+	}
+	.ast-search-menu-icon .search-form {
+		border: 1px solid #e7e7e7;
+		line-height: normal;
+		padding: 0 3em 0 0;
+		border-radius: 2px;
+		display: inline-block;
+		-webkit-backface-visibility: hidden;
+		backface-visibility: hidden;
+		position: relative;
+		color: inherit;
+		background-color: #fff;
+	}
+	.ast-search-menu-icon .astra-search-icon {
+		-js-display: flex;
+		display: flex;
+		line-height: normal;
+	}
+	.ast-search-menu-icon .astra-search-icon:focus {
+		outline: none;
+	}
+	.ast-search-menu-icon .search-field {
+		border: none;
+		background-color: transparent;
+		transition: width .2s;
+		border-radius: inherit;
+		color: inherit;
+		font-size: inherit;
+		width: 0;
+		color: #757575;
+	}
+	.ast-search-menu-icon .search-submit {
+		display: none;
+		background: none;
+		border: none;
+		font-size: 1.3em;
+		color: #757575;
+	}
+	.ast-search-menu-icon.ast-dropdown-active {
+		visibility: visible;
+		opacity: 1;
+		position: relative;
+	}
+	.ast-search-menu-icon.ast-dropdown-active .search-field {
+		width: 235px;
+	}
+	.ast-header-search .ast-search-menu-icon.slide-search .search-form, .ast-header-search .ast-search-menu-icon.ast-inline-search .search-form {
+		-js-display: flex;
+		display: flex;
+		align-items: center;
+	}';
+
+	if ( is_rtl() ) {
+		$search_css .= '
+		.ast-search-menu-icon.ast-inline-search .search-field {
+			width : 100%;
+			padding : 0.60em;
+			padding-left : 5.5em;
+		}
+		.site-header-section-left .ast-search-menu-icon.slide-search .search-form {
+			padding-right: 3em;
+			padding-left: unset;
+			right: -1em;
+			left: unset;
+		}
+		.site-header-section-left .ast-search-menu-icon.slide-search .search-form .search-field {
+			margin-left: unset;
+			margin-right: 10px;
+		}
+		.ast-search-menu-icon.slide-search .search-form {
+			-webkit-backface-visibility: visible;
+			backface-visibility: visible;
+			visibility: hidden;
+			opacity: 0;
+			transition: all .2s;
+			position: absolute;
+			z-index: 3;
+			left: -1em;
+			top: 50%;
+			transform: translateY(-50%);
+		}';
+	} else {
+		$search_css .= '
+		.ast-search-menu-icon.ast-inline-search .search-field {
+			width : 100%;
+			padding : 0.60em;
+			padding-right : 5.5em;
+		}
+		.site-header-section-left .ast-search-menu-icon.slide-search .search-form {
+			padding-left: 3em;
+			padding-right: unset;
+			left: -1em;
+			right: unset;
+		}
+		.site-header-section-left .ast-search-menu-icon.slide-search .search-form .search-field {
+			margin-right: unset;
+			margin-left: 10px;
+		}
+		.ast-search-menu-icon.slide-search .search-form {
+			-webkit-backface-visibility: visible;
+			backface-visibility: visible;
+			visibility: hidden;
+			opacity: 0;
+			transition: all .2s;
+			position: absolute;
+			z-index: 3;
+			right: -1em;
+			top: 50%;
+			transform: translateY(-50%);
+		}';
+	}
+
+	return Astra_Enqueue_Scripts::trim_css( $search_css );
+}
+
+/**
+ * Showcase "Upgrade to Pro" notices for Astra & here is the filter work as central control to enable/disable those notices from customizer, meta settings, admin area, pro post types pages.
+ *
+ * @since 3.9.4
+ * @return bool
+ */
+function astra_showcase_upgrade_notices() {
+	return ( ! defined( 'ASTRA_EXT_VER' ) && astra_get_option( 'ast-disable-upgrade-notices', true ) ) ? true : false;
 }
