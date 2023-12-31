@@ -162,6 +162,35 @@ final class Astra_Builder_Helper {
 	);
 
 	/**
+	 * Default button responsive spacing control value.
+	 *
+	 * @var string[][]
+	 */
+	public static $default_button_responsive_spacing = array(
+		'desktop'      => array(
+			'top'    => '12',
+			'right'  => '20',
+			'bottom' => '12',
+			'left'   => '20',
+		),
+		'tablet'       => array(
+			'top'    => '',
+			'right'  => '',
+			'bottom' => '',
+			'left'   => '',
+		),
+		'mobile'       => array(
+			'top'    => '',
+			'right'  => '',
+			'bottom' => '',
+			'left'   => '',
+		),
+		'desktop-unit' => 'px',
+		'tablet-unit'  => 'px',
+		'mobile-unit'  => 'px',
+	);
+
+	/**
 	 * Config Tablet device context.
 	 *
 	 * @var string[][]
@@ -205,7 +234,7 @@ final class Astra_Builder_Helper {
 	/**
 	 *  No. Of. Component count array.
 	 *
-	 * @var int
+	 * @var array
 	 */
 	public static $component_count_array = array();
 
@@ -333,14 +362,14 @@ final class Astra_Builder_Helper {
 	/**
 	 * Member Variable
 	 *
-	 * @var instance
+	 * @var mixed
 	 */
 	public static $loaded_grid = null;
 
 	/**
 	 * Member Variable
 	 *
-	 * @var instance
+	 * @var null instance
 	 */
 	private static $instance = null;
 
@@ -949,7 +978,7 @@ final class Astra_Builder_Helper {
 			<div class="ast-mobile-popup-overlay"></div>
 			<div class="ast-mobile-popup-inner">
 					<div class="ast-mobile-popup-header">
-						<button type="button" id="menu-toggle-close" class="menu-toggle-close" aria-label="Close menu">
+						<button type="button" id="menu-toggle-close" class="menu-toggle-close" aria-label="Close menu" tabindex="0">
 							<span class="ast-svg-iconset">
 								<?php echo Astra_Builder_UI_Controller::fetch_svg_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</span>
@@ -1078,7 +1107,9 @@ final class Astra_Builder_Helper {
 
 		$loaded_components = array();
 
+		/** @psalm-suppress RedundantConditionGivenDocblockType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		if ( is_null( self::$loaded_grid ) ) {
+				/** @psalm-suppress RedundantConditionGivenDocblockType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 
 			$grids['header_desktop'] = astra_get_option( 'header-desktop-items', array() );
 			$grids['header_mobile']  = astra_get_option( 'header-mobile-items', array() );
@@ -1144,7 +1175,8 @@ final class Astra_Builder_Helper {
 	 * @return boolean true if it is an existing user , false if not.
 	 */
 	public static function apply_flex_based_css() {
-		$astra_settings                      = get_option( ASTRA_THEME_SETTINGS );
+		$astra_settings = get_option( ASTRA_THEME_SETTINGS, array() );
+
 		$astra_settings['is-flex-based-css'] = isset( $astra_settings['is-flex-based-css'] ) ? $astra_settings['is-flex-based-css'] : true;
 		return apply_filters( 'astra_apply_flex_based_css', $astra_settings['is-flex-based-css'] );
 	}

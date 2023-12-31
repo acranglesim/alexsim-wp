@@ -168,6 +168,7 @@ if ( ! function_exists( 'astra_get_font_css_value' ) ) {
 
 		switch ( $unit ) {
 			case 'em':
+			case 'vw':
 			case '%':
 						$css_val = esc_attr( $value ) . $unit;
 				break;
@@ -346,11 +347,21 @@ if ( ! function_exists( 'astra_get_background_obj' ) ) {
 					break;
 
 				case 'image':
-					if ( '' !== $bg_img && '' !== $bg_color && ( ! is_numeric( strpos( $bg_color, 'linear-gradient' ) ) && ! is_numeric( strpos( $bg_color, 'radial-gradient' ) ) ) ) {
-						$gen_bg_css['background-image'] = 'linear-gradient(to right, ' . $bg_color . ', ' . $bg_color . '), url(' . $bg_img . ');';
-					}
-					if ( '' === $bg_color || is_numeric( strpos( $bg_color, 'linear-gradient' ) ) || is_numeric( strpos( $bg_color, 'radial-gradient' ) ) && '' !== $bg_img ) {
-						$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+					$overlay_type  = isset( $bg_obj['overlay-type'] ) ? $bg_obj['overlay-type'] : 'none';
+					$overlay_color = isset( $bg_obj['overlay-color'] ) ? $bg_obj['overlay-color'] : '';
+					$overlay_grad  = isset( $bg_obj['overlay-gradient'] ) ? $bg_obj['overlay-gradient'] : '';
+					if ( '' !== $bg_img ) {
+						if ( 'none' !== $overlay_type ) {
+							if ( 'classic' === $overlay_type && '' !== $overlay_color ) {
+								$gen_bg_css['background-image'] = 'linear-gradient(to right, ' . $overlay_color . ', ' . $overlay_color . '), url(' . $bg_img . ');';
+							} elseif ( 'gradient' === $overlay_type && '' !== $overlay_grad ) {
+								$gen_bg_css['background-image'] = $overlay_grad . ', url(' . $bg_img . ');';
+							} else {
+								$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+							}
+						} else {
+							$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+						}
 					}
 					break;
 
@@ -523,6 +534,9 @@ if ( ! function_exists( 'astra_update_option' ) ) {
 		$theme_options = get_option( ASTRA_THEME_SETTINGS );
 
 		// Update value in options array.
+		if ( ! is_array( $theme_options ) ) {
+			$theme_options = array();
+		}
 		$theme_options[ $option ] = $value;
 
 		update_option( ASTRA_THEME_SETTINGS, $theme_options );
@@ -835,10 +849,13 @@ if ( ! function_exists( 'astra_the_title' ) ) {
 	function astra_the_title( $before = '', $after = '', $post_id = 0, $echo = true ) {
 
 		$title             = '';
-		$blog_post_title   = astra_get_option( 'blog-post-structure' );
-		$single_post_title = astra_get_option( 'blog-single-post-structure' );
+		$post_type         = strval( get_post_type() );
+		$blog_post_title   = astra_get_option( 'ast-dynamic-archive-' . $post_type . '-structure', array( 'ast-dynamic-archive-' . $post_type . '-title', 'ast-dynamic-archive-' . $post_type . '-description' ) );
+		$single_post_title = astra_get_option( 'ast-dynamic-single-' . $post_type . '-structure', 'page' === $post_type ? array( 'ast-dynamic-single-' . $post_type . '-image', 'ast-dynamic-single-' . $post_type . '-title' ) : array( 'ast-dynamic-single-' . $post_type . '-title', 'ast-dynamic-single-' . $post_type . '-meta' ) );
 
-		if ( ( ! is_singular() && in_array( 'title-meta', $blog_post_title ) ) || ( is_single() && in_array( 'single-title-meta', $single_post_title ) ) || is_page() ) {
+		if ( ( ! is_singular() && ( in_array( 'ast-dynamic-archive-' . $post_type . '-title', $blog_post_title ) || in_array( 'ast-dynamic-archive-' . $post_type . '-meta', $blog_post_title ) ) )
+			|| ( is_singular() && ( in_array( 'ast-dynamic-single-' . $post_type . '-title', $single_post_title ) || in_array( 'ast-dynamic-single-' . $post_type . '-meta', $single_post_title ) ) )
+		) {
 			if ( apply_filters( 'astra_the_title_enabled', true ) ) {
 
 				$title  = astra_get_the_title( $post_id );
@@ -917,6 +934,58 @@ if ( ! function_exists( 'astra_get_the_title' ) ) {
 }
 
 /**
+ * Don't apply direct new layouts to legacy users.
+ *
+ * @since 4.0.0
+ * @return boolean false if it is an existing user , true if not.
+ */
+function astra_use_dynamic_blog_layouts() {
+	$astra_settings                         = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings['dynamic-blog-layouts'] = isset( $astra_settings['dynamic-blog-layouts'] ) ? $astra_settings['dynamic-blog-layouts'] : true;
+	return apply_filters( 'astra_get_option_dynamic_blog_layouts', $astra_settings['dynamic-blog-layouts'] );
+}
+
+/**
+ * Get taxonomy archive banner for layout 1.
+ *
+ * @since 4.0.0
+ */
+function astra_get_taxonomy_banner_legacy_layout() {
+	?>
+		<section class="ast-archive-description">
+			<?php
+				$post_type        = strval( get_post_type() );
+				$banner_structure = astra_get_option( 'ast-dynamic-archive-' . $post_type . '-structure', array( 'ast-dynamic-archive-' . $post_type . '-title', 'ast-dynamic-archive-' . $post_type . '-description' ) );
+			foreach ( $banner_structure as $metaval ) {
+				$meta_key = 'archive-' . astra_get_last_meta_word( $metaval );
+				switch ( $meta_key ) {
+					case 'archive-title':
+						do_action( 'astra_before_archive_title' );
+						add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
+						the_archive_title( '<h1 class="page-title ast-archive-title">', '</h1>' );
+						remove_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
+						do_action( 'astra_after_archive_title' );
+						break;
+					case 'archive-breadcrumb':
+						if ( ! is_author() ) {
+							do_action( 'astra_before_archive_breadcrumb' );
+							echo astra_get_breadcrumb(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							do_action( 'astra_after_archive_breadcrumb' );
+						}
+						break;
+					case 'archive-description':
+						do_action( 'astra_before_archive_description' );
+						echo wp_kses_post( wpautop( get_the_archive_description() ) );
+						do_action( 'astra_after_archive_description' );
+						break;
+				}
+			}
+			?>
+		</section>
+	<?php
+}
+
+/**
  * Archive Page Title
  */
 if ( ! function_exists( 'astra_archive_page_info' ) ) {
@@ -951,34 +1020,6 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 
 				<?php
 
-				// Category.
-			} elseif ( is_category() ) {
-				?>
-
-				<section class="ast-archive-description">
-					<?php do_action( 'astra_before_archive_title' ); ?>
-					<h1 class="page-title ast-archive-title"><?php echo single_cat_title(); ?></h1>
-					<?php do_action( 'astra_after_archive_title' ); ?>
-					<?php echo wp_kses_post( wpautop( get_the_archive_description() ) ); ?>
-					<?php do_action( 'astra_after_archive_description' ); ?>
-				</section>
-
-				<?php
-
-				// Tag.
-			} elseif ( is_tag() ) {
-				?>
-
-				<section class="ast-archive-description">
-					<?php do_action( 'astra_before_archive_title' ); ?>
-					<h1 class="page-title ast-archive-title"><?php echo single_tag_title(); ?></h1>
-					<?php do_action( 'astra_after_archive_title' ); ?>
-					<?php echo wp_kses_post( wpautop( get_the_archive_description() ) ); ?>
-					<?php do_action( 'astra_after_archive_description' ); ?>
-				</section>
-
-				<?php
-
 				// Search.
 			} elseif ( is_search() ) {
 				?>
@@ -997,17 +1038,7 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 
 				// Other.
 			} else {
-				?>
-
-				<section class="ast-archive-description">
-					<?php do_action( 'astra_before_archive_title' ); ?>
-					<?php the_archive_title( '<h1 class="page-title ast-archive-title">', '</h1>' ); ?>
-					<?php do_action( 'astra_after_archive_title' ); ?>
-					<?php echo wp_kses_post( wpautop( get_the_archive_description() ) ); ?>
-					<?php do_action( 'astra_after_archive_description' ); ?>
-				</section>
-
-				<?php
+				echo wp_kses_post( astra_get_taxonomy_banner_legacy_layout() );
 			}
 		}
 	}
@@ -1161,15 +1192,15 @@ if ( ! function_exists( 'astra_get_pro_url' ) ) :
 		$astra_pro_url = trailingslashit( $url );
 
 		// Set up our URL if we have a source.
-		if ( isset( $source ) ) {
+		if ( ! empty( $source ) ) {
 			$astra_pro_url = add_query_arg( 'utm_source', sanitize_text_field( $source ), $url );
 		}
 		// Set up our URL if we have a medium.
-		if ( isset( $medium ) ) {
+		if ( ! empty( $medium ) ) {
 			$astra_pro_url = add_query_arg( 'utm_medium', sanitize_text_field( $medium ), $astra_pro_url );
 		}
 		// Set up our URL if we have a campaign.
-		if ( isset( $campaign ) ) {
+		if ( ! empty( $campaign ) ) {
 			$astra_pro_url = add_query_arg( 'utm_campaign', sanitize_text_field( $campaign ), $astra_pro_url );
 		}
 
@@ -1201,7 +1232,7 @@ if ( ! function_exists( 'astra_get_search_form' ) ) :
 
 		$form = get_search_form(
 			array(
-				'input_placeholder' => apply_filters( 'astra_search_field_placeholder', esc_attr_x( 'Search &hellip;', 'placeholder', 'astra' ) ),
+				'input_placeholder' => apply_filters( 'astra_search_field_placeholder', esc_attr_x( 'Search...', 'placeholder', 'astra' ) ),
 				'data_attributes'   => apply_filters( 'astra_search_field_toggle_data_attrs', '' ),
 				'input_value'       => get_search_query(),
 				'show_input_submit' => false,
@@ -1398,42 +1429,6 @@ function astra_get_fonts_display_property() {
 }
 
 /**
- * Return Theme options from database.
- *
- * @param  string $option       Option key.
- * @param  string $default      Option default value.
- * @param  string $deprecated   Option default value.
- * @return Mixed               Return option value.
- */
-function astra_get_db_option( $option, $default = '', $deprecated = '' ) {
-
-	if ( '' != $deprecated ) {
-		$default = $deprecated;
-	}
-
-	$theme_options = Astra_Theme_Options::get_db_options();
-
-	/**
-	 * Filter the options array for Astra Settings.
-	 *
-	 * @since  1.0.20
-	 * @var Array
-	 */
-	$theme_options = apply_filters( 'astra_get_db_option_array', $theme_options, $option, $default );
-
-	$value = ( isset( $theme_options[ $option ] ) && '' !== $theme_options[ $option ] ) ? $theme_options[ $option ] : $default;
-
-	/**
-	 * Dynamic filter astra_get_option_$option.
-	 * $option is the name of the Astra Setting, Refer Astra_Theme_Options::defaults() for option names from the theme.
-	 *
-	 * @since  1.0.20
-	 * @var Mixed.
-	 */
-	return apply_filters( "astra_get_db_option_{$option}", $value, $option, $default );
-}
-
-/**
  * Generate Responsive Background Color CSS.
  *
  * @param array  $bg_obj_res array of background object.
@@ -1490,11 +1485,26 @@ function astra_get_responsive_background_obj( $bg_obj_res, $device ) {
 				break;
 
 			case 'image':
-				if ( '' !== $bg_img && '' !== $bg_color && ( ! is_numeric( strpos( $bg_color, 'linear-gradient' ) ) && ! is_numeric( strpos( $bg_color, 'radial-gradient' ) ) ) ) {
-					$gen_bg_css['background-image'] = 'linear-gradient(to right, ' . $bg_color . ', ' . $bg_color . '), url(' . $bg_img . ');';
-				}
-				if ( '' === $bg_color || is_numeric( strpos( $bg_color, 'linear-gradient' ) ) || is_numeric( strpos( $bg_color, 'radial-gradient' ) ) && '' !== $bg_img ) {
-					$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+				/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+				$overlay_type = isset( $bg_obj['overlay-type'] ) ? $bg_obj['overlay-type'] : 'none';
+				/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+				$overlay_color = isset( $bg_obj['overlay-color'] ) ? $bg_obj['overlay-color'] : '';
+				/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+				$overlay_grad = isset( $bg_obj['overlay-gradient'] ) ? $bg_obj['overlay-gradient'] : '';
+				/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+
+				if ( '' !== $bg_img ) {
+					if ( 'none' !== $overlay_type ) {
+						if ( 'classic' === $overlay_type && '' !== $overlay_color ) {
+							$gen_bg_css['background-image'] = 'linear-gradient(to right, ' . $overlay_color . ', ' . $overlay_color . '), url(' . $bg_img . ');';
+						} elseif ( 'gradient' === $overlay_type && '' !== $overlay_grad ) {
+							$gen_bg_css['background-image'] = $overlay_grad . ', url(' . $bg_img . ');';
+						} else {
+							$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+						}
+					} else {
+						$gen_bg_css['background-image'] = 'url(' . $bg_img . ');';
+					}
 				}
 				break;
 
@@ -1619,4 +1629,213 @@ function astra_check_old_sidebar_user() {
 function astra_load_woocommerce_login_form_password_icon() {
 	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
 	return apply_filters( 'astra_get_option_woo-show-password-icon', isset( $astra_settings['woo-show-password-icon'] ) ? false : true ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+}
+
+/**
+ * Function to add narrow width properties in the frontend.
+ *
+ * @since 4.0.0
+ * @param string $location container layout for single-post, archives, pages, page meta.
+ * @param string $narrow_container_max_width  dynamic container width in px.
+ * @return string Parsed CSS based on $location and $narrow_container_max_width.
+ */
+function astra_narrow_container_width( $location, $narrow_container_max_width ) {
+
+	if ( 'narrow-container' === $location ) {
+
+		$narrow_container_css = array(
+			'.ast-narrow-container .site-content > .ast-container' => array(
+				'max-width' => astra_get_css_value( $narrow_container_max_width, 'px' ),
+			),
+		);
+
+		// Remove Sidebar for Narrow Width Container Layout.
+		if ( 'narrow-container' === astra_get_content_layout() ) {
+			add_filter(
+				'astra_page_layout',
+				function() { // phpcs:ignore PHPCompatibility.FunctionDeclarations.NewClosure.Found
+					return 'no-sidebar';
+				}
+			);
+		}
+
+		return astra_parse_css( $narrow_container_css, astra_get_tablet_breakpoint( '', 1 ) );
+
+	} else {
+		return '';
+	}
+}
+
+/**
+ * Function which will return the Sidebar Layout to determine default body classes for Editor.
+ *
+ * @since 4.2.0
+ * @param string $post_type Post Type.
+ * @return string Sidebar Layout.
+ */
+function astra_get_sidebar_layout_for_editor( $post_type ) {
+
+	$sidebar_layout = astra_get_option( 'single-' . $post_type . '-sidebar-layout' );
+
+	if ( 'default' === $sidebar_layout ) {
+		$sidebar_layout = astra_get_option( 'site-sidebar-layout' );
+	}
+
+	return $sidebar_layout;
+}
+
+/**
+ * Gets the SVG for the duotone filter definition.
+ *
+ * @since 4.2.2
+ *
+ * @param string $filter_id The ID of the filter.
+ * @param array  $color    An array of color strings.
+ * @return string An SVG with a duotone filter definition.
+ */
+function astra_get_filter_svg( $filter_id, $color ) {
+
+	$duotone_values = array(
+		'r' => array(),
+		'g' => array(),
+		'b' => array(),
+		'a' => array(),
+	);
+
+	/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	$duotone_values['r'][] = $color['r'] / 255;
+			/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			$duotone_values['g'][] = $color['g'] / 255;
+			/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			$duotone_values['b'][] = $color['b'] / 255;
+			/** @psalm-suppress PossiblyUndefinedStringArrayOffset */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			$duotone_values['a'][] = $color['a'];
+	ob_start();
+
+	?>
+
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 0 0"
+		width="0"
+		height="0"
+		focusable="false"
+		role="none"
+		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
+	>
+		<defs>
+			<filter id="<?php echo esc_attr( $filter_id ); ?>">
+				<feColorMatrix
+					color-interpolation-filters="sRGB"
+					type="matrix"
+					values="
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+						.299 .587 .114 0 0
+					"
+				/>
+				<feComponentTransfer color-interpolation-filters="sRGB" >
+					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
+					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
+					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
+					<feFuncA type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['a'] ) ); ?>" />
+				</feComponentTransfer>
+				<feComposite in2="SourceGraphic" operator="in" />
+			</filter>
+		</defs>
+	</svg>
+
+	<?php
+
+	$svg = ob_get_clean();
+
+	// Clean up the whitespace.
+	$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
+	$svg = str_replace( '> <', '><', $svg );
+	$svg = trim( $svg );
+
+	return $svg;
+}
+
+/**
+ * Converts HEX to RGB.
+ *
+ * @since 4.2.2
+ *
+ * @param string $hex Hex color.
+ * @return array split version of rgb.
+ */
+function astra_hex_to_rgb( $hex ) {
+	// @codingStandardsIgnoreStart
+	/**
+	 * @psalm-suppress PossiblyNullArrayAccess
+	 */
+	list($r, $g, $b) = sscanf( $hex, '#%02x%02x%02x' );
+
+	// @codingStandardsIgnoreEnd
+	return array(
+		'r' => $r,
+		'g' => $g,
+		'b' => $b,
+		'a' => 1,
+	);
+}
+
+/**
+ * Converts RGBA to split array RGBA.
+ *
+ * @since 4.2.2
+ *
+ * @param string $rgba RGBA value.
+ * @return array split version of rgba.
+ */
+function astra_split_rgba( $rgba ) {
+	// Remove the "rgba(" and ")" from the input string.
+	$rgba = str_replace( array( 'rgba(', ')' ), '', $rgba );
+
+	// Split the RGBA values by comma.
+	$values = explode( ',', $rgba );
+
+	// Convert each value from string to integer.
+	$r = intval( $values[0] );
+	$g = intval( $values[1] );
+	$b = intval( $values[2] );
+	$a = floatval( $values[3] );
+
+	// Create the split RGBA string.
+	return array(
+		'r' => $r,
+		'g' => $g,
+		'b' => $b,
+		'a' => $a,
+	);
+}
+
+/**
+ * Render svg mask.
+ *
+ * @since 4.2.2
+ *
+ * @param string $id id.
+ * @param string $filter_name filter name.
+ * @param string $color color.
+ * @return mixed masked svg,
+ */
+function astra_render_svg_mask( $id, $filter_name, $color ) {
+
+	if ( 0 === strpos( $color, 'var(--' ) ) {
+		$agp = new Astra_Global_Palette();
+		/** @psalm-suppress UndefinedFunction  */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+		$svg_color = astra_hex_to_rgb( $agp->get_color_by_palette_variable( $color ) );
+	} elseif ( preg_match( '/^#[a-f0-9]{6}$/i', $color ) ) {
+		/** @psalm-suppress UndefinedFunction  */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+		$svg_color = astra_hex_to_rgb( $color );
+	} else {
+		/** @psalm-suppress UndefinedFunction  */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+		$svg_color = astra_split_rgba( $color );
+	}
+
+	/** @psalm-suppress UndefinedFunction  */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	echo astra_get_filter_svg( $id, apply_filters( 'astra_' . $filter_name, $svg_color ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }

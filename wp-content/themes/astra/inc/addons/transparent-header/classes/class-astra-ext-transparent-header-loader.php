@@ -1,8 +1,8 @@
 <?php
 /**
- * Sticky Header - Customizer.
+ * Transparent Header - Customizer.
  *
- * @package Astra Addon
+ * @package Astra
  * @since 1.0.0
  */
 
@@ -22,7 +22,7 @@ if ( ! class_exists( 'Astra_Ext_Transparent_Header_Loader' ) ) {
 		/**
 		 * Member Variable
 		 *
-		 * @var instance
+		 * @var object instance
 		 */
 		private static $instance;
 
@@ -84,6 +84,7 @@ if ( ! class_exists( 'Astra_Ext_Transparent_Header_Loader' ) ) {
 			$defaults['transparent-submenu-bg-color']          = '';
 			$defaults['transparent-submenu-color']             = '';
 			$defaults['transparent-submenu-h-color']           = '';
+			$defaults['transparent-header-logo-color']         = '';
 
 			/**
 			* Transparent Header Responsive Colors

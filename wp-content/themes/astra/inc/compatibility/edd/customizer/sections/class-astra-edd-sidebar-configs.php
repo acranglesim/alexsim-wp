@@ -43,7 +43,7 @@ if ( ! class_exists( 'Astra_Edd_Sidebar_Configs' ) ) {
 					'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_choices' ),
 					'section'           => 'section-edd-general',
 					'default'           => astra_get_option( 'edd-general-sidebar-layout' ),
-					'priority'          => 5,
+					'priority'          => 6,
 					'title'             => __( 'Sidebar Layout', 'astra' ),
 					'choices'           => array(
 						'default'       => array(
@@ -63,78 +63,45 @@ if ( ! class_exists( 'Astra_Edd_Sidebar_Configs' ) ) {
 							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'right-sidebar', false ) : '',
 						),
 					),
+					'divider'           => array( 'ast_class' => 'ast-top-section-divider' ),
 				),
 
 				/**
-				 * Option: Sidebar Layout.
+				 * Help Text: EDD Sidebar Layout.
 				 */
-
 				array(
-					'name'              => ASTRA_THEME_SETTINGS . '[edd-sidebar-layout]',
-					'type'              => 'control',
-					'control'           => 'ast-radio-image',
-					'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_choices' ),
-					'section'           => 'section-edd-archive',
-					'default'           => astra_get_option( 'edd-sidebar-layout' ),
-					'priority'          => 5,
-					'title'             => __( 'Sidebar Layout', 'astra' ),
-					'choices'           => array(
-						'default'       => array(
-							'label' => __( 'Default', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'layout-default', false ) : '',
-						),
-						'no-sidebar'    => array(
-							'label' => __( 'No Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'no-sidebar', false ) : '',
-						),
-						'left-sidebar'  => array(
-							'label' => __( 'Left Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'left-sidebar', false ) : '',
-						),
-						'right-sidebar' => array(
-							'label' => __( 'Right Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'right-sidebar', false ) : '',
-						),
-					),
-					'divider'           => array( 'ast_class' => 'ast-bottom-section-divider' ),
+					'name'     => ASTRA_THEME_SETTINGS . '[edd-sidebar-layout-description]',
+					'type'     => 'control',
+					'control'  => 'ast-description',
+					'section'  => 'section-edd-general',
+					'priority' => 6,
+					'title'    => '',
+					'help'     => __( 'Sidebar will only apply when container layout is set to normal.', 'astra' ),
+					'divider'  => array( 'ast_class' => 'ast-bottom-spacing ast-section-divider' ),
+					'settings' => array(),
+					'hide'     => ( ! Astra_Dynamic_CSS::astra_fullwidth_sidebar_support() ),
 				),
-
 
 				/**
-				 * Option: Sidebar Layout.
+				 * Option: EDD Sidebar Style.
 				 */
-
 				array(
-					'name'              => ASTRA_THEME_SETTINGS . '[edd-single-product-sidebar-layout]',
-					'type'              => 'control',
-					'control'           => 'ast-radio-image',
-					'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_choices' ),
-					'section'           => 'section-edd-single',
-					'default'           => astra_get_option( 'edd-single-product-sidebar-layout' ),
-					'priority'          => 5,
-					'title'             => __( 'Sidebar Layout', 'astra' ),
-					'choices'           => array(
-						'default'       => array(
-							'label' => __( 'Default', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'layout-default', false ) : '',
-						),
-						'no-sidebar'    => array(
-							'label' => __( 'No Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'no-sidebar', false ) : '',
-						),
-						'left-sidebar'  => array(
-							'label' => __( 'Left Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'left-sidebar', false ) : '',
-						),
-						'right-sidebar' => array(
-							'label' => __( 'Right Sidebar', 'astra' ),
-							'path'  => ( class_exists( 'Astra_Builder_UI_Controller' ) ) ? Astra_Builder_UI_Controller::fetch_svg_icon( 'right-sidebar', false ) : '',
-						),
+					'name'       => ASTRA_THEME_SETTINGS . '[edd-sidebar-style]',
+					'type'       => 'control',
+					'control'    => 'ast-selector',
+					'section'    => 'section-edd-general',
+					'default'    => astra_get_option( 'edd-sidebar-style', 'default' ),
+					'priority'   => 6,
+					'title'      => __( 'Sidebar Style', 'astra' ),
+					'choices'    => array(
+						'default' => __( 'Default', 'astra' ),
+						'unboxed' => __( 'Unboxed', 'astra' ),
+						'boxed'   => __( 'Boxed', 'astra' ),
 					),
-					'divider'           => array( 'ast_class' => 'ast-bottom-section-divider' ),
+					'responsive' => false,
+					'renderAs'   => 'text',
+					'divider'    => array( 'ast_class' => 'ast-top-divider ast-top-spacing' ),
 				),
-
-
 			);
 
 			return array_merge( $configurations, $_configs );

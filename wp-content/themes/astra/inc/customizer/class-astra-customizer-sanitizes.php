@@ -492,6 +492,7 @@ if ( ! class_exists( 'Astra_Customizer_Sanitizes' ) ) {
 		public static function sanitize_font_weight( $input ) {
 
 			$valid = array(
+				'inherit',
 				'normal',
 				'bold',
 				'100',
@@ -541,6 +542,9 @@ if ( ! class_exists( 'Astra_Customizer_Sanitizes' ) ) {
 				'background-position'   => 'center center',
 				'background-size'       => 'auto',
 				'background-attachment' => 'scroll',
+				'overlay-type'          => '',
+				'overlay-color'         => '',
+				'overlay-gradient'      => '',
 				'background-media'      => '',
 				'background-type'       => '',
 			);
@@ -624,6 +628,9 @@ if ( ! class_exists( 'Astra_Customizer_Sanitizes' ) ) {
 					'background-position'   => 'center center',
 					'background-size'       => 'auto',
 					'background-attachment' => 'scroll',
+					'overlay-type'          => '',
+					'overlay-color'         => '',
+					'overlay-gradient'      => '',
 					'background-media'      => '',
 					'background-type'       => '',
 				),
@@ -634,6 +641,9 @@ if ( ! class_exists( 'Astra_Customizer_Sanitizes' ) ) {
 					'background-position'   => 'center center',
 					'background-size'       => 'auto',
 					'background-attachment' => 'scroll',
+					'overlay-type'          => '',
+					'overlay-color'         => '',
+					'overlay-gradient'      => '',
 					'background-media'      => '',
 					'background-type'       => '',
 				),
@@ -644,6 +654,9 @@ if ( ! class_exists( 'Astra_Customizer_Sanitizes' ) ) {
 					'background-position'   => 'center center',
 					'background-size'       => 'auto',
 					'background-attachment' => 'scroll',
+					'overlay-type'          => '',
+					'overlay-color'         => '',
+					'overlay-gradient'      => '',
 					'background-media'      => '',
 					'background-type'       => '',
 				),

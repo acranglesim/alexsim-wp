@@ -57,13 +57,13 @@ function astra_check_any_page_builder_is_active( $post_id ) {
 
 		$brizy_post_types = Brizy_Editor::get()->supported_post_types();
 		$post_type        = get_post_type( $post_id );
-		
+
 		if ( in_array( $post_type, $brizy_post_types ) ) {
 
 			if ( Brizy_Editor_Post::get( $post_id )->uses_editor() ) {
 				return true;
-			}       
-		}   
+			}
+		}
 	}
 
 	return false;
@@ -77,10 +77,60 @@ function astra_check_any_page_builder_is_active( $post_id ) {
 function astra_container_layout_css() {
 	$container_layout = astra_get_content_layout();
 
-	$page_container_css        = '';
+	$page_container_css = '
+		.ast-single-post-featured-section + article {
+			margin-top: 2em;
+		}
+		.site-content .ast-single-post-featured-section img {
+			width: 100%;
+			overflow: hidden;
+			object-fit: cover;
+		}
+	';
+
+	$tab_one_max_breakpoint = astra_get_tablet_breakpoint( '', 1 );
+	/** @psalm-suppress InvalidOperand */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	$tab_one_max_breakpoint = '@media (min-width: ' . $tab_one_max_breakpoint . 'px)';
+	/** @psalm-suppress InvalidOperand */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+
+	$page_container_css .= '
+		.ast-separate-container .site-content .ast-single-post-featured-section + article {
+			margin-top: -80px;
+			z-index: 9;
+			position: relative;
+			border-radius: 4px;
+		}
+		' . $tab_one_max_breakpoint . ' {
+			.ast-no-sidebar .site-content .ast-article-image-container--wide {
+				margin-left: -120px;
+				margin-right: -120px;
+				max-width: unset;
+				width: unset;
+			}
+			.ast-left-sidebar .site-content .ast-article-image-container--wide, .ast-right-sidebar .site-content .ast-article-image-container--wide {
+				margin-left: -10px;
+				margin-right: -10px;
+			}
+			.site-content .ast-article-image-container--full {
+				margin-left: calc( -50vw + 50%);
+				margin-right: calc( -50vw + 50%);
+				max-width: 100vw;
+				width: 100vw;
+			}
+			.ast-left-sidebar .site-content .ast-article-image-container--full,
+			.ast-right-sidebar .site-content .ast-article-image-container--full {
+				margin-left: -10px;
+				margin-right: -10px;
+				max-width: inherit;
+				width: auto;
+			}
+		}
+	';
+
 	$customizer_default_update = astra_check_is_structural_setup();
 	$page_title_header_padding = ( true === $customizer_default_update ) ? '2em' : '4em';
-
+	// Transparent Header.
+	$display_title = get_post_meta( absint( astra_get_post_id() ), 'site-post-title', true );
 	/** @psalm-suppress InvalidCast */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 	$tablet_breakpoint = (string) astra_get_tablet_breakpoint();
 	/** @psalm-suppress InvalidCast */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
@@ -134,7 +184,7 @@ function astra_container_layout_css() {
 				}
 			';
 			/** @psalm-suppress InvalidArgument */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-			if ( true === apply_filters( 'astra_stretched_layout_with_spacing', true ) && false === astra_check_any_page_builder_is_active( astra_get_post_id() ) ) {
+			if ( 'disabled' !== $display_title && true === apply_filters( 'astra_stretched_layout_with_spacing', true ) && false === astra_check_any_page_builder_is_active( astra_get_post_id() ) ) {
 				/** @psalm-suppress InvalidArgument */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 				$page_container_css .= '
 					.ast-single-post.ast-page-builder-template .site-main > article, .woocommerce.ast-page-builder-template .site-main {

@@ -72,7 +72,8 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'section'   => 'section-blog-single',
 				'priority'  => 11,
 				'title'     => __( 'Title', 'astra' ),
-				'control'   => 'text',
+				'control'   => 'ast-text-input',
+				'divider'   => array( 'ast_class' => 'ast-top-dotted-divider' ),
 				'transport' => 'postMessage',
 				'partial'   => array(
 					'selector'            => '.ast-related-posts-title-section .ast-related-posts-title',
@@ -329,6 +330,7 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'section'    => 'section-blog-single',
 				'priority'   => 1,
 				'control'    => 'ast-selector',
+				'divider'    => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 				'title'      => __( 'Related Posts by', 'astra' ),
 				'choices'    => array(
 					'categories' => __( 'Categories', 'astra' ),
@@ -347,6 +349,7 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'parent'    => ASTRA_THEME_SETTINGS . '[related-posts-query-group]',
 				'section'   => 'section-blog-single',
 				'type'      => 'sub-control',
+				'divider'   => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 				'priority'  => 2,
 				'transport' => 'postMessage',
 				'title'     => __( 'Order by', 'astra' ),
@@ -571,7 +574,6 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 					),
 				),
 				'priority' => 14,
-				'divider'  => array( 'ast_class' => 'ast-section-spacing' ),
 			),
 
 			/**
@@ -685,37 +687,9 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'control'   => 'ast-font',
 				'font_type' => 'ast-font-family',
 				'default'   => astra_get_option( 'related-posts-title-font-family' ),
-				'title'     => __( 'Family', 'astra' ),
+				'title'     => __( 'Font Family', 'astra' ),
 				'connect'   => ASTRA_THEME_SETTINGS . '[related-posts-title-font-weight]',
-			),
-
-			/**
-			 * Option: Related Posts Title Font Size
-			 */
-
-			array(
-				'name'              => 'related-posts-title-font-size',
-				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-title-typography-group]',
-				'section'           => 'section-blog-single',
-				'type'              => 'sub-control',
-				'control'           => 'ast-responsive-slider',
-				'default'           => astra_get_option( 'related-posts-title-font-size' ),
-				'transport'         => 'postMessage',
-				'title'             => __( 'Size', 'astra' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
-				'suffix'            => array( 'px', 'em' ),
-				'input_attrs'       => array(
-					'px' => array(
-						'min'  => 0,
-						'step' => 1,
-						'max'  => 100,
-					),
-					'em' => array(
-						'min'  => 0,
-						'step' => 0.01,
-						'max'  => 20,
-					),
-				),
+				'divider'   => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
@@ -730,51 +704,58 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'font_type'         => 'ast-font-weight',
 				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_font_weight' ),
 				'default'           => astra_get_option( 'related-posts-title-font-weight' ),
-				'title'             => __( 'Weight', 'astra' ),
+				'title'             => __( 'Font Weight', 'astra' ),
 				'connect'           => 'related-posts-title-font-family',
+				'divider'           => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
-			 * Option: Related Posts Title Text Transform
+			 * Option: Related Posts Title Font Size
 			 */
-			array(
-				'name'      => 'related-posts-title-text-transform',
-				'parent'    => ASTRA_THEME_SETTINGS . '[related-posts-title-typography-group]',
-				'section'   => 'section-blog-single',
-				'type'      => 'sub-control',
-				'title'     => __( 'Text Transform', 'astra' ),
-				'default'   => astra_get_option( 'related-posts-title-text-transform' ),
-				'transport' => 'postMessage',
-				'control'   => 'ast-select',
-				'choices'   => array(
-					''           => __( 'Inherit', 'astra' ),
-					'none'       => __( 'None', 'astra' ),
-					'capitalize' => __( 'Capitalize', 'astra' ),
-					'uppercase'  => __( 'Uppercase', 'astra' ),
-					'lowercase'  => __( 'Lowercase', 'astra' ),
-				),
-			),
 
-			/**
-			 * Option: Related Posts Title Line Height
-			 */
 			array(
-				'name'              => 'related-posts-title-line-height',
+				'name'              => 'related-posts-title-font-size',
 				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-title-typography-group]',
 				'section'           => 'section-blog-single',
 				'type'              => 'sub-control',
+				'control'           => 'ast-responsive-slider',
+				'default'           => astra_get_option( 'related-posts-title-font-size' ),
 				'transport'         => 'postMessage',
-				'default'           => astra_get_option( 'related-posts-title-line-height' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_number_n_blank' ),
-				'title'             => __( 'Line Height', 'astra' ),
-				'control'           => 'ast-slider',
-				'suffix'            => '',
+				'title'             => __( 'Font Size', 'astra' ),
+				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
+				'suffix'            => array( 'px', 'em', 'vw' ),
 				'input_attrs'       => array(
-					'min'  => 1,
-					'step' => 1,
-					'max'  => 5,
+					'px' => array(
+						'min'  => 0,
+						'step' => 1,
+						'max'  => 200,
+					),
+					'em' => array(
+						'min'  => 0,
+						'step' => 0.01,
+						'max'  => 20,
+					),
+					'vw' => array(
+						'min'  => 0,
+						'step' => 0.1,
+						'max'  => 25,
+					),
 				),
 			),
+
+			/**
+				 * Option: Related Posts Title Font Extras
+				 */
+				array(
+					'name'    => 'related-posts-title-font-extras',
+					'type'    => 'sub-control',
+					'parent'  => ASTRA_THEME_SETTINGS . '[related-posts-title-typography-group]',
+					'control' => 'ast-font-extras',
+					'section' => 'section-blog-single',
+					'default' => astra_get_option( 'related-posts-title-font-extras' ),
+					'title'   => __( 'Font Extras', 'astra' ),
+				),
+
 
 			/**
 			 * Option: Related Posts Title Font Family
@@ -787,37 +768,9 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'control'   => 'ast-font',
 				'font_type' => 'ast-font-family',
 				'default'   => astra_get_option( 'related-posts-section-title-font-family' ),
-				'title'     => __( 'Family', 'astra' ),
+				'title'     => __( 'Font Family', 'astra' ),
 				'connect'   => ASTRA_THEME_SETTINGS . '[related-posts-section-title-font-weight]',
-			),
-
-			/**
-			 * Option: Related Posts Title Font Size
-			 */
-
-			array(
-				'name'              => 'related-posts-section-title-font-size',
-				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-section-title-typography-group]',
-				'section'           => 'section-blog-single',
-				'type'              => 'sub-control',
-				'control'           => 'ast-responsive-slider',
-				'default'           => astra_get_option( 'related-posts-section-title-font-size' ),
-				'transport'         => 'postMessage',
-				'title'             => __( 'Size', 'astra' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
-				'suffix'            => array( 'px', 'em' ),
-				'input_attrs'       => array(
-					'px' => array(
-						'min'  => 0,
-						'step' => 1,
-						'max'  => 100,
-					),
-					'em' => array(
-						'min'  => 0,
-						'step' => 0.01,
-						'max'  => 20,
-					),
-				),
+				'divider'   => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
@@ -832,51 +785,57 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'font_type'         => 'ast-font-weight',
 				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_font_weight' ),
 				'default'           => astra_get_option( 'related-posts-section-title-font-weight' ),
-				'title'             => __( 'Weight', 'astra' ),
+				'title'             => __( 'Font Weight', 'astra' ),
 				'connect'           => 'related-posts-section-title-font-family',
+				'divider'           => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
-			 * Option: Related Posts Title Text Transform
+			 * Option: Related Posts Title Font Size
 			 */
-			array(
-				'name'      => 'related-posts-section-title-text-transform',
-				'parent'    => ASTRA_THEME_SETTINGS . '[related-posts-section-title-typography-group]',
-				'section'   => 'section-blog-single',
-				'type'      => 'sub-control',
-				'title'     => __( 'Text Transform', 'astra' ),
-				'default'   => astra_get_option( 'related-posts-section-title-text-transform' ),
-				'transport' => 'postMessage',
-				'control'   => 'ast-select',
-				'choices'   => array(
-					''           => __( 'Inherit', 'astra' ),
-					'none'       => __( 'None', 'astra' ),
-					'capitalize' => __( 'Capitalize', 'astra' ),
-					'uppercase'  => __( 'Uppercase', 'astra' ),
-					'lowercase'  => __( 'Lowercase', 'astra' ),
-				),
-			),
 
-			/**
-			 * Option: Related Posts Title Line Height
-			 */
 			array(
-				'name'              => 'related-posts-section-title-line-height',
+				'name'              => 'related-posts-section-title-font-size',
 				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-section-title-typography-group]',
 				'section'           => 'section-blog-single',
 				'type'              => 'sub-control',
+				'control'           => 'ast-responsive-slider',
+				'default'           => astra_get_option( 'related-posts-section-title-font-size' ),
 				'transport'         => 'postMessage',
-				'default'           => astra_get_option( 'related-posts-section-title-line-height' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_number_n_blank' ),
-				'title'             => __( 'Line Height', 'astra' ),
-				'control'           => 'ast-slider',
-				'suffix'            => '',
+				'title'             => __( 'Font Size', 'astra' ),
+				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
+				'suffix'            => array( 'px', 'em', 'vw' ),
 				'input_attrs'       => array(
-					'min'  => 1,
-					'step' => 1,
-					'max'  => 5,
+					'px' => array(
+						'min'  => 0,
+						'step' => 1,
+						'max'  => 200,
+					),
+					'em' => array(
+						'min'  => 0,
+						'step' => 0.01,
+						'max'  => 20,
+					),
+					'vw' => array(
+						'min'  => 0,
+						'step' => 0.1,
+						'max'  => 25,
+					),
 				),
 			),
+
+			/**
+				 * Option: Related Posts Title Font Extras
+				 */
+				array(
+					'name'    => 'related-posts-section-title-font-extras',
+					'type'    => 'sub-control',
+					'parent'  => ASTRA_THEME_SETTINGS . '[related-posts-section-title-typography-group]',
+					'control' => 'ast-font-extras',
+					'section' => 'section-blog-single',
+					'default' => astra_get_option( 'related-posts-section-title-font-extras' ),
+					'title'   => __( 'Font Extras', 'astra' ),
+				),
 
 			/**
 			 * Option: Related Posts Meta Font Family
@@ -889,37 +848,9 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'control'   => 'ast-font',
 				'font_type' => 'ast-font-family',
 				'default'   => astra_get_option( 'related-posts-meta-font-family' ),
-				'title'     => __( 'Family', 'astra' ),
+				'title'     => __( 'Font Family', 'astra' ),
 				'connect'   => ASTRA_THEME_SETTINGS . '[related-posts-meta-font-weight]',
-			),
-
-			/**
-			 * Option: Related Posts Meta Font Size
-			 */
-
-			array(
-				'name'              => 'related-posts-meta-font-size',
-				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-meta-typography-group]',
-				'section'           => 'section-blog-single',
-				'type'              => 'sub-control',
-				'control'           => 'ast-responsive-slider',
-				'default'           => astra_get_option( 'related-posts-meta-font-size' ),
-				'transport'         => 'postMessage',
-				'title'             => __( 'Size', 'astra' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
-				'suffix'            => array( 'px', 'em' ),
-				'input_attrs'       => array(
-					'px' => array(
-						'min'  => 0,
-						'step' => 1,
-						'max'  => 100,
-					),
-					'em' => array(
-						'min'  => 0,
-						'step' => 0.01,
-						'max'  => 20,
-					),
-				),
+				'divider'   => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
@@ -934,50 +865,56 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'font_type'         => 'ast-font-weight',
 				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_font_weight' ),
 				'default'           => astra_get_option( 'related-posts-meta-font-weight' ),
-				'title'             => __( 'Weight', 'astra' ),
+				'title'             => __( 'Font Weight', 'astra' ),
 				'connect'           => 'related-posts-meta-font-family',
+				'divider'           => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
-			 * Option: Related Posts Meta Text Transform
+			 * Option: Related Posts Meta Font Size
 			 */
-			array(
-				'name'      => 'related-posts-meta-text-transform',
-				'parent'    => ASTRA_THEME_SETTINGS . '[related-posts-meta-typography-group]',
-				'section'   => 'section-blog-single',
-				'type'      => 'sub-control',
-				'title'     => __( 'Text Transform', 'astra' ),
-				'default'   => astra_get_option( 'related-posts-meta-text-transform' ),
-				'transport' => 'postMessage',
-				'control'   => 'ast-select',
-				'choices'   => array(
-					''           => __( 'Inherit', 'astra' ),
-					'none'       => __( 'None', 'astra' ),
-					'capitalize' => __( 'Capitalize', 'astra' ),
-					'uppercase'  => __( 'Uppercase', 'astra' ),
-					'lowercase'  => __( 'Lowercase', 'astra' ),
-				),
-			),
 
-			/**
-			 * Option: Related Posts Meta Line Height
-			 */
 			array(
-				'name'              => 'related-posts-meta-line-height',
+				'name'              => 'related-posts-meta-font-size',
 				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-meta-typography-group]',
 				'section'           => 'section-blog-single',
 				'type'              => 'sub-control',
+				'control'           => 'ast-responsive-slider',
+				'default'           => astra_get_option( 'related-posts-meta-font-size' ),
 				'transport'         => 'postMessage',
-				'default'           => astra_get_option( 'related-posts-meta-line-height' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_number_n_blank' ),
-				'title'             => __( 'Line Height', 'astra' ),
-				'control'           => 'ast-slider',
-				'suffix'            => '',
+				'title'             => __( 'Font Size', 'astra' ),
+				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
+				'suffix'            => array( 'px', 'em', 'vw' ),
 				'input_attrs'       => array(
-					'min'  => 1,
-					'step' => 1,
-					'max'  => 5,
+					'px' => array(
+						'min'  => 0,
+						'step' => 1,
+						'max'  => 200,
+					),
+					'em' => array(
+						'min'  => 0,
+						'step' => 0.01,
+						'max'  => 20,
+					),
+					'vw' => array(
+						'min'  => 0,
+						'step' => 0.1,
+						'max'  => 25,
+					),
 				),
+			),
+
+			/**
+			 * Option: Related Posts Meta Font Extras
+			 */
+			array(
+				'name'    => 'related-posts-meta-font-extras',
+				'type'    => 'sub-control',
+				'parent'  => ASTRA_THEME_SETTINGS . '[related-posts-meta-typography-group]',
+				'control' => 'ast-font-extras',
+				'section' => 'section-blog-single',
+				'default' => astra_get_option( 'related-posts-meta-font-extras' ),
+				'title'   => __( 'Font Extras', 'astra' ),
 			),
 
 			/**
@@ -991,37 +928,9 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'control'   => 'ast-font',
 				'font_type' => 'ast-font-family',
 				'default'   => astra_get_option( 'related-posts-content-font-family' ),
-				'title'     => __( 'Family', 'astra' ),
+				'title'     => __( 'Font Family', 'astra' ),
 				'connect'   => ASTRA_THEME_SETTINGS . '[related-posts-content-font-weight]',
-			),
-
-			/**
-			 * Option: Related Posts Content Font Size
-			 */
-
-			array(
-				'name'              => 'related-posts-content-font-size',
-				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-content-typography-group]',
-				'section'           => 'section-blog-single',
-				'type'              => 'sub-control',
-				'control'           => 'ast-responsive-slider',
-				'default'           => astra_get_option( 'related-posts-content-font-size' ),
-				'transport'         => 'postMessage',
-				'title'             => __( 'Size', 'astra' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
-				'suffix'            => array( 'px', 'em' ),
-				'input_attrs'       => array(
-					'px' => array(
-						'min'  => 0,
-						'step' => 1,
-						'max'  => 100,
-					),
-					'em' => array(
-						'min'  => 0,
-						'step' => 0.01,
-						'max'  => 20,
-					),
-				),
+				'divider'   => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
@@ -1036,50 +945,58 @@ class Astra_Related_Posts_Configs extends Astra_Customizer_Config_Base {
 				'font_type'         => 'ast-font-weight',
 				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_font_weight' ),
 				'default'           => astra_get_option( 'related-posts-content-font-weight' ),
-				'title'             => __( 'Weight', 'astra' ),
+				'title'             => __( 'Font Weight', 'astra' ),
 				'connect'           => 'related-posts-content-font-family',
+				'divider'           => array( 'ast_class' => 'ast-sub-bottom-dotted-divider' ),
 			),
 
 			/**
-			 * Option: Related Posts Content Text Transform
+			 * Option: Related Posts Content Font Size
 			 */
 			array(
-				'name'      => 'related-posts-content-text-transform',
-				'parent'    => ASTRA_THEME_SETTINGS . '[related-posts-content-typography-group]',
-				'section'   => 'section-blog-single',
-				'type'      => 'sub-control',
-				'title'     => __( 'Text Transform', 'astra' ),
-				'default'   => astra_get_option( 'related-posts-content-text-transform' ),
-				'transport' => 'postMessage',
-				'control'   => 'ast-select',
-				'choices'   => array(
-					''           => __( 'Inherit', 'astra' ),
-					'none'       => __( 'None', 'astra' ),
-					'capitalize' => __( 'Capitalize', 'astra' ),
-					'uppercase'  => __( 'Uppercase', 'astra' ),
-					'lowercase'  => __( 'Lowercase', 'astra' ),
-				),
-			),
-
-			/**
-			 * Option: Related Posts Content Line Height
-			 */
-			array(
-				'name'              => 'related-posts-content-line-height',
+				'name'              => 'related-posts-content-font-size',
 				'parent'            => ASTRA_THEME_SETTINGS . '[related-posts-content-typography-group]',
 				'section'           => 'section-blog-single',
 				'type'              => 'sub-control',
+				'control'           => 'ast-responsive-slider',
+				'default'           => astra_get_option( 'related-posts-content-font-size' ),
 				'transport'         => 'postMessage',
-				'default'           => astra_get_option( 'related-posts-content-line-height' ),
-				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_number_n_blank' ),
-				'title'             => __( 'Line Height', 'astra' ),
-				'control'           => 'ast-slider',
-				'suffix'            => '',
+				'title'             => __( 'Font Size', 'astra' ),
+				'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
+				'suffix'            => array( 'px', 'em', 'vw' ),
 				'input_attrs'       => array(
-					'min'  => 1,
-					'step' => 1,
-					'max'  => 5,
+					'px' => array(
+						'min'  => 0,
+						'step' => 1,
+						'max'  => 200,
+					),
+					'em' => array(
+						'min'  => 0,
+						'step' => 0.01,
+						'max'  => 20,
+					),
+					'vw' => array(
+						'min'  => 0,
+						'step' => 0.1,
+						'max'  => 25,
+					),
 				),
+			),
+
+			/**
+			 * Option: Related Posts Content Font Extras.
+			 */
+			/**
+			 * Option: Related Posts Meta Font Extras
+			 */
+			array(
+				'name'    => 'related-posts-content-font-extras',
+				'type'    => 'sub-control',
+				'parent'  => ASTRA_THEME_SETTINGS . '[related-posts-content-typography-group]',
+				'control' => 'ast-font-extras',
+				'section' => 'section-blog-single',
+				'default' => astra_get_option( 'related-posts-content-font-extras' ),
+				'title'   => __( 'Font Extras', 'astra' ),
 			),
 		);
 

@@ -19,6 +19,7 @@
 }
 .customize-control-ast-sortable .sortable .ast-sortable-subcontrols {
     border: none;
+	padding: 0 0 0 9px;
     border-top: 1px solid #d1d5db;
     border-radius: 0 0 3px 3px;
 }
@@ -37,6 +38,7 @@
 
 .customize-control-ast-sortable .sortable div.invisible {
   opacity: 0.6;
+  visibility: visible;
 }
 
 .customize-control-ast-sortable .sortable div.invisible .dashicons.visibility:after {
@@ -64,8 +66,8 @@
 .ast-sortable-item.show:hover {
   opacity: 1;
 }
-.ast-sortable-item .dashicons-arrow-down-alt2 {
-	margin-left: -6px;
+.ast-sortable-item .dashicons-arrow-down-alt2, .ast-sortable-item .dashicons-remove {
+    margin-left: -6px;
 }
 .ast-sortable-item .dashicons-admin-page, .ast-sortable-item .dashicons-arrow-down-alt2, .ast-sortable-item .dashicons-remove {
     cursor: pointer;
@@ -73,13 +75,7 @@
 .ast-sortable-subcontrols {
 	display: none;
 	padding: 12px 0;
-    margin-right: -12px !important;
     border-top: 1px solid #d1d5db;
-	margin-left: -3px!important;
-}
-.ast-sortable-subcontrols > * {
-	padding-left: 9px;
-	padding-bottom: 12px;
 }
 .show .ast-sortable-subcontrols {
 	display: block;
@@ -87,7 +83,6 @@
 .ast-sortable-subfields-wrap .customize-control {
 	box-sizing: border-box;
     position: relative;
-    padding-right: 12px;
 }
 /**
  * ast-list-icons inside sortable compatibility CSS.
@@ -129,7 +124,7 @@
 	overflow: hidden;
 }
 
-.ast-sortable-subfields-wrap .customize-control-ast-list-icons .ahfb-sorter-visiblity svg, 
+.ast-sortable-subfields-wrap .customize-control-ast-list-icons .ahfb-sorter-visiblity svg,
 .ast-sortable-subfields-wrap .customize-control-ast-list-icons .ahfb-sorter-visiblity .ast-media-image-preview {
     height: 14px;
     width: 14px;
@@ -175,9 +170,13 @@
     top: 0;
 }
 .customize-control-ast-sortable .ast-sortable-subfields-wrap .customize-control-title {
-    margin-bottom: 20px;
-    font-size: 13px;
-    margin-top: 3px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+.ast-sortable-subfields-wrap .customize-control-ast-color .ast-control-wrap .astra-popover-color {
+    margin-right: -10px;
+    margin-left: 10px;
+    width: calc(100% + 15px);
 }
 
 .customize-control-ast-sortable .ast-sortable-subfields-wrap .ast-responsive-btns {
@@ -185,11 +184,12 @@
 }
 
 .ast-sortable-subfields-wrap .ast-fields-wrap {
-    margin-right: -12px;
-	padding-bottom: 10px;
+	padding-bottom: 16px;
 }
 .customize-control-content {
     width: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 .ast-sortable-subfields-wrap .ast-fields-wrap {
@@ -226,4 +226,25 @@
 }
 .ast-sortable-subfields-wrap .customize-control-ast-responsive-slider .ast-responsive-slider-btns {
     top: -2px;
+}
+
+/**
+ * Dynamic featured-image section compat.
+ */
+.ast-sortable-item .customize-control-ast-color .ast-color-btn-reset-wrap {
+    top: 12px;
+}
+.ast-sortable-item .customize-control-ast-color .color-button-wrap {
+    top: 8px;
+}
+.ast-sortable-item .customize-control-ast-color .astra-color-picker-wrap {
+    position: relative;
+    top: 8px;
+}
+.ast-sortable-subfields-wrap .customize-control-ast-description {
+    line-height: 1;
+}
+
+.customize-control-ast-list-icons .ahfb-sorter-item-panel-header .dashicons-admin-page {
+    margin-left: 0;
 }
