@@ -21,38 +21,54 @@ class DashboardWidget extends Widget {
 	public $settings;
 
 	/**
-	 * Constructor.
-	 *
-	 * @since 1.5.0
-	 */
-	public function __construct() {
-
-		add_action( 'admin_init', array( $this, 'init' ) );
-	}
-	/**
 	 * Init class.
 	 *
 	 * @since 1.5.5
 	 */
-	public function init() {
+	public function init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+		/**
+		 * Allow disabling the widget.
+		 *
+		 * @since 1.5.1
+		 *
+		 * @param bool $load Should the widget be loaded?
+		 */
+		if ( ! apply_filters( 'wpforms_admin_dashboardwidget', true ) ) {
+			return;
+		}
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
+		add_action( 'wpforms_process_complete', [ static::class, 'clear_widget_cache' ] );
+		add_action( 'admin_init', [ $this, 'admin_init' ] );
+	}
+
+	/**
+	 * Admin init class.
+	 *
+	 * @since 1.8.3
+	 */
+	public function admin_init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		// This widget should be displayed for certain high-level users only.
-		if ( ! wpforms_current_user_can() ) {
+		if ( ! wpforms_current_user_can( 'view_forms' ) ) {
 			return;
 		}
 
-		global $pagenow;
+		add_action( 'wpforms_create_form', [ static::class, 'clear_widget_cache' ] );
+		add_action( 'wpforms_save_form', [ static::class, 'clear_widget_cache' ] );
+		add_action( 'wpforms_delete_form', [ static::class, 'clear_widget_cache' ] );
 
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$is_admin_page   = $pagenow === 'index.php' && empty( $_GET['page'] );
-		$is_ajax_request = wp_doing_ajax() && isset( $_REQUEST['action'] ) && strpos( sanitize_key( $_REQUEST['action'] ), 'wpforms_dash_widget' ) !== false;
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		/**
+		 * Clear cache after Lite plugin deactivation.
+		 *
+		 * Also triggered when the user upgrades plugin to the Pro version.
+		 * After activation of the Pro version the cache will be cleared.
+		 */
+		add_action( 'deactivate_wpforms-lite/wpforms.php', [ static::class, 'clear_widget_cache' ] );
 
-		if ( ! $is_admin_page && ! $is_ajax_request ) {
-			return;
-		}
-
-		if ( ! apply_filters( 'wpforms_admin_dashboardwidget', true ) ) {
+		if ( ! $this->is_dashboard_page() && ! $this->is_dashboard_widget_ajax_request() ) {
 			return;
 		}
 
@@ -100,11 +116,6 @@ class DashboardWidget extends Widget {
 		add_action( 'wp_dashboard_setup', [ $this, 'widget_register' ] );
 		add_action( 'admin_init', [ $this, 'hide_widget' ] );
 		add_action( "wp_ajax_wpforms_{$widget_slug}_save_widget_meta", [ $this, 'save_widget_meta_ajax' ] );
-
-		add_action( 'wpforms_create_form', [ static::class, 'clear_widget_cache' ] );
-		add_action( 'wpforms_save_form', [ static::class, 'clear_widget_cache' ] );
-		add_action( 'wpforms_delete_form', [ static::class, 'clear_widget_cache' ] );
-		add_action( 'wpforms_process_entry_save', [ static::class, 'clear_widget_cache' ] );
 	}
 
 	/**
@@ -130,18 +141,10 @@ class DashboardWidget extends Widget {
 		);
 
 		wp_enqueue_script(
-			'wpforms-moment',
-			WPFORMS_PLUGIN_URL . 'assets/lib/moment/moment.min.js',
-			[],
-			'2.22.2',
-			true
-		);
-
-		wp_enqueue_script(
 			'wpforms-chart',
 			WPFORMS_PLUGIN_URL . 'assets/lib/chart.min.js',
-			[ 'wpforms-moment' ],
-			'2.7.2',
+			[ 'moment' ],
+			'2.9.4',
 			true
 		);
 
@@ -179,17 +182,19 @@ class DashboardWidget extends Widget {
 
 		$widget_key = 'wpforms_reports_widget_lite';
 
-		\wp_add_dashboard_widget(
+		wp_add_dashboard_widget(
 			$widget_key,
-			\esc_html__( 'WPForms', 'wpforms-lite' ),
-			array( $this, 'widget_content' )
+			esc_html__( 'WPForms', 'wpforms-lite' ),
+			[ $this, 'widget_content' ]
 		);
 
 		// Attempt to place the widget at the top.
 		$normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
-		$widget_instance  = array( $widget_key => $normal_dashboard[ $widget_key ] );
+		$widget_instance  = [ $widget_key => $normal_dashboard[ $widget_key ] ];
+
 		unset( $normal_dashboard[ $widget_key ] );
-		$sorted_dashboard = \array_merge( $widget_instance, $normal_dashboard );
+
+		$sorted_dashboard = array_merge( $widget_instance, $normal_dashboard );
 
 		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}
@@ -407,13 +412,18 @@ class DashboardWidget extends Widget {
 
 		?>
 		<div class="wpforms-dash-widget-recommended-plugin-block">
-			<p><?php esc_html_e( 'Recommended Plugin:', 'wpforms-lite' ); ?>
-				<strong><?php echo esc_html( $plugin['name'] ); ?></strong> -
-				<?php if ( wpforms_can_install( 'plugin' ) ) { ?>
-					<a href="<?php echo esc_url( $install_url ); ?>"><?php esc_html_e( 'Install', 'wpforms-lite' ); ?></a> &vert;
-				<?php } ?>
-				<a href="<?php echo esc_url( $plugin['more'] ); ?>?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php esc_html_e( 'Learn More', 'wpforms-lite' ); ?></a></p>
-
+			<span class="wpforms-dash-widget-recommended-plugin">
+				<span class="recommended"><?php esc_html_e( 'Recommended Plugin:', 'wpforms-lite' ); ?></span>
+				<strong><?php echo esc_html( $plugin['name'] ); ?></strong>
+				<span class="sep">-</span>
+				<span class="action-links">
+					<?php if ( wpforms_can_install( 'plugin' ) ) { ?>
+						<a href="<?php echo esc_url( $install_url ); ?>"><?php esc_html_e( 'Install', 'wpforms-lite' ); ?></a>
+						<span class="sep sep-vertical">&vert;</span>
+					<?php } ?>
+					<a href="<?php echo esc_url( $plugin['more'] ); ?>?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php esc_html_e( 'Learn More', 'wpforms-lite' ); ?></a>
+				</span>
+			</span>
 			<button type="button" id="wpforms-dash-widget-dismiss-recommended-plugin-block" class="wpforms-dash-widget-dismiss-recommended-plugin-block" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms-lite' ); ?>">
 				<span class="dashicons dashicons-no-alt"></span>
 			</button>
@@ -443,28 +453,28 @@ class DashboardWidget extends Widget {
 		}
 
 		// is_array() detects cached empty searches.
-		if ( $allow_caching && \is_array( $cache ) ) {
+		if ( $allow_caching && is_array( $cache ) ) {
 			return $cache;
 		}
 
-		$forms = \wpforms()->form->get( '', array( 'fields' => 'ids' ) );
+		$forms = wpforms()->form->get( '', [ 'fields' => 'ids' ] );
 
-		if ( empty( $forms ) || ! \is_array( $forms ) ) {
-			return array();
+		if ( empty( $forms ) || ! is_array( $forms ) ) {
+			return [];
 		}
 
-		$result = array();
+		$result = [];
 
 		foreach ( $forms as $form_id ) {
 			$count = \absint( \get_post_meta( $form_id, 'wpforms_entries_count', true ) );
 			if ( empty( $count ) && empty( $this->settings['display_forms_list_empty_entries'] ) ) {
 				continue;
 			}
-			$result[ $form_id ] = array(
+			$result[ $form_id ] = [
 				'form_id' => $form_id,
 				'count'   => $count,
 				'title'   => \get_the_title( $form_id ),
-			);
+			];
 		}
 
 		if ( ! empty( $result ) ) {
@@ -491,33 +501,34 @@ class DashboardWidget extends Widget {
 	 */
 	public function hide_widget() {
 
-		if ( ! \is_admin() || ! \is_user_logged_in() ) {
+		if ( ! is_admin() || ! is_user_logged_in() ) {
 			return;
 		}
 
-		if ( ! isset( $_GET['wpforms-nonce'] ) || ! \wp_verify_nonce( \sanitize_key( \wp_unslash( $_GET['wpforms-nonce'] ) ), 'wpforms_hide_dash_widget' ) ) {
+		if ( ! isset( $_GET['wpforms-nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['wpforms-nonce'] ) ), 'wpforms_hide_dash_widget' ) ) {
 			return;
 		}
 
-		if ( ! isset( $_GET['wpforms-widget'] ) || 'hide' !== $_GET['wpforms-widget'] ) {
+		if ( ! isset( $_GET['wpforms-widget'] ) || $_GET['wpforms-widget'] !== 'hide' ) {
 			return;
 		}
 
-		$user_id       = \get_current_user_id();
-		$metaboxhidden = \get_user_meta( $user_id, 'metaboxhidden_dashboard', true );
+		$user_id       = get_current_user_id();
+		$metaboxhidden = get_user_meta( $user_id, 'metaboxhidden_dashboard', true );
 
-		if ( ! \is_array( $metaboxhidden ) ) {
-			\update_user_meta( $user_id, 'metaboxhidden_dashboard', array( 'wpforms_reports_widget_lite' ) );
+		if ( ! is_array( $metaboxhidden ) ) {
+			update_user_meta( $user_id, 'metaboxhidden_dashboard', [ 'wpforms_reports_widget_lite' ] );
 		}
 
-		if ( \is_array( $metaboxhidden ) && ! \in_array( 'wpforms_reports_widget_lite', $metaboxhidden, true ) ) {
+		if ( is_array( $metaboxhidden ) && ! in_array( 'wpforms_reports_widget_lite', $metaboxhidden, true ) ) {
 			$metaboxhidden[] = 'wpforms_reports_widget_lite';
-			\update_user_meta( $user_id, 'metaboxhidden_dashboard', $metaboxhidden );
+
+			update_user_meta( $user_id, 'metaboxhidden_dashboard', $metaboxhidden );
 		}
 
-		$redirect_url = \remove_query_arg( array( 'wpforms-widget', 'wpforms-nonce' ) );
+		$redirect_url = remove_query_arg( [ 'wpforms-widget', 'wpforms-nonce' ] );
 
-		\wp_safe_redirect( $redirect_url );
+		wp_safe_redirect( $redirect_url );
 		exit();
 	}
 

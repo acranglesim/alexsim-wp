@@ -1,5 +1,7 @@
 <?php
 
+use WPForms\Admin\Education\Helpers;
+
 /**
  * Output fields to be used on panels (settings etc).
  *
@@ -15,7 +17,7 @@
  *
  * @return string
  */
-function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args = array(), $echo = true ) {
+function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args = [], $echo = true ) {
 
 	// Required params.
 	if ( empty( $option ) || empty( $panel ) || empty( $field ) ) {
@@ -59,7 +61,7 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 	}
 
 	if ( ! empty( $args['pro_badge'] ) ) {
-		$label .= '<span class="wpforms-field-option-education-pro-badge">pro</span>';
+		$label .= Helpers::get_badge( 'Pro', 'sm', 'inline', 'silver' );
 	}
 
 	// Check if we should store values in a parent array.
@@ -151,12 +153,17 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 			$id                               = str_replace( '-', '_', $input_id );
 			$args['tinymce']['textarea_name'] = $field_name;
 			$args['tinymce']['teeny']         = true;
-			$args['tinymce']                  = wp_parse_args( $args['tinymce'], array(
-				'media_buttons' => false,
-				'teeny'         => true,
-			) );
+			$args['tinymce']                  = wp_parse_args(
+				$args['tinymce'],
+				[
+					'media_buttons' => false,
+					'teeny'         => true,
+				]
+			);
+
 			ob_start();
 			wp_editor( $value, $id, $args['tinymce'] );
+
 			$output = ob_get_clean();
 			break;
 
@@ -277,6 +284,12 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				$options = $args['options'];
 			}
 
+			if ( array_key_exists( 'choicesjs', $args ) && is_array( $args['choicesjs'] ) ) {
+				$input_class .= ' choicesjs-select';
+				$data_attr   .= ! empty( $args['choicesjs']['use_ajax'] ) ? ' data-choicesjs-use-ajax=1' : '';
+				$data_attr   .= ! empty( $args['choicesjs']['callback_fn'] ) ? ' data-choicesjs-callback-fn="' . esc_attr( $args['choicesjs']['callback_fn'] ) . '"' : '';
+			}
+
 			if ( ! empty( $args['multiple'] ) ) {
 				$data_attr .= ' multiple';
 			}
@@ -285,7 +298,7 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				'<select id="%s" name="%s" class="%s" %s>',
 				$input_id,
 				$field_name,
-				$input_class,
+				esc_attr( $input_class ),
 				$data_attr
 			);
 
@@ -293,7 +306,26 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				$output .= '<option value="">' . $placeholder . '</option>';
 			}
 
+			// This argument is used to disable some options, it takes an array of option values.
+			// For instance, if you want to disable options with value '1' and '2', you should pass array( '1', '2' ).
+			$disabled_options = ! empty( $args['disabled_options'] ) ? (array) $args['disabled_options'] : [];
+
 			foreach ( $options as $key => $item ) {
+
+				// If the option is disabled, we add the disabled attribute.
+				$disabled = in_array( $key, $disabled_options, true ) ? 'disabled' : '';
+
+				// Disabled options cannot be selected, so we bail early.
+				if ( ! empty( $disabled ) ) {
+					$output .= sprintf(
+						'<option value="%s" %s>%s</option>',
+						esc_attr( $key ),
+						$disabled,
+						$item
+					);
+
+					continue;
+				}
 
 				if ( is_array( $value ) ) {
 					$selected = in_array( $key, $value, true ) ? 'selected' : '';
@@ -310,6 +342,20 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 			}
 
 			$output .= '</select>';
+			break;
+
+		case 'color':
+			$class       .= ' wpforms-panel-field-colorpicker';
+			$input_class .= ' wpforms-color-picker';
+
+			$output = sprintf(
+				'<input type="text" id="%s" name="%s" value="%s" class="%s" %s>',
+				$input_id,
+				$field_name,
+				esc_attr( $value ),
+				wpforms_sanitize_classes( $input_class, false ),
+				$data_attr
+			);
 			break;
 	}
 
@@ -409,7 +455,7 @@ function wpforms_panel_field_toggle_control( $args, $input_id, $field_name, $lab
 			esc_attr( $input_id ),
 			esc_attr( $status_on ),
 			esc_attr( $status_off ),
-			esc_html( ! empty( $args['value'] ) ? $status_on : $status_off )
+			esc_html( $value ? $status_on : $status_off )
 		);
 	}
 
@@ -583,4 +629,35 @@ function wpforms_panel_fields_group( $inner, $args = [], $echo = true ) {
 	}
 
 	echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/**
+ * Get the pages for the "Show Page" dropdown selection in Confirmations Settings in Builder.
+ *
+ * @since 1.7.9
+ *
+ * @param array $form_data       Form data.
+ * @param int   $confirmation_id Confirmation ID.
+ *
+ * @return array
+ */
+function wpforms_builder_form_settings_confirmation_get_pages( $form_data, $confirmation_id ) {
+
+	$pre_selected_page_id = empty( $form_data['settings']['confirmations'][ $confirmation_id ]['page'] ) ? 0 : absint( $form_data['settings']['confirmations'][ $confirmation_id ]['page'] );
+	$pages                = wp_list_pluck( wpforms_search_posts(), 'post_title', 'ID' );
+
+	if ( empty( $pre_selected_page_id ) || isset( $pages[ $pre_selected_page_id ] ) ) {
+		return $pages;
+	}
+
+	// If the pre-selected page isn't in `$pages`, we manually fetch it include it in `$pages`.
+	$pre_selected_page = get_post( $pre_selected_page_id );
+
+	if ( empty( $pre_selected_page ) ) {
+		return $pages;
+	}
+
+	$pages[ $pre_selected_page->ID ] = wpforms_get_post_title( $pre_selected_page );
+
+	return $pages;
 }

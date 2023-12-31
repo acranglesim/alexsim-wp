@@ -3,6 +3,7 @@
 namespace WPForms\Admin\Education\Builder;
 
 use WPForms\Admin\Education\AddonsItemBase;
+use WPForms\Admin\Education\Helpers;
 
 
 /**
@@ -108,7 +109,7 @@ class Geolocation extends AddonsItemBase {
 				[
 					'data'  => [
 						'action' => 'activate',
-						'name'   => sprintf( /* translators: %s - Addon name. */
+						'name'   => sprintf( /* translators: %s - addon name. */
 							esc_html__( '%s addon', 'wpforms-lite' ),
 							$addon['title']
 						),
@@ -124,10 +125,11 @@ class Geolocation extends AddonsItemBase {
 		return wp_parse_args(
 			[
 				'data'  => [
-					'action'  => 'upgrade',
-					'name'    => esc_html__( 'Address Autocomplete', 'wpforms-lite' ),
-					'licence' => 'pro',
-					'message' => esc_html__( 'We\'re sorry, Address Autocomplete is part of the Geolocation Addon and not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms-lite' ),
+					'action'      => 'upgrade',
+					'name'        => esc_html__( 'Address Autocomplete', 'wpforms-lite' ),
+					'utm-content' => 'Address Autocomplete',
+					'licence'     => 'pro',
+					'message'     => esc_html__( 'We\'re sorry, Address Autocomplete is part of the Geolocation Addon and not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms-lite' ),
 				],
 				'class' => 'education-modal',
 			],
@@ -160,8 +162,9 @@ class Geolocation extends AddonsItemBase {
 		return wp_parse_args(
 			[
 				'desc'  => sprintf(
-					'%s<span class="wpforms-field-option-education-pro-badge">pro</span>',
-					esc_html__( 'Enable Address Autocomplete', 'wpforms-lite' )
+					'%1$s%2$s',
+					esc_html__( 'Enable Address Autocomplete', 'wpforms-lite' ),
+					Helpers::get_badge( 'Pro', 'sm', 'inline', 'slate' )
 				),
 				'attrs' => [
 					'disabled' => 'disabled',

@@ -37,14 +37,18 @@ class Loader {
 			'LiteConnect\LiteConnect',
 			'Divi\Divi',
 			'Elementor\Elementor',
+			'WPCode\WPCode',
+			'WPCode\RegisterLibrary',
 			'Gutenberg\FormSelector',
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
+			'Stripe\Stripe',
 			'UncannyAutomator\UncannyAutomator',
 			'UsageTracking\UsageTracking',
 			'DefaultThemes\DefaultThemes',
-			'TranslationsPress\Translations',
+			'Translations\Translations',
 			'DefaultContent\DefaultContent',
+			'PopupMaker\PopupMaker',
 		];
 
 		$class_names = (array) apply_filters( 'wpforms_integrations_available', $core_class_names );

@@ -57,30 +57,39 @@ WPFormsEducation.liteCore = window.WPFormsEducation.liteCore || ( function( docu
 		 */
 		openModalButtonClick: function() {
 
-			$( document ).on(
-				'click',
-				'.education-modal',
-				function( event ) {
+			$( document )
+				.on( 'click', '.education-modal:not(.wpforms-add-fields-button)', app.openModalButtonHandler )
+				.on( 'mousedown', '.education-modal.wpforms-add-fields-button', app.openModalButtonHandler );
+		},
 
-					var $this = $( this ),
-						name = $this.data( 'name' ),
-						utmContent = WPFormsEducation.core.getUTMContentValue( $this );
+		/**
+		 * Open education modal handler.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param {Event} event Event.
+		 */
+		openModalButtonHandler: function( event ) {
 
-					if ( $this.data( 'action' ) && [ 'activate', 'install' ].includes( $this.data( 'action' ) ) ) {
-						return;
-					}
+			const $this = $( this );
 
-					event.preventDefault();
-					event.stopImmediatePropagation();
+			if ( $this.data( 'action' ) && [ 'activate', 'install' ].includes( $this.data( 'action' ) ) ) {
+				return;
+			}
 
-					if ( $this.hasClass( 'wpforms-add-fields-button' ) ) {
-						name  = $this.text();
-						name += name.indexOf( wpforms_builder.field ) < 0 ?  ' ' + wpforms_builder.field : '';
-					}
+			event.preventDefault();
+			event.stopImmediatePropagation();
 
-					app.upgradeModal( name, utmContent, $this.data( 'license' ), $this.data( 'video' ) );
-				}
-			);
+			let name = $this.data( 'name' );
+
+			if ( $this.hasClass( 'wpforms-add-fields-button' ) ) {
+				name  = $this.text();
+				name += name.indexOf( wpforms_builder.field ) < 0 ? ' ' + wpforms_builder.field : '';
+			}
+
+			const utmContent = WPFormsEducation.core.getUTMContentValue( $this );
+
+			app.upgradeModal( name, utmContent, $this.data( 'license' ), $this.data( 'video' ), $this.data( 'plural' ) );
 		},
 
 		/**
@@ -88,13 +97,13 @@ WPFormsEducation.liteCore = window.WPFormsEducation.liteCore || ( function( docu
 		 *
 		 * @since 1.6.6
 		 *
-		 * @param {string} feature    Feature name.
-		 * @param {string} utmContent UTM content.
-		 * @param {string} type       Feature license type: pro or elite.
-		 * @param {string} video      Feature video URL.
+		 * @param {string}  feature    Feature name.
+		 * @param {string}  utmContent UTM content.
+		 * @param {string}  type       Feature license type: pro or elite.
+		 * @param {string}  video      Feature video URL.
+		 * @param {boolean} isPlural   Is feature name plural.
 		 */
-		upgradeModal: function( feature, utmContent, type, video ) {
-
+		upgradeModal( feature, utmContent, type, video, isPlural ) {
 			// Provide a default value.
 			if ( typeof type === 'undefined' || type.length === 0 ) {
 				type = 'pro';
@@ -105,13 +114,15 @@ WPFormsEducation.liteCore = window.WPFormsEducation.liteCore || ( function( docu
 				return;
 			}
 
-			var message      = wpforms_education.upgrade[ type ].message.replace( /%name%/g, feature ),
-				isVideoModal = ! _.isEmpty( video ),
-				modalWidth   = WPFormsEducation.core.getUpgradeModalWidth( isVideoModal );
+			const message = wpforms_education.upgrade[ type ].message.replace( /%name%/g, feature );
+			const isVideoModal = ! _.isEmpty( video );
+			const titleMessage = isPlural ? wpforms_education.upgrade[ type ].title_plural : wpforms_education.upgrade[ type ].title;
 
-			var modal = $.alert( {
+			let modalWidth = WPFormsEducation.core.getUpgradeModalWidth( isVideoModal );
+
+			const modal = $.alert( {
 				backgroundDismiss: true,
-				title            : feature + ' ' + wpforms_education.upgrade[type].title,
+				title            : feature + ' ' + titleMessage,
 				icon             : 'fa fa-lock',
 				content          : message,
 				boxWidth         : modalWidth,
@@ -126,7 +137,7 @@ WPFormsEducation.liteCore = window.WPFormsEducation.liteCore || ( function( docu
 					var videoHtml = isVideoModal ? '<iframe src="' + video + '" class="feature-video" frameborder="0" allowfullscreen="" width="475" height="267"></iframe>' : '';
 
 					this.$btnc.after( '<div class="discount-note">' + wpforms_education.upgrade_bonus + '</div>' );
-					this.$btnc.after(  wpforms_education.upgrade[type].doc  );
+					this.$btnc.after( wpforms_education.upgrade[type].doc.replace( /%25name%25/g, feature ) );
 					this.$btnc.after( videoHtml );
 
 					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
