@@ -521,6 +521,16 @@ function astra_hb_woo_cart_dynamic_css( $dynamic_css, $dynamic_css_filtered = ''
 				'color' => esc_attr( $icon_color ),
 			),
 
+			// Fix: Count color for the legacy users. ( shopping-default ) [Ref: #AST-3683].
+			'.ast-menu-cart-outline .ast-cart-menu-wrap .count' => array(
+				'color' => esc_attr( $cart_products_count_color ),
+			),
+
+			// Fix: Count hover color for the legacy users. ( shopping-default ) [Ref: #AST-3683].
+			'.ast-site-header-cart .ast-site-header-cart-li:hover .ast-cart-menu-wrap .count .ast-count-text' => array(
+				'color' => esc_attr( $cart_products_count_color_hover ),
+			),
+
 			// Outline Info colors.
 			$selector . ' .ast-menu-cart-outline .ast-woo-header-cart-info-wrap' => array(
 				'color' => esc_attr( $icon_color ),
@@ -806,7 +816,7 @@ function astra_hb_woo_cart_dynamic_css( $dynamic_css, $dynamic_css_filtered = ''
 	$css_output      .= astra_parse_css( $angle_transition );
 
 
-	$css_output .= Astra_Builder_Base_Dynamic_CSS::prepare_advanced_margin_padding_css( 'section-header-woo-cart', '.woocommerce .ast-header-woo-cart .ast-site-header-cart .ast-addon-cart-wrap, .ast-header-woo-cart .ast-site-header-cart .ast-addon-cart-wrap' );
+	$css_output .= Astra_Extended_Base_Dynamic_CSS::prepare_advanced_margin_padding_css( 'section-header-woo-cart', '.woocommerce .ast-header-woo-cart .ast-site-header-cart .ast-addon-cart-wrap, .ast-header-woo-cart .ast-site-header-cart .ast-addon-cart-wrap' );
 	$css_output .= Astra_Builder_Base_Dynamic_CSS::prepare_visibility_css( 'section-header-woo-cart', '.ast-header-woo-cart' );
 
 	$dynamic_css .= $css_output;

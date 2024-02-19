@@ -3352,6 +3352,12 @@ return array(
 		),
 	),
 	array(
+		'Honk' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Hubballi' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'sans-serif',
@@ -7276,6 +7282,30 @@ return array(
 		),
 	),
 	array(
+		'Protest Guerrilla' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Protest Revolution' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Protest Riot' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Protest Strike' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Proza Libre' => array(
 			'variants' => array( 'regular', 'italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic' ),
 			'category' => 'sans-serif',
@@ -7738,6 +7768,12 @@ return array(
 		),
 	),
 	array(
+		'Rubik Broken Fax' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Rubik Bubbles' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
@@ -7762,6 +7798,18 @@ return array(
 		),
 	),
 	array(
+		'Rubik Doodle Shadow' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Rubik Doodle Triangles' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Rubik Gemstones' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
@@ -7774,7 +7822,25 @@ return array(
 		),
 	),
 	array(
+		'Rubik Glitch Pop' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Rubik Iso' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Rubik Lines' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Rubik Maps' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
 		),
@@ -7817,6 +7883,12 @@ return array(
 	),
 	array(
 		'Rubik Puddles' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
+		'Rubik Scribble' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
 		),
@@ -8275,6 +8347,12 @@ return array(
 		'Six Caps' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'sans-serif',
+		),
+	),
+	array(
+		'Sixtyfour' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'monospace',
 		),
 	),
 	array(
@@ -9313,6 +9391,12 @@ return array(
 		'Work Sans' => array(
 			'variants' => array( '100', '200', '300', 'regular', '500', '600', '700', '800', '900', '100italic', '200italic', '300italic', 'italic', '500italic', '600italic', '700italic', '800italic', '900italic' ),
 			'category' => 'sans-serif',
+		),
+	),
+	array(
+		'Workbench' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'monospace',
 		),
 	),
 	array(
