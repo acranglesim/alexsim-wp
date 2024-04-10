@@ -472,6 +472,12 @@ return array(
 		),
 	),
 	array(
+		'Annapurna SIL' => array(
+			'variants' => array( 'regular', '700' ),
+			'category' => 'serif',
+		),
+	),
+	array(
 		'Annie Use Your Telescope' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'handwriting',
@@ -481,6 +487,12 @@ return array(
 		'Anonymous Pro' => array(
 			'variants' => array( 'regular', 'italic', '700', '700italic' ),
 			'category' => 'monospace',
+		),
+	),
+	array(
+		'Anta' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'sans-serif',
 		),
 	),
 	array(
@@ -3652,6 +3664,12 @@ return array(
 		),
 	),
 	array(
+		'Jacquarda Bastarda 9' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
+		),
+	),
+	array(
 		'Jacques Francois' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'serif',
@@ -3991,6 +4009,12 @@ return array(
 		'Kodchasan' => array(
 			'variants' => array( '200', '200italic', '300', '300italic', 'regular', 'italic', '500', '500italic', '600', '600italic', '700', '700italic' ),
 			'category' => 'sans-serif',
+		),
+	),
+	array(
+		'Kode Mono' => array(
+			'variants' => array( 'regular', '500', '600', '700' ),
+			'category' => 'monospace',
 		),
 	),
 	array(
@@ -4582,6 +4606,12 @@ return array(
 		),
 	),
 	array(
+		'Madimi One' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'sans-serif',
+		),
+	),
+	array(
 		'Magra' => array(
 			'variants' => array( 'regular', '700' ),
 			'category' => 'sans-serif',
@@ -4891,6 +4921,12 @@ return array(
 		'Michroma' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'sans-serif',
+		),
+	),
+	array(
+		'Micro 5' => array(
+			'variants' => array( 'regular' ),
+			'category' => 'display',
 		),
 	),
 	array(
@@ -5227,6 +5263,12 @@ return array(
 		'Nabla' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
+		),
+	),
+	array(
+		'Namdhinggo' => array(
+			'variants' => array( 'regular', '500', '600', '700', '800' ),
+			'category' => 'serif',
 		),
 	),
 	array(
@@ -6709,6 +6751,12 @@ return array(
 		'Oi' => array(
 			'variants' => array( 'regular' ),
 			'category' => 'display',
+		),
+	),
+	array(
+		'Ojuju' => array(
+			'variants' => array( '200', '300', 'regular', '500', '600', '700', '800' ),
+			'category' => 'sans-serif',
 		),
 	),
 	array(

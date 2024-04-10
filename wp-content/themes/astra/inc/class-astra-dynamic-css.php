@@ -71,6 +71,7 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 			$narrow_container_max_width = astra_get_option( 'narrow-container-max-width', apply_filters( 'astra_narrow_container_width', 750 ) );
 			$header_logo_width          = astra_get_option( 'ast-header-responsive-logo-width' );
 			$container_layout           = astra_toggle_layout( 'ast-site-content-layout', 'global', false );
+
 			// Get the Global Container Layout based on Global Boxed and Global Sidebar Style.
 			if ( 'plain-container' === $container_layout ) {
 				$is_boxed         = ( 'boxed' === astra_get_option( 'site-content-style' ) );
@@ -211,6 +212,9 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 
 			// Elementor heading margin compatibility.
 			$elementor_heading_margin_style_comp = self::elementor_heading_margin_style_comp();
+
+			// Elementor Loop block padding compatibility.
+			$elementor_container_padding_style_comp = self::elementor_container_padding_style_comp();
 
 			$update_customizer_strctural_defaults = astra_check_is_structural_setup();
 			$blog_layout                          = astra_get_blog_layout();
@@ -2418,6 +2422,14 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 				);
 			}
 
+			// Handle backward compatibility for Elementor Loop block post div container padding.
+			if ( defined( 'ELEMENTOR_PRO_VERSION' ) && $elementor_container_padding_style_comp ) {
+				$elementor_base_css['.elementor-loop-container .e-loop-item, .elementor-loop-container .ast-separate-container .ast-article-post, .elementor-loop-container .ast-separate-container .ast-article-single, .elementor-loop-container .ast-separate-container .comment-respond'] = array(
+					'padding' => '0px',
+				);
+				$parse_css .= astra_parse_css( $elementor_base_css );
+			}
+
 			/**
 			 * Beaver Builder themer sticky header compatibility.
 			 */
@@ -2829,25 +2841,33 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 						'background-color' => esc_attr( $btn_bg_hover_color ),
 						'border-color'     => empty( $btn_border_h_color ) ? esc_attr( $btn_bg_hover_color ) : esc_attr( $btn_border_h_color ),
 					),
-					'.elementor-widget-heading h1.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h1_line_height ),
-					),
-					'.elementor-widget-heading h2.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h2_line_height ),
-					),
-					'.elementor-widget-heading h3.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h3_line_height ),
-					),
-					'.elementor-widget-heading h4.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h4_line_height ),
-					),
-					'.elementor-widget-heading h5.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h5_line_height ),
-					),
-					'.elementor-widget-heading h6.elementor-heading-title' => array(
-						'line-height' => esc_attr( $h6_line_height ),
-					),
 				);
+
+				if ( defined( 'ELEMENTOR_VERSION' ) ) {
+					$global_button_page_builder_desktop = array_merge(
+						$global_button_page_builder_desktop,
+						array(
+							'.elementor-widget-heading h1.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h1_line_height ),
+							),
+							'.elementor-widget-heading h2.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h2_line_height ),
+							),
+							'.elementor-widget-heading h3.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h3_line_height ),
+							),
+							'.elementor-widget-heading h4.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h4_line_height ),
+							),
+							'.elementor-widget-heading h5.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h5_line_height ),
+							),
+							'.elementor-widget-heading h6.elementor-heading-title' => array(
+								'line-height' => esc_attr( $h6_line_height ),
+							),
+						)
+					);
+				}
 
 				if ( $block_editor_legacy_setup && self::gutenberg_core_patterns_compat() && ! astra_button_default_padding_updated() ) {
 					$theme_outline_gb_btn_top_border    = ( isset( $global_custom_button_border_size['top'] ) && ( '' !== $global_custom_button_border_size['top'] && '0' !== $global_custom_button_border_size['top'] ) ) ? astra_get_css_value( $global_custom_button_border_size['top'], 'px' ) : '2px';
@@ -4137,6 +4157,16 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 						$parse_css          .= astra_parse_css( $blog_featured_image );
 				}
 
+				// Added cover styling for Custom image ratio.
+				if ( 'custom' === $aspect_ratio_type ) {
+					$cover_style_image = array(
+						'.ast-article-post .post-thumb-img-content img' => array(
+							'object-fit' => 'cover',
+						),
+					);
+					$parse_css        .= astra_parse_css( $cover_style_image );
+				}
+
 				$author_avatar = astra_get_option( 'blog-meta-author-avatar' );
 
 				if ( $author_avatar ) {
@@ -4281,10 +4311,12 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 				$social_bg_color       = astra_get_option( 'transparent-header-social-icons-bg-color' );
 				$social_bg_hover_color = astra_get_option( 'transparent-header-social-icons-bg-h-color' );
 
-				$button_color      = astra_get_option( 'transparent-header-button-text-color' );
-				$button_h_color    = astra_get_option( 'transparent-header-button-text-h-color' );
-				$button_bg_color   = astra_get_option( 'transparent-header-button-bg-color' );
-				$button_bg_h_color = astra_get_option( 'transparent-header-button-bg-h-color' );
+				$button_color          = astra_get_option( 'transparent-header-button-text-color' );
+				$button_h_color        = astra_get_option( 'transparent-header-button-text-h-color' );
+				$button_bg_color       = astra_get_option( 'transparent-header-button-bg-color' );
+				$button_bg_h_color     = astra_get_option( 'transparent-header-button-bg-h-color' );
+				$button_border_color   = astra_get_option( 'transparent-header-button-border-color' );
+				$button_h_border_color = astra_get_option( 'transparent-header-button-border-h-color' );
 
 				$divider_color                = astra_get_option( 'transparent-header-divider-color' );
 				$account_icon_color           = astra_get_option( 'transparent-account-icon-color' );
@@ -4336,12 +4368,14 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 						'color' => esc_attr( $social_hover_color['desktop'] ),
 					),
 					'.ast-theme-transparent-header [CLASS*="ast-header-button-"] .ast-custom-button' => array(
-						'color'      => esc_attr( $button_color ),
-						'background' => esc_attr( $button_bg_color ),
+						'color'        => esc_attr( $button_color ),
+						'background'   => esc_attr( $button_bg_color ),
+						'border-color' => esc_attr( $button_border_color ),
 					),
 					'.ast-theme-transparent-header [CLASS*="ast-header-button-"] .ast-custom-button:hover' => array(
-						'color'      => esc_attr( $button_h_color ),
-						'background' => esc_attr( $button_bg_h_color ),
+						'color'        => esc_attr( $button_h_color ),
+						'background'   => esc_attr( $button_bg_h_color ),
+						'border-color' => esc_attr( $button_h_border_color ),
 					),
 					'.ast-theme-transparent-header .ast-header-divider-element .ast-divider-wrapper'         => array(
 						'border-color' => esc_attr( $divider_color ),
@@ -4577,6 +4611,20 @@ if ( ! class_exists( 'Astra_Dynamic_CSS' ) ) {
 			$astra_settings['elementor-headings-style'] = isset( $astra_settings['elementor-headings-style'] ) ? false : true;
 			return apply_filters( 'elementor_heading_margin', $astra_settings['elementor-headings-style'] );
 		}
+
+
+		/**
+		 * Added Elementor post loop block padding support .
+		 *
+		 * @since 4.6.6
+		 * @return boolean
+		 */
+		public static function elementor_container_padding_style_comp() {
+			$astra_settings                                      = get_option( ASTRA_THEME_SETTINGS, array() );
+			$astra_settings['elementor-container-padding-style'] = isset( $astra_settings['elementor-container-padding-style'] ) ? false : true;
+			return apply_filters( 'elementor_container_padding', $astra_settings['elementor-container-padding-style'] );
+		}
+
 
 		/**
 		 * Return post meta CSS
