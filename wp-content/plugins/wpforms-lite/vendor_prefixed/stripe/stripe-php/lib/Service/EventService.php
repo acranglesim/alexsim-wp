@@ -3,17 +3,21 @@
 // File generated from our OpenAPI spec
 namespace WPForms\Vendor\Stripe\Service;
 
+/**
+ * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ */
 class EventService extends \WPForms\Vendor\Stripe\Service\AbstractService
 {
     /**
      * List events, going back up to 30 days. Each event data is rendered according to
      * Stripe API version at its creation time, specified in <a
-     * href="/docs/api/events/object">event object</a> <code>api_version</code>
-     * attribute (not according to your current Stripe API version or
-     * <code>Stripe-Version</code> header).
+     * href="https://docs.stripe.com/api/events/object">event object</a>
+     * <code>api_version</code> attribute (not according to your current Stripe API
+     * version or <code>Stripe-Version</code> header).
      *
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
@@ -29,7 +33,7 @@ class EventService extends \WPForms\Vendor\Stripe\Service\AbstractService
      *
      * @param string $id
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *

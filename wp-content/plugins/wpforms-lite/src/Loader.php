@@ -68,6 +68,10 @@ class Loader {
 			'name' => 'API',
 			'id'   => 'api',
 		];
+
+		$this->classes[] = [
+			'name' => 'Emails\Summaries',
+		];
 	}
 
 	/**
@@ -112,6 +116,11 @@ class Loader {
 		$this->classes[] = [
 			'name' => 'Forms\IconChoices',
 			'id'   => 'icon_choices',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\AntiSpam',
+			'id'   => 'anti_spam',
 		];
 	}
 
@@ -204,6 +213,14 @@ class Loader {
 				'hook' => 'admin_init',
 			],
 			[
+				'name' => 'Admin\Forms\UserTemplates',
+				'id'   => 'user_templates',
+			],
+			[
+				'name' => 'Admin\Forms\Page',
+				'id'   => 'forms_overview',
+			],
+			[
 				'name' => 'Admin\Challenge',
 				'id'   => 'challenge',
 			],
@@ -281,6 +298,7 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\PluginList',
+				'id'   => 'plugin_list',
 				'hook' => 'admin_init',
 			],
 			[
@@ -291,6 +309,7 @@ class Loader {
 			[
 				'name' => 'Admin\Splash\SplashCache',
 				'id'   => 'splash_cache',
+				'hook' => 'plugins_loaded',
 			],
 			[
 				'name' => 'Admin\Splash\SplashUpgrader',
@@ -360,6 +379,37 @@ class Loader {
 		$this->classes[] = [
 			'name' => 'Forms\Fields\CustomCaptcha\Field',
 		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Process',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Notifications',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Process',
+			'id'   => 'repeater_process',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Notifications',
+			'hook' => 'init',
+		];
 	}
 
 	/**
@@ -375,10 +425,6 @@ class Loader {
 
 		array_push(
 			$this->classes,
-			[
-				'name' => 'Admin\Forms\Page',
-				'id'   => 'forms_overview',
-			],
 			[
 				'name' => 'Admin\Forms\Ajax\Columns',
 				'id'   => 'forms_columns_ajax',
@@ -426,7 +472,7 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Entries\Overview\Page',
-				'hook' => 'admin_init',
+				'id'   => 'entries_overview',
 			],
 			[
 				'name'      => 'Admin\Entries\Overview\Ajax',
@@ -487,6 +533,10 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Builder\AntiSpam',
+				'hook' => 'wpforms_builder_init',
+			],
+			[
+				'name' => 'Admin\Builder\Settings\Themes',
 				'hook' => 'wpforms_builder_init',
 			],
 			[
@@ -639,7 +689,17 @@ class Loader {
 	private function populate_education() {
 
 		// Kill switch.
-		if ( ! (bool) apply_filters( 'wpforms_admin_education', true ) ) {
+
+		/**
+		 * Filters admin education status.
+		 *
+		 * @since 1.6.6
+		 *
+		 * @param bool $status Current admin education status.
+		 *
+		 * @return bool
+		 */
+		if ( ! apply_filters( 'wpforms_admin_education', true ) ) { // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			return;
 		}
 
@@ -669,6 +729,11 @@ class Loader {
 			[
 				'name' => 'Admin\Education\Admin\EditPost',
 				'hook' => 'load-post.php',
+			],
+			[
+				'name'     => 'Admin\Education\Pointers\Payment',
+				'hook'     => 'admin_init',
+				'priority' => 20,
 			]
 		);
 
@@ -728,10 +793,12 @@ class Loader {
 			],
 			[
 				'name' => 'AntiSpam\KeywordFilter',
+				'id'   => 'antispam_keyword_filter',
 				'hook' => 'init',
 			],
 			[
 				'name' => 'AntiSpam\SpamEntry',
+				'id'   => 'spam_entry',
 				'hook' => 'init',
 			]
 		);
