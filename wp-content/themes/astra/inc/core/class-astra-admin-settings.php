@@ -290,7 +290,7 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 						__( 'Astra Works Seamlessly with WooCommerce!', 'astra' ),
 						__( 'Use every tool at your disposal to optimize your online store for conversion. All the advantages you need to make more profit!', 'astra' ),
 						esc_attr( 'button button-primary' ),
-						'href="' . ASTRA_PRO_UPGRADE_URL . '" target="_blank"',
+						'href="' . astra_get_pro_url( 'https://wpastra.com/pricing/', 'dashboard', 'free-theme', 'woocommerce' ) . '" target="_blank"',
 						__( 'Upgrade Now', 'astra' )
 					),
 					'priority'                   => 5,
@@ -546,7 +546,8 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 				$screen     = get_current_screen();
 				$post_type  = $screen->id;
 
-				if ( in_array( $post_type, (array) $post_types ) ) {
+				// Check if block editor is enabled or not.
+				if ( null !== $post_type && is_callable( 'use_block_editor_for_post_type' ) && use_block_editor_for_post_type( $post_type ) && in_array( $post_type, (array) $post_types ) ) {
 
 					echo '<style class="astra-meta-box-style">
 						.block-editor-page #side-sortables #astra_settings_meta_box select { min-width: 84%; padding: 3px 24px 3px 8px; height: 20px; }
