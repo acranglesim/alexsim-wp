@@ -274,6 +274,7 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 		// Add Eventlisteners for Submenu.
 		if (astra_menu_toggle.length > 0) {
 			for (var i = 0; i < astra_menu_toggle.length; i++) {
+				astra_menu_toggle[i].removeEventListener('click', AstraToggleSubMenu);
 				astra_menu_toggle[i].addEventListener('click', AstraToggleSubMenu, false);
 			}
 		}
@@ -290,6 +291,7 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 
 				if ( ! menu_click_listeners_nav[i] ) {
 					menu_click_listeners_nav[i] = menu_toggle_all[i];
+					menu_toggle_all[i].removeEventListener('click', astraNavMenuToggle);
 					menu_toggle_all[i].addEventListener('click', astraNavMenuToggle, false);
 				}
 
@@ -304,6 +306,7 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 					// Add Eventlisteners for Submenu.
 					if (astra_menu_toggle.length > 0) {
 						for (var j = 0; j < astra_menu_toggle.length; j++) {
+							astra_menu_toggle[j].removeEventListener('click', AstraToggleSubMenu);
 							astra_menu_toggle[j].addEventListener('click', AstraToggleSubMenu, false);
 						}
 					}
@@ -656,7 +659,17 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 	 * @since x.x.x
 	 */
 	if ( astra.is_scroll_to_id ) {
-		function scrollToIDHandler(e) {
+		// Calculate the offset top of an element, accounting for nested elements.
+		const getOffsetTop = (element) => {
+			let offsetTop = 0;
+			while (element) {
+				offsetTop += element.offsetTop;
+				element = element.offsetParent;
+			}
+			return offsetTop;
+		}
+
+		const scrollToIDHandler = (e) => {
 
 			let offset = 0;
 			const siteHeader = document.querySelector('.site-header');
@@ -672,7 +685,7 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 					});
 				}
 
-				const href = this.hash;
+				const href = e.target.closest('a').hash;
 				if (href) {
 					const scrollId = document.querySelector(href);
 					if (scrollId) {
@@ -683,16 +696,6 @@ astScrollToTopHandler = function ( masthead, astScrollTop ) {
 					}
 				}
 			}
-		}
-
-		// Calculate the offset top of an element, accounting for nested elements.
-		function getOffsetTop(element) {
-			let offsetTop = 0;
-			while (element) {
-				offsetTop += element.offsetTop;
-				element = element.offsetParent;
-			}
-			return offsetTop;
 		}
 
 		let hashLinks = [];

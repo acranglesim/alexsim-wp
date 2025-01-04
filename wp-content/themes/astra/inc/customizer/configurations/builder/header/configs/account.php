@@ -2,9 +2,7 @@
 /**
  * Account Header Configuration.
  *
- * @author      Astra
  * @package     Astra
- * @copyright   Copyright (c) 2023, Astra
  * @link        https://wpastra.com/
  * @since       4.5.2
  */
@@ -655,6 +653,6 @@ function astra_header_account_configuration() {
 }
 
 if ( Astra_Builder_Customizer::astra_collect_customizer_builder_data() ) {
-	astra_header_account_configuration();
+	add_action( 'init', 'astra_header_account_configuration' );
 }
 

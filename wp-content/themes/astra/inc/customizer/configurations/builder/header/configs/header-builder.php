@@ -2,9 +2,7 @@
 /**
  * Header Builder Configuration.
  *
- * @author      Astra
  * @package     Astra
- * @copyright   Copyright (c) 2023, Astra
  * @link        https://wpastra.com/
  * @since       4.5.2
  */
@@ -37,7 +35,7 @@ function astra_header_header_builder_configuration( $configurations = array() ) 
 
 		$item = array(
 			'name'    => ( 1 === Astra_Builder_Helper::$num_of_header_button ) ? 'Button' : 'Button ' . $index,
-			'icon'    => 'admin-links',
+			'icon'    => 'button',
 			'section' => $header_button_section,
 			'clone'   => defined( 'ASTRA_EXT_VER' ),
 			'type'    => 'button',
@@ -60,7 +58,7 @@ function astra_header_header_builder_configuration( $configurations = array() ) 
 
 		$item = array(
 			'name'    => ( 1 === Astra_Builder_Helper::$num_of_header_html ) ? 'HTML' : 'HTML ' . $index,
-			'icon'    => 'text',
+			'icon'    => 'editor-code',
 			'section' => $header_html_section,
 			'clone'   => defined( 'ASTRA_EXT_VER' ),
 			'type'    => 'html',
@@ -83,7 +81,7 @@ function astra_header_header_builder_configuration( $configurations = array() ) 
 
 		$item = array(
 			'name'    => ( 1 === Astra_Builder_Helper::$num_of_header_widgets ) ? 'Widget' : 'Widget ' . $index,
-			'icon'    => 'wordpress',
+			'icon'    => 'screenoptions',
 			'section' => $header_widget_section,
 			'clone'   => defined( 'ASTRA_EXT_VER' ),
 			'type'    => 'widget',
@@ -768,5 +766,5 @@ function astra_header_header_builder_configuration( $configurations = array() ) 
 }
 
 if ( Astra_Builder_Customizer::astra_collect_customizer_builder_data() ) {
-	astra_header_header_builder_configuration();
+	add_action( 'init', 'astra_header_header_builder_configuration', 10, 0 );
 }

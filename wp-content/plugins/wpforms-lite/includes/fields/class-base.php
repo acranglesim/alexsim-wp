@@ -1340,7 +1340,7 @@ abstract class WPForms_Field {
 					$fld .= sprintf(
 						'<input type="text" name="%s[label]" value="%s" class="label">',
 						esc_attr( $base ),
-						$this->esc_attr_brackets( $label )
+						esc_attr( $label )
 					);
 					$fld .= '<a class="add" href="#"><i class="fa fa-plus-circle"></i></a><a class="remove" href="#"><i class="fa fa-minus-circle"></i></a>';
 					$fld .= sprintf(
@@ -2661,7 +2661,7 @@ abstract class WPForms_Field {
 						);
 
 						$label  = $this->get_choices_label( $value['label'] ?? '', $key + 1, $field );
-						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $value['value'] ), true ) : '';
+						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? $this->get_price_after_label( $value['value'] ) : '';
 
 						if ( $with_images ) {
 
@@ -3069,9 +3069,9 @@ abstract class WPForms_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int   $field_id     Field ID.
-	 * @param mixed $field_submit Submitted field value (raw data).
-	 * @param array $form_data    Form data and settings.
+	 * @param string|int $field_id     Field ID as a numeric string.
+	 * @param mixed      $field_submit Submitted field value (raw data).
+	 * @param array      $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
 
@@ -3728,30 +3728,16 @@ abstract class WPForms_Field {
 	}
 
 	/**
-	 * Wrapper for esc_html() to prevent conversion of `<>` special chars to brackets.
+	 * Get formatted price after label.
 	 *
-	 * @since 1.9.1
+	 * @since 1.9.2
 	 *
-	 * @param string $str String to escape.
+	 * @param float $amount Amount.
 	 *
 	 * @return string
 	 */
-	protected function esc_attr_brackets( $str ): string {
+	protected function get_price_after_label( $amount ): string {
 
-		return str_replace(
-			[
-				'&lt;',
-				'&gt;',
-				'&#060;',
-				'&#062;',
-			],
-			[
-				'&amp;lt;',
-				'&amp;gt;',
-				'&amp;#060;',
-				'&amp;#062;',
-			],
-			esc_html( $str )
-		);
+		return sprintf( ' - <span class="wpforms-currency-symbol">%s</span>', wpforms_format_amount( wpforms_sanitize_amount( $amount ), true ) );
 	}
 }

@@ -5,8 +5,6 @@
  * @link https://developer.wordpress.org/themes/basics/theme-functions/
  *
  * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2020, Astra
  * @link        http://wpastra.com/
  * @since       Astra 1.0
  */
@@ -255,12 +253,14 @@ if ( ! class_exists( 'Gutenberg_Editor_CSS' ) ) :
 
 			if ( is_array( $body_font_size ) ) {
 				$body_font_size_desktop = ( isset( $body_font_size['desktop'] ) && '' != $body_font_size['desktop'] ) ? $body_font_size['desktop'] : 15;
+				// Convert to appropriate pixels if the unit is 'rem'.
+				$body_font_size_desktop = ! empty( $body_font_size['desktop-unit'] ) && $body_font_size['desktop-unit'] === 'rem' ? $body_font_size_desktop * 16 : $body_font_size_desktop;
 			} else {
 				$body_font_size_desktop = ( '' != $body_font_size ) ? $body_font_size : 15;
 			}
 
 			// Site title (Page Title) on Block Editor.
-			$post_type                 = strval( get_post_type() );
+			$post_type                 = astra_get_post_type();
 			$site_title_font_family    = astra_get_option( 'ast-dynamic-archive-' . esc_attr( $post_type ) . '-title-font-family' );
 			$site_title_font_weight    = astra_get_option( 'ast-dynamic-archive-' . esc_attr( $post_type ) . '-title-font-weight' );
 			$site_title_line_height    = astra_get_option( 'ast-dynamic-archive-' . esc_attr( $post_type ) . '-title-line-height' );
@@ -294,8 +294,20 @@ if ( ! class_exists( 'Gutenberg_Editor_CSS' ) ) :
 
 			$ast_content_width = apply_filters( 'astra_block_content_width', '910px' );
 
+			$color_palette_reorganize = Astra_Dynamic_CSS::astra_4_8_9_compatibility();
+			$primary_color            = $color_palette_reorganize ? 'var(--ast-global-color-4)' : 'var(--ast-global-color-5)';
+			$secondary_color          = $color_palette_reorganize ? 'var(--ast-global-color-5)' : 'var(--ast-global-color-4)';
+			$alternate_color          = $color_palette_reorganize ? 'var(--ast-global-color-6)' : 'var(--ast-global-color-7)';
+			$subtle_color             = $color_palette_reorganize ? 'var(--ast-global-color-7)' : 'var(--ast-global-color-6)';
+
 			$content_width_size             = ( true === $improve_gb_ui ) ? $ast_content_width : '1200px';
-			$css                            = ':root{ --wp--custom--ast-content-width-size: ' . $content_width_size . ' }';
+			$css                            = ':root{
+				--wp--custom--ast-content-width-size: ' . $content_width_size . ';
+				--ast-global-color-primary: ' . $primary_color . ';
+				--ast-global-color-secondary: ' . $secondary_color . ';
+				--ast-global-color-alternate-background: ' . $alternate_color . ';
+				--ast-global-color-subtle-background: ' . $subtle_color . ';
+			}';
 			$css                           .= '.ast-narrow-container { --wp--custom--ast-content-width-size: ' . $ast_narrow_width . ' }';
 			$astra_apply_content_background = astra_apply_content_background_fullwidth_layouts();
 

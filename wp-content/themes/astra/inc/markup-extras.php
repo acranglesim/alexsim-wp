@@ -6,8 +6,6 @@
  * All the functions here generate some kind of Markup for the frontend.
  *
  * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2020, Astra
  * @link        https://wpastra.com/
  * @since       Astra 2.5.0
  */
@@ -260,7 +258,7 @@ function astra_is_content_style_boxed( $post_id = false ) {
  */
 function astra_with_third_party( $is_sidebar_option = false ) {
 
-	$post_type = strval( get_post_type() );
+	$post_type = astra_get_post_type();
 
 	// @codingStandardsIgnoreStart
 	/**
@@ -294,7 +292,7 @@ function astra_with_third_party( $is_sidebar_option = false ) {
  */
 function astra_is_sidebar_style_boxed( $post_id = false ) {
 
-	$post_type            = strval( get_post_type() );
+	$post_type            = astra_get_post_type();
 	$blog_type            = is_singular() ? 'single' : 'archive';
 	$global_sidebar_style = astra_get_option( 'site-sidebar-style' );
 	$meta_sidebar_style   = astra_get_option_meta( 'site-sidebar-style', '', true );
@@ -584,7 +582,7 @@ if ( ! function_exists( 'astra_logo' ) ) {
 		 * Echo or Return the Logo Markup
 		 */
 		if ( $echo ) {
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo do_shortcode( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
 			return $html;
 		}
@@ -858,7 +856,7 @@ if ( ! function_exists( 'astra_get_custom_html' ) ) {
 	function astra_get_custom_html( $option_name = '' ) {
 
 		$custom_html         = '';
-		$custom_html_content = astra_get_option( $option_name );
+		$custom_html_content = astra_get_i18n_option( $option_name, _x( '%astra%', 'Primary Menu: Custom Menu Text / HTML for Last Item in Menu', 'astra' ) );
 
 		if ( ! empty( $custom_html_content ) ) {
 			$custom_html = '<div class="ast-custom-html">' . do_shortcode( wp_kses_post( $custom_html_content ) ) . '</div>';
@@ -888,13 +886,29 @@ if ( ! function_exists( 'astra_get_custom_button' ) ) {
 
 		$custom_html    = '';
 		$button_classes = '';
-		$button_text    = astra_get_option( $button_text );
+		$button_text    = astra_get_i18n_option( $button_text, Astra_Builder_Helper::get_translatable_string( $button_text ) );
 		$button_style   = astra_get_option( $button_style );
 		$outside_menu   = astra_get_option( 'header-display-outside-menu' );
 
 		$header_button = astra_get_option( $button_options );
 		$new_tab       = ( $header_button['new_tab'] ? 'target="_blank"' : 'target="_self"' );
 		$link_rel      = ( ! empty( $header_button['link_rel'] ) ? 'rel="' . esc_attr( $header_button['link_rel'] ) . '"' : '' );
+
+		// Check for the multisite with subdirectory and if the subdirectory path is enabled for button links.
+		if ( defined( 'SUBDOMAIN_INSTALL' ) && ! SUBDOMAIN_INSTALL ) {
+			$enable_subdirectory_path = apply_filters( 'astra_enable_subdirectory_path', false );
+			if (
+				$enable_subdirectory_path
+				&& isset( $header_button['url'] ) // Check for URL availability.
+				&& ! str_starts_with( $header_button['url'], 'http' ) // Check for external site link.
+			) {
+				$current_site = get_blog_details();
+				if ( $current_site instanceof WP_Site && $current_site->path ) {
+					$btn_url              = $current_site->path . $header_button['url'];
+					$header_button['url'] = str_replace( '//', '/', $btn_url );
+				}
+			}
+		}
 
 		$button_classes    = ( 'theme-button' === $button_style ? 'ast-button' : 'ast-custom-button' );
 		$outside_menu_item = apply_filters( 'astra_convert_link_to_button', $outside_menu );
@@ -988,14 +1002,21 @@ if ( ! function_exists( 'astra_get_small_footer_custom_text' ) ) {
 	 *
 	 * @since 1.0.14
 	 * @param string $option Custom text option name.
-	 * @return mixed         Markup of custom text option.
+	 *
+	 * @return mixed Markup of custom text option.
 	 */
 	function astra_get_small_footer_custom_text( $option = '' ) {
-
 		$output = $option;
 
 		if ( '' != $option ) {
-			$output = astra_get_option( $option );
+			$translatable_strings = array(
+				'footer-sml-section-1-credit' => _x( '%astra%', 'Footer small section 1 credit', 'astra' ),
+				'footer-sml-section-2-credit' => _x( '%astra%', 'Footer small section 2 credit', 'astra' ),
+			);
+	
+			$translated_text = isset( $translatable_strings[ $option ] ) ? $translatable_strings[ $option ] : '%astra%';
+
+			$output = astra_get_i18n_option( $option, $translated_text );
 			$output = str_replace( '[current_year]', date_i18n( 'Y' ), $output );
 			$output = str_replace( '[site_title]', '<span class="ast-footer-site-title">' . get_bloginfo( 'name' ) . '</span>', $output );
 
@@ -1068,11 +1089,13 @@ if ( ! function_exists( 'astra_header_markup' ) ) {
 		?>
 		<header
 		<?php
-				echo astra_attr(
-					'header',
-					array(
-						'id'    => 'masthead',
-						'class' => join( ' ', astra_get_header_classes() ),
+				echo wp_kses_post(
+					astra_attr(
+						'header',
+						array(
+							'id'    => 'masthead',
+							'class' => join( ' ', astra_get_header_classes() ),
+						)
 					)
 				);
 		?>
@@ -1113,10 +1136,12 @@ if ( ! function_exists( 'astra_site_branding_markup' ) ) {
 		<div class="site-branding">
 			<div
 			<?php
-				echo astra_attr(
-					'site-identity',
-					array(
-						'class' => 'ast-site-identity',
+				echo wp_kses_post(
+					astra_attr(
+						'site-identity',
+						array(
+							'class' => 'ast-site-identity',
+						)
 					)
 				);
 			?>
@@ -1282,20 +1307,22 @@ if ( ! function_exists( 'astra_primary_navigation_markup' ) ) {
 			if ( has_nav_menu( 'primary' ) ) {
 				// To add default alignment for navigation which can be added through any third party plugin.
 				// Do not add any CSS from theme except header alignment.
-				echo '<div ' . astra_attr( 'ast-main-header-bar-alignment' ) . '>';
+				echo '<div ' . astra_attr( 'ast-main-header-bar-alignment' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					wp_nav_menu( $primary_menu_args );
 				echo '</div>';
 			} else {
 
-				echo '<div ' . astra_attr( 'ast-main-header-bar-alignment' ) . '>';
+				echo '<div ' . astra_attr( 'ast-main-header-bar-alignment' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo '<div class="main-header-bar-navigation ast-flex-1">';
 						echo '<nav ';
-						echo astra_attr(
-							'site-navigation',
-							array(
-								'id'         => 'primary-site-navigation',
-								'class'      => 'site-navigation ast-flex-grow-1 navigation-accessibility',
-								'aria-label' => esc_attr__( 'Site Navigation', 'astra' ),
+						echo wp_kses_post(
+							astra_attr(
+								'site-navigation',
+								array(
+									'id'         => 'primary-site-navigation',
+									'class'      => 'site-navigation ast-flex-grow-1 navigation-accessibility',
+									'aria-label' => esc_attr__( 'Site Navigation', 'astra' ),
+								)
 							)
 						);
 						echo '>';
@@ -1412,11 +1439,13 @@ if ( ! function_exists( 'astra_footer_markup' ) ) {
 
 		<footer
 		<?php
-				echo astra_attr(
-					'footer',
-					array(
-						'id'    => 'colophon',
-						'class' => join( ' ', astra_get_footer_classes() ),
+				echo wp_kses_post(
+					astra_attr(
+						'footer',
+						array(
+							'id'    => 'colophon',
+							'class' => join( ' ', astra_get_footer_classes() ),
+						)
 					)
 				);
 		?>
@@ -1619,14 +1648,17 @@ if ( ! function_exists( 'astra_comment_form_default_fields_markup' ) ) {
 		}
 
 		$fields['author'] = '<div class="ast-comment-formwrap ast-row"><p class="comment-form-author ' . astra_attr( 'comment-form-grid-class' ) . '">' .
-					'<label for="author" class="screen-reader-text">' . esc_html( $name_label ) . '</label><input id="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) .
-					'" placeholder="' . esc_attr( $name_label ) . '" size="30"' . $aria_req . ' /></p>';
-		$fields['email']  = '<p class="comment-form-email ' . astra_attr( 'comment-form-grid-class' ) . '">' .
-					'<label for="email" class="screen-reader-text">' . esc_html( $email_label ) . '</label><input id="email" name="email" type="text" value="' . esc_attr( $commenter['comment_author_email'] ) .
-					'" placeholder="' . esc_attr( $email_label ) . '" size="30"' . $aria_req . ' /></p>';
-		$fields['url']    = '<p class="comment-form-url ' . astra_attr( 'comment-form-grid-class' ) . '"><label for="url">' .
-					'<label for="url" class="screen-reader-text">' . esc_html( $website_label ) . '</label><input id="url" name="url" type="text" value="' . esc_url( $commenter['comment_author_url'] ) .
-					'" placeholder="' . esc_attr( $website_label ) . '" size="30" /></label></p></div>';
+		'<label for="author" class="screen-reader-text">' . esc_html( $name_label ) . '</label><input id="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) .
+		'" placeholder="' . esc_attr( $name_label ) . '" size="30"' . $aria_req . ' autocomplete="name" /></p>';
+	
+		$fields['email'] = '<p class="comment-form-email ' . astra_attr( 'comment-form-grid-class' ) . '">' .
+		'<label for="email" class="screen-reader-text">' . esc_html( $email_label ) . '</label><input id="email" name="email" type="text" value="' . esc_attr( $commenter['comment_author_email'] ) .
+		'" placeholder="' . esc_attr( $email_label ) . '" size="30"' . $aria_req . ' autocomplete="email" /></p>';
+	
+		$fields['url'] = '<p class="comment-form-url ' . astra_attr( 'comment-form-grid-class' ) . '"><label for="url">' .
+		'<label for="url" class="screen-reader-text">' . esc_html( $website_label ) . '</label><input id="url" name="url" type="text" value="' . esc_url( $commenter['comment_author_url'] ) .
+		'" placeholder="' . esc_attr( $website_label ) . '" size="30" autocomplete="url" /></label></p></div>';
+	
 
 		return apply_filters( 'astra_comment_form_default_fields_markup', $fields );
 	}

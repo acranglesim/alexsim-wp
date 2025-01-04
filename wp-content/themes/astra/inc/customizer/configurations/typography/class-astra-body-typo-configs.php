@@ -3,8 +3,6 @@
  * Styling Options for Astra Theme.
  *
  * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2020, Astra
  * @link        https://wpastra.com/
  * @since       Astra 1.0.15
  */
@@ -276,7 +274,7 @@ if ( ! class_exists( 'Astra_Body_Typo_Configs' ) ) {
 					'transport' => 'postMessage',
 					'section'   => $typo_section,
 					'priority'  => 26,
-					'default'   => astra_get_option( 'headings-font-height-settings' ),
+					'default'   => astra_get_option( 'headings-font-extras' ),
 					'title'     => __( 'Font Extras', 'astra' ),
 					'divider'   => array( 'ast_class' => 'ast-sub-top-dotted-divider' ),
 				),

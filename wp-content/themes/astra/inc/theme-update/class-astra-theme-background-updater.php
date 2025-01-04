@@ -3,8 +3,6 @@
  * Theme Batch Update
  *
  * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2020, Astra
  * @link        https://wpastra.com/
  * @since 2.1.3
  */
@@ -95,6 +93,18 @@ if ( ! class_exists( 'Astra_Theme_Background_Updater' ) ) {
 			'4.8.0'  => array(
 				'astra_theme_background_updater_4_8_0',
 			),
+			'4.8.2'  => array(
+				'astra_theme_background_updater_4_8_2',
+			),
+			'4.8.4'  => array(
+				'astra_theme_background_updater_4_8_4',
+			),
+			'4.8.7'  => array(
+				'astra_theme_background_updater_4_8_7',
+			),
+			'4.8.9'  => array(
+				'astra_theme_background_updater_4_8_9',
+			),
 		);
 
 		/**
@@ -164,12 +174,10 @@ if ( ! class_exists( 'Astra_Theme_Background_Updater' ) ) {
 
 			if ( wp_remote_retrieve_response_code( $result ) >= 300 ) {
 				return true;
-			} else {
-				set_transient( 'astra-theme-cron-test-ok', 1, 3600 );
-				return false;
 			}
 
-			return $migration_fallback;
+			set_transient( 'astra-theme-cron-test-ok', 1, 3600 );
+			return false;
 		}
 
 		/**

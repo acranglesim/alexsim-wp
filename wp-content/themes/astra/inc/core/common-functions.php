@@ -3,8 +3,6 @@
  * Functions for Astra Theme.
  *
  * @package     Astra
- * @author      Astra
- * @copyright   Copyright (c) 2020, Astra
  * @link        https://wpastra.com/
  * @since       Astra 1.0.0
  */
@@ -183,8 +181,11 @@ if ( ! function_exists( 'astra_get_font_css_value' ) ) {
 					$fonts['tablet']  = ( isset( $body_font_size['tablet'] ) && '' != $body_font_size['tablet'] ) ? $body_font_size['tablet'] : $fonts['desktop'];
 					$fonts['mobile']  = ( isset( $body_font_size['mobile'] ) && '' != $body_font_size['mobile'] ) ? $body_font_size['mobile'] : $fonts['tablet'];
 
-					if ( $fonts[ $device ] ) {
-						$css_val = esc_attr( $value ) . 'px;font-size:' . ( esc_attr( $value ) / esc_attr( $fonts[ $device ] ) ) . 'rem';
+					// Construct the CSS value with the provided unit.
+					$css_val = esc_attr( $value ) . $unit . ';';
+					// If the device unit is 'px' and the device font size is set, convert the value to 'rem'.
+					if ( $body_font_size[ $device . '-unit' ] === 'px' && $fonts[ $device ] ) {
+						$css_val .= 'font-size:' . ( esc_attr( $value ) / esc_attr( $fonts[ $device ] ) ) . 'rem';
 					}
 				} else {
 					$css_val = esc_attr( $value );
@@ -472,7 +473,58 @@ if ( ! function_exists( 'astra_parse_css' ) ) {
 }
 
 /**
- * Return Theme options.
+ * Return theme options from astra-settings option key.
+ */
+if ( ! function_exists( 'astra_get_options' ) ) {
+
+	/**
+	 * Retrieve Astra theme options array.
+	 *
+	 * @return array The theme options array.
+	 *
+	 * @since 4.8.9
+	 */
+	function astra_get_options() {
+		// Ensure we're not interfering during WordPress installation.
+		if ( wp_installing() ) {
+			return [];
+		}
+
+		/**
+		 * Filter to bypass the cached Astra options.
+		 *
+		 * Example usage:
+		 *     add_filter( 'astra_get_options_nocache', '__return_true' );
+		 *
+		 * @since 4.8.9
+		 * @return bool Whether to bypass the cache. Default is false.
+		 */
+		if ( apply_filters( 'astra_get_options_nocache', false ) ) {
+			$astra_options = get_option( ASTRA_THEME_SETTINGS );
+		} else {
+			// Use a static variable to cache the options for this request.
+			static $cached_astra_options = null;
+
+			// Fetch the options once and cache them in the static variable.
+			if ( is_null( $cached_astra_options ) || is_customize_preview() ) {
+				$cached_astra_options = Astra_Theme_Options::get_astra_options();
+			}
+
+			$astra_options = $cached_astra_options;
+		}
+
+		/**
+		 * Filter the options array for Astra Settings.
+		 *
+		 * @since 4.8.9
+		 * @return array The theme options array.
+		 */
+		return apply_filters( 'astra_get_options', $astra_options );
+	}
+}
+
+/**
+ * Return Theme option.
  */
 if ( ! function_exists( 'astra_get_option' ) ) {
 
@@ -516,7 +568,7 @@ if ( ! function_exists( 'astra_get_option' ) ) {
 /**
  * Return translated theme option.
  */
-if ( ! function_exists( '__astra_get_option' ) ) {
+if ( ! function_exists( 'astra_get_i18n_option' ) ) {
 
 	/**
 	 * Returns translated string for strings saved in Astra settings.
@@ -527,11 +579,10 @@ if ( ! function_exists( '__astra_get_option' ) ) {
 	 *
 	 * Usage examples:
 	 * - Retrieve translated theme option with a context description:
-	 *      $value = __astra_get_option( 'astra-option-key', esc_html_x( '%astra%', 'Context Description', 'astra-addon' ) );
+	 *      $value = astra_get_i18n_option( 'astra-option-key', esc_html_x( '%astra%', 'Context Description', 'astra-addon' ) );
 	 *
 	 * - Retrieve translated theme option with a different context:
-	 *      $value = __astra_get_option( 'astra-option-key', _x( '%astra%', 'Context Description', 'astra-addon' ) );
-	 *
+	 *      $value = astra_get_i18n_option( 'astra-option-key', _x( '%astra%', 'Context Description', 'astra-addon' ) );
 	 *
 	 * @param  string $option       Option key.
 	 * @param  string $translated   Default translation flag.
@@ -542,16 +593,17 @@ if ( ! function_exists( '__astra_get_option' ) ) {
 	 *
 	 * @since 4.8.1
 	 */
-	function 
-	__astra_get_option( $option, $translated, $default = '', $deprecated = '' ) {
-		return '%astra%' !== $translated ? $translated : astra_get_option( $option, $default, $deprecated );
+	function astra_get_i18n_option( $option, $translated, $default = '', $deprecated = '' ) {
+		// #%astra%# is for TranslatePress compatibility.
+		$is_translated = '%astra%' !== $translated && ! strpos( $translated, '#%astra%#' );
+		return $is_translated ? $translated : astra_get_option( $option, $default, $deprecated );
 	}
 }
 
 /**
  * Return translated string.
  */
-if ( ! function_exists( '__astra_get_string' ) ) {
+if ( ! function_exists( 'astra_get_i18n_string' ) ) {
 
 	/**
 	 * Returns translated string.
@@ -561,11 +613,10 @@ if ( ! function_exists( '__astra_get_string' ) ) {
 	 *
 	 * Usage examples:
 	 * - Retrieve translated theme option with a context description:
-	 *      $value = __astra_get_string( $default, esc_html_x( '%astra%', 'Context Description', 'astra-addon' ) );
+	 *      $value = astra_get_i18n_string( $default, esc_html_x( '%astra%', 'Context Description', 'astra-addon' ) );
 	 *
 	 * - Retrieve translated theme option with a different context:
-	 *      $value = __astra_get_string( $default, _x( '%astra%', 'Context Description', 'astra-addon' ) );
-	 *
+	 *      $value = astra_get_i18n_string( $default, _x( '%astra%', 'Context Description', 'astra-addon' ) );
 	 *
 	 * @param  string $default      Default string value.
 	 * @param  string $translated   Default translation flag.
@@ -574,8 +625,10 @@ if ( ! function_exists( '__astra_get_string' ) ) {
 	 *
 	 * @since 4.8.1
 	 */
-	function __astra_get_string( $default, $translated ) {
-		return '%astra%' !== $translated ? $translated : $default;
+	function astra_get_i18n_string( $default, $translated ) {
+		// #%astra%# is for TranslatePress compatibility.
+		$is_translated = '%astra%' !== $translated && ! strpos( $translated, '#%astra%#' );
+		return $is_translated ? $translated : $default;
 	}
 }
 
@@ -892,6 +945,37 @@ if ( ! function_exists( 'astra_the_post_title' ) ) {
 	}
 }
 
+if ( ! function_exists( 'astra_the_search_page_title' ) ) {
+	/**
+	 * Function to get the search page custom title.
+	 *
+	 * @param string $before Optional. Content to prepend to the title.
+	 * @param string $after  Optional. Content to append to the title.
+	 * @param bool   $echo   Optional, default to true.Whether to display or return.
+	 *
+	 * @return string Returns search page custom title.
+	 *
+	 * @since 4.8.4
+	 */
+	function astra_the_search_page_title( $before = '', $after = '', $echo = false ) {
+		$title = apply_filters(
+			'astra_the_search_page_title',
+			sprintf(
+				/* translators: 1: search title, 2: search string */
+				'%1$s %2$s',
+				astra_get_i18n_option( 'section-search-page-title-custom-title', _x( '%astra%', 'Search Page Title: Heading - Text', 'astra' ) ),
+				'<span>' . get_search_query() . '</span>'
+			)
+		);
+
+		if ( $echo ) {
+			echo $before . $title . $after; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		} else {
+			return $before . $title . $after;
+		}
+	}
+}
+
 /**
  * Wrapper function for the_title()
  */
@@ -911,7 +995,7 @@ if ( ! function_exists( 'astra_the_title' ) ) {
 	function astra_the_title( $before = '', $after = '', $post_id = 0, $echo = true ) {
 
 		$title             = '';
-		$post_type         = strval( get_post_type() );
+		$post_type         = astra_get_post_type();
 		$blog_post_title   = astra_get_option( 'ast-dynamic-archive-' . $post_type . '-structure', array( 'ast-dynamic-archive-' . $post_type . '-title', 'ast-dynamic-archive-' . $post_type . '-description' ) );
 		$single_post_title = astra_get_option( 'ast-dynamic-single-' . $post_type . '-structure', 'page' === $post_type ? array( 'ast-dynamic-single-' . $post_type . '-image', 'ast-dynamic-single-' . $post_type . '-title' ) : array( 'ast-dynamic-single-' . $post_type . '-title', 'ast-dynamic-single-' . $post_type . '-meta' ) );
 
@@ -970,8 +1054,7 @@ if ( ! function_exists( 'astra_get_the_title' ) ) {
 				// for search page - title always display.
 			} elseif ( is_search() ) {
 
-				/* translators: 1: search string */
-				$title = apply_filters( 'astra_the_search_page_title', sprintf( astra_get_option( 'section-search-page-title-custom-title' ) . ' %s', '<span>' . get_search_query() . '</span>' ) );
+				$title = astra_the_search_page_title();
 
 			} elseif ( class_exists( 'WooCommerce' ) && is_shop() ) {
 
@@ -1002,7 +1085,7 @@ if ( ! function_exists( 'astra_get_the_title' ) ) {
  * @return boolean false if it is an existing user , true if not.
  */
 function astra_use_dynamic_blog_layouts() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return apply_filters( 'astra_get_option_dynamic_blog_layouts', isset( $astra_settings['dynamic-blog-layouts'] ) ? $astra_settings['dynamic-blog-layouts'] : true );
 }
 
@@ -1012,7 +1095,7 @@ function astra_use_dynamic_blog_layouts() {
  * @since 4.0.0
  */
 function astra_get_taxonomy_banner_legacy_layout() {
-	$post_type        = strval( get_post_type() );
+	$post_type        = astra_get_post_type();
 	$banner_structure = is_search() ? astra_get_option( 'section-search-page-title-structure' ) : astra_get_option( 'ast-dynamic-archive-' . $post_type . '-structure', array( 'ast-dynamic-archive-' . $post_type . '-title', 'ast-dynamic-archive-' . $post_type . '-description' ) );
 
 	if ( empty( $banner_structure ) ) {
@@ -1028,10 +1111,7 @@ function astra_get_taxonomy_banner_legacy_layout() {
 					case 'archive-title':
 						do_action( 'astra_before_archive_title' );
 						if ( is_search() ) {
-							$title = apply_filters( 'astra_the_search_page_title', sprintf( /* translators: 1: search string */ astra_get_option( 'section-search-page-title-custom-title' ) . ' %s', '<span>' . get_search_query() . '</span>' ) );
-							?>
-							 <h1 class="page-title ast-archive-title"> <?php echo $title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> </h1>
-																				  <?php
+							astra_the_search_page_title( '<h1 class="page-title ast-archive-title">', '</h1>', true );
 						} else {
 							add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
 							the_archive_title( '<h1 class="page-title ast-archive-title">', '</h1>' );
@@ -1049,11 +1129,10 @@ function astra_get_taxonomy_banner_legacy_layout() {
 					case 'archive-description':
 						do_action( 'astra_before_archive_description' );
 						if ( is_search() ) {
-							if ( have_posts() ) {
-								echo wp_kses_post( wpautop( astra_get_option( 'section-search-page-title-found-custom-description' ) ) );
-							} else {
-								echo wp_kses_post( wpautop( astra_get_option( 'section-search-page-title-not-found-custom-description' ) ) );
-							}
+							$title = have_posts()
+								? astra_get_i18n_option( 'section-search-page-title-found-custom-description', _x( '%astra%', 'Search Page Custom `When Results Found` Text', 'astra' ) )
+								: astra_get_i18n_option( 'section-search-page-title-not-found-custom-description', _x( '%astra%', 'Search Page Custom `When Results Not Found` Text', 'astra' ) );
+							echo wp_kses_post( wpautop( $title ) );
 						} else {
 							echo wp_kses_post( wpautop( get_the_archive_description() ) );
 						}
@@ -1086,7 +1165,6 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 				$author_name_html   = ( true === astra_check_is_structural_setup() && $author_name ) ? __( 'Author name: ', 'astra' ) . $author_name : $author_name;
 				$author_description = get_the_author_meta( 'description' );
 				/** @psalm-suppress RedundantConditionGivenDocblockType */
-				$author_description_html = wp_kses_post( $author_description );
 				?>
 
 				<section class="ast-author-box ast-archive-description">
@@ -1094,7 +1172,7 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 						<?php do_action( 'astra_before_archive_title' ); ?>
 						<h1 class='page-title ast-archive-title'><?php echo esc_html( apply_filters( 'astra_author_page_title', $author_name_html ) ); ?></h1>
 						<?php do_action( 'astra_after_archive_title' ); ?>
-						<p><?php echo $author_description_html; ?></p>
+						<p><?php echo wp_kses_post( $author_description ); ?></p>
 						<?php do_action( 'astra_after_archive_description' ); ?>
 					</div>
 					<div class="ast-author-avatar">
@@ -1105,9 +1183,8 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 				<?php
 
 			} else {
-				$taxonomy_banner_content      = astra_get_taxonomy_banner_legacy_layout();
-				$taxonomy_banner_content_html = is_string( $taxonomy_banner_content ) ? wp_kses_post( $taxonomy_banner_content ) : '';
-				echo $taxonomy_banner_content_html;
+				$taxonomy_banner_content = astra_get_taxonomy_banner_legacy_layout();
+				echo wp_kses_post( $taxonomy_banner_content );
 			}
 		}
 	}
@@ -1658,7 +1735,7 @@ function astra_check_current_post_comment_enabled() {
  * @return boolean false if it is an existing user , true if not.
  */
 function astra_zero_font_size_case() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return apply_filters( 'astra_zero_font_size_case', isset( $astra_settings['astra-zero-font-size-case-css'] ) ? false : true );
 }
 
@@ -1680,7 +1757,7 @@ function astra_wp_version_compare( $version, $compare ) {
  * @return bool true|false.
  */
 function astra_block_based_legacy_setup() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return ( isset( $astra_settings['blocks-legacy-setup'] ) && isset( $astra_settings['wp-blocks-ui'] ) && 'legacy' === $astra_settings['wp-blocks-ui'] ) ? true : false;
 }
 
@@ -1690,7 +1767,7 @@ function astra_block_based_legacy_setup() {
  * @return bool true|false.
  */
 function astra_check_is_structural_setup() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return apply_filters( 'astra_get_option_customizer-default-layout-update', isset( $astra_settings['customizer-default-layout-update'] ) ? false : true ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 }
 
@@ -1701,7 +1778,7 @@ function astra_check_is_structural_setup() {
  * @return bool true|false.
  */
 function astra_check_old_sidebar_user() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return apply_filters( 'astra_old_global_sidebar_defaults', isset( $astra_settings['astra-old-global-sidebar-default'] ) ? false : true );
 }
 
@@ -1712,7 +1789,7 @@ function astra_check_old_sidebar_user() {
  * @return bool true|false.
  */
 function astra_load_woocommerce_login_form_password_icon() {
-	$astra_settings = get_option( ASTRA_THEME_SETTINGS );
+	$astra_settings = astra_get_options();
 	return apply_filters( 'astra_get_option_woo-show-password-icon', isset( $astra_settings['woo-show-password-icon'] ) ? false : true ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 }
 
@@ -1925,7 +2002,6 @@ function astra_render_svg_mask( $id, $filter_name, $color ) {
 	echo astra_get_filter_svg( $id, apply_filters( 'astra_' . $filter_name, $svg_color ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
-
 /**
  * Returns an array of logo svg icons.
  *
@@ -1943,7 +2019,7 @@ function astra_get_logo_svg_icons_array() {
 
 	for ( $i = 0; $i < 4; $i++ ) {
 		$file = "{$icons_dir}/icons-v6-{$i}.php";
-		
+
 		if ( file_exists( $file ) ) {
 			$icons = include_once $file;
 
@@ -1969,4 +2045,59 @@ function astra_get_logo_svg_icons_array() {
 	}
 
 	return $ast_all_svg_icons;
+}
+
+/**
+ * Retrieve the post type for the current page based on category, tag, or custom taxonomy archives.
+ *
+ * @return string The detected post type.
+ *
+ * @since 4.8.4
+ */
+function astra_get_post_type() {
+	$post_type = get_post_type();
+
+	// If post type not found check for taxonomy archives.
+	if ( ! $post_type ) {
+		// Get the queried object (category, tag, or custom taxonomy).
+		$queried_object = get_queried_object();
+
+		if ( is_category() || is_tag() || is_tax() ) {
+			$taxonomy   = $queried_object->taxonomy ?? '';
+			$post_types = get_post_types();
+			
+			// Loop through all post types to see which ones support the current taxonomy.
+			foreach ( $post_types as $type ) {
+				if ( in_array( $taxonomy, get_object_taxonomies( $type ) ) ) {
+					// If a custom post type matches the taxonomy, assign it.
+					$post_type = $type;
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Filter the detected post type before returning.
+	 *
+	 * @param string $post_type The detected post type.
+	 */
+	return apply_filters( 'astra_get_post_type', strval( $post_type ) );
+}
+
+/**
+ * Get Astra's upgrade URL based on org or woo package version.
+ *
+ * @param string $type Type of upgrade URL.
+ * @since 4.8.4
+ * @return string Upgrade URL.
+ */
+function astra_get_upgrade_url( $type = 'pro' ) {
+	$upgrade_url = 'pricing' === $type ? astra_get_pro_url( 'https://wpastra.com/pricing/', 'customizer', 'free-theme', 'main-cta' ) : astra_get_pro_url( 'https://wpastra.com/pro/', 'dashboard', 'free-theme', 'upgrade-now' );
+	/** @psalm-suppress TypeDoesNotContainType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+	if ( false === ASTRA_THEME_ORG_VERSION ) {
+		/** @psalm-suppress TypeDoesNotContainType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+		$upgrade_url = 'https://woo.com/products/astra-pro/';
+	}
+	return $upgrade_url;
 }

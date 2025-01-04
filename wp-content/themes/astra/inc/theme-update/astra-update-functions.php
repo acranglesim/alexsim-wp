@@ -1001,7 +1001,6 @@ function astra_theme_background_updater_4_6_6() {
  * @since 4.6.11
  * @return void
  */
-
 function astra_theme_background_updater_4_6_11() {
 	$theme_options = get_option( 'astra-settings', array() );
 
@@ -1121,7 +1120,6 @@ function astra_theme_background_updater_4_7_1() {
 	}
 }
 
-
 /**
  * Handle backward compatibility Spectra Heading max-width with Astra when fullwidth layout is selected.
  *
@@ -1133,6 +1131,85 @@ function astra_theme_background_updater_4_8_0() {
 
 	if ( ! isset( $theme_options['enable-4-8-0-compatibility'] ) ) {
 		$theme_options['enable-4-8-0-compatibility'] = false;
+		update_option( 'astra-settings', $theme_options );
+	}
+}
+
+/**
+ * Handle backward compatibility Single post outside spacing issue.
+ *
+ * @since 4.8.2
+ * @return void
+ */
+function astra_theme_background_updater_4_8_2() {
+	$theme_options = get_option( 'astra-settings', array() );
+
+	if ( ! isset( $theme_options['v4-8-2-backward-option'] ) ) {
+		$theme_options['v4-8-2-backward-option'] = false;
+		update_option( 'astra-settings', $theme_options );
+	}
+}
+
+/**
+ * Handle backward compatibility for Spectra container margin left and right.
+ * Handle backward compatibility for Heading font size px to em conversion cases.
+ *
+ * @since 4.8.4
+ * @return void
+ */
+function astra_theme_background_updater_4_8_4() {
+	$theme_options = get_option( 'astra-settings', array() );
+
+	if ( ! isset( $theme_options['enable-4-8-4-compatibility'] ) ) {
+		$theme_options['enable-4-8-4-compatibility'] = false;
+		update_option( 'astra-settings', $theme_options );
+	}
+
+	if ( ! isset( $theme_options['astra-heading-font-size-compatibility'] ) ) {
+				$theme_options['astra-heading-font-size-compatibility'] = false;
+		update_option( 'astra-settings', $theme_options );
+	}
+}
+
+/**
+ * Set key to show NPS survey popup immediately for old user.
+ *
+ * @since 4.8.7
+ * @return void
+ */
+function astra_theme_background_updater_4_8_7() {
+
+	// Bail early if the starter template is being imported.
+	if ( get_option( 'astra_sites_import_started' ) === 'yes' ) {
+		return;
+	}
+
+	update_option( 'astra_nps_show', true );
+
+}
+
+/**
+ * Handle backward compatibility on version 4.8.9.
+ * 1. Reorganizing color palettes.
+ *
+ * @since 4.8.9
+ * @return void
+ */
+function astra_theme_background_updater_4_8_9() {
+	// Bail early if the starter template is being imported.
+	if ( get_option( 'astra_sites_import_started' ) === 'yes' || astra_get_option( 'new-color-labels' ) ) {
+		astra_update_option( 'new-color-labels', true );
+	}
+
+	$theme_options = get_option( 'astra-settings', array() );
+	if ( ! isset( $theme_options['enable-4-8-9-compatibility'] ) ) {
+		$theme_options['enable-4-8-9-compatibility'] = false;
+		update_option( 'astra-settings', $theme_options );
+	}
+
+	// Enable off canvas move body option for existing users.
+	if ( ! isset( $theme_options['off-canvas-move-body'] ) ) {
+		$theme_options['off-canvas-move-body'] = true;
 		update_option( 'astra-settings', $theme_options );
 	}
 }

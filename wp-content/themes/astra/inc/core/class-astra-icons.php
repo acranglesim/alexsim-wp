@@ -3,11 +3,11 @@
  * Icons for Astra theme.
  *
  * @package     Astra
- * @author      Brainstorm Force
- * @copyright   Copyright (c) 2020, Brainstorm Force
  * @link        https://www.brainstormforce.com
  * @since       Astra 3.3.0
  */
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Icons Initial Setup
@@ -34,7 +34,7 @@ class Astra_Icons {
 	 * @return boolean should be svg or font.
 	 */
 	public static function is_svg_icons() {
-		$astra_settings = get_option( ASTRA_THEME_SETTINGS, array() );
+		$astra_settings = astra_get_options();
 		return apply_filters( 'astra_is_svg_icons', isset( $astra_settings['can-update-astra-icons-svg'] ) ? $astra_settings['can-update-astra-icons-svg'] : true );
 	}
 
@@ -68,7 +68,7 @@ class Astra_Icons {
 					break;
 
 				case 'search':
-					$output = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="-893 488 142 142" enable-background="new -888 480 142 142" xml:space="preserve">
+					$output = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="-893 477 142 142" enable-background="new -888 480 142 142" xml:space="preserve">
 						  <path d="M-787.4,568.7h-6.3l-2.4-2.4c7.9-8.7,12.6-20.5,12.6-33.1c0-28.4-22.9-51.3-51.3-51.3  c-28.4,0-51.3,22.9-51.3,51.3c0,28.4,22.9,51.3,51.3,51.3c12.6,0,24.4-4.7,33.1-12.6l2.4,2.4v6.3l39.4,39.4l11.8-11.8L-787.4,568.7  L-787.4,568.7z M-834.7,568.7c-19.7,0-35.5-15.8-35.5-35.5c0-19.7,15.8-35.5,35.5-35.5c19.7,0,35.5,15.8,35.5,35.5  C-799.3,553-815,568.7-834.7,568.7L-834.7,568.7z"/>
 						  </svg>';
 					break;
