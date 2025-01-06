@@ -64,7 +64,7 @@
   roles: %w{web app},
   ssh_options: {
     user: 'deploy',
-    keys: %w(/Users/alex/.ssh/deploy_id_rsa)
+    keys: %w(/var/lib/jenkins/.ssh/deploy_id_rsa)
   }
 
 
