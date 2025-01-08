@@ -60,7 +60,7 @@
 #     # password: 'please use keys'
 #   }
 
- server '18.0.1.2',
+ server '10.0.1.2',
   roles: %w{web app},
   ssh_options: {
     user: 'deploy',
