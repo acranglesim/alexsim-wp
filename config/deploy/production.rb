@@ -60,7 +60,7 @@
 #     # password: 'please use keys'
 #   }
 
- server '18.130.166.163',
+ server '18.0.1.2',
   roles: %w{web app},
   ssh_options: {
     user: 'deploy',
@@ -70,7 +70,7 @@
 
   task :restart_php do
     on roles(:web) do
-      execute "sudo /usr/sbin/service php8.3-fpm restart"
+      execute "sudo /usr/sbin/service php8.2-fpm restart"
     end
   end
   after "deploy:published", "restart_php"
