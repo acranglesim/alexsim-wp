@@ -73,5 +73,13 @@
       execute "sudo /usr/sbin/service php8.2-fpm restart"
     end
   end
+
+    task :reset_permissions do
+      on roles(:web) do
+        execute "sudo /usr/local/bin/wppermissions"
+      end
+    end
+
   after "deploy:published", "restart_php"
+  after "deploy:published", "reset_permissions"
 
