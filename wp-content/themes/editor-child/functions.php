@@ -19,9 +19,4 @@ function add_prism() {
     wp_enqueue_script('prismJS');
 }
 
-function my_mail_from( $email ) {
-    return "system@alexandchelsea.co.uk";
-}
-
 add_action('wp_enqueue_scripts', 'add_prism');
-add_filter( 'wp_mail_from', 'my_mail_from' );
