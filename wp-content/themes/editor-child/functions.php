@@ -19,3 +19,4 @@ function add_prism() {
     wp_enqueue_script('prismJS');
 }
 add_action('wp_enqueue_scripts', 'add_prism');
+apply_filters( 'wp_mail_from', 'system@alexandchelsea.co.uk' );
