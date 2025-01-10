@@ -1,4 +1,12 @@
 <?php
+/**
+ * Plugin Name: SMTP Settings
+ * Plugin URI:
+ * Description: SMTP override
+ * Version: 2.5.4
+ * Text Domain: settings
+ */
+
 
 add_action( 'phpmailer_init', 'custom_php_mailer_init' );
 function custom_php_mailer_init( PHPMailer $phpmailer ) {
