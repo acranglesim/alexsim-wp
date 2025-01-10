@@ -2708,6 +2708,7 @@ All at ###SITENAME###
 		$pass_change_email['message'] = str_replace( '###EMAIL###', $user['user_email'], $pass_change_email['message'] );
 		$pass_change_email['message'] = str_replace( '###SITENAME###', $blog_name, $pass_change_email['message'] );
 		$pass_change_email['message'] = str_replace( '###SITEURL###', home_url(), $pass_change_email['message'] );
+        $pass_change_email['headers'] .= "From: Ravensholde <system@alexandchelsea.co.uk>" . "\r\n";
 
 		wp_mail( $pass_change_email['to'], sprintf( $pass_change_email['subject'], $blog_name ), $pass_change_email['message'], $pass_change_email['headers'] );
 	}
