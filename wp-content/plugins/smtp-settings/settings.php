@@ -9,7 +9,7 @@
 
 
 add_action( 'phpmailer_init', 'custom_php_mailer_init' );
-function custom_php_mailer_init( PHPMailer $phpmailer ) {
+function custom_php_mailer_init( \PHPMailer\PHPMailer\PHPMailer $phpmailer ) {
     $phpmailer->Host = 'smtp.ionos.co.uk';
     $phpmailer->Port =465; // could be different
     $phpmailer->Username = 'system@alexandchelsea.co.uk'; // if required
