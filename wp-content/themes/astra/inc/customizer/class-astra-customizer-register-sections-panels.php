@@ -17,7 +17,6 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 	 * Customizer Sanitizes Initial setup
 	 */
 	class Astra_Customizer_Register_Sections_Panels extends Astra_Customizer_Config_Base {
-
 		/**
 		 * Register Panels and Sections for Customizer.
 		 *
@@ -55,13 +54,13 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Site Layout Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/site-layout-overview/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/site-layout-overview/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 								array(
 									'text'  => __( 'Container Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/container-overview/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/container-overview/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -100,7 +99,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Site Identity Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/site-identity-free/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/site-identity-free/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -127,7 +126,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Primary Header Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/header-overview/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/header-overview/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -183,7 +182,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Footer Bar Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/footer-bar/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/footer-bar/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -239,7 +238,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Sidebar Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/sidebar-free/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/sidebar-free/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -248,10 +247,10 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 				),
 
 				/**
-				* Accessibility Panel
-				*
-				* @since 4.1.0
-				*/
+				 * Accessibility Panel
+				 *
+				 * @since 4.1.0
+				 */
 				array(
 					'name'     => 'section-accessibility',
 					'type'     => 'section',
@@ -276,7 +275,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Colors & Background Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/colors-background/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/colors-background/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -318,7 +317,7 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 								array(
 									'text'  => __( 'Typography Overview', 'astra' ) . ' &#187;',
 									'attrs' => array(
-										'href' => astra_get_pro_url( 'https://wpastra.com/docs/typography-free/?utm_source=wp&utm_medium=dashboard', 'customizer', 'helpful_information', 'astra_theme' ),
+										'href' => astra_get_pro_url( '/docs/typography-free/', 'free-theme', 'customizer', 'helpful_information' ),
 									),
 								),
 							),
@@ -442,7 +441,6 @@ if ( ! class_exists( 'Astra_Customizer_Register_Sections_Panels' ) ) {
 		}
 	}
 }
-
 
 /**
  * Kicking this off by calling 'get_instance()' method

@@ -116,7 +116,12 @@ if ( ! function_exists( 'astra_responsive_font' ) ) {
 	 */
 	function astra_responsive_font( $font, $device = 'desktop', $default = '' ) {
 
-		if ( isset( $font[ $device ] ) && isset( $font[ $device . '-unit' ] ) ) {
+		if ( isset( $font[ $device ] ) ) {
+			// Set default unit to 'px' if not explicitly set for the device.
+			if ( ! isset( $font[ $device . '-unit' ] ) ) {
+				$font[ $device . '-unit' ] = 'px';
+			}
+
 			if ( '' != $default ) {
 				$font_size = astra_get_css_value( $font[ $device ], $font[ $device . '-unit' ], $default );
 			} else {
@@ -174,6 +179,22 @@ if ( ! function_exists( 'astra_get_font_css_value' ) ) {
 
 			case 'px':
 				if ( is_numeric( $value ) || strpos( $value, 'px' ) ) {
+					/**
+					 * Filter to disable px to rem conversion.
+					 *
+					 * This filter allows developers to disable the automatic conversion of font sizes from `px` to `rem` when calculating CSS values.
+					 *
+					 * @param bool $disable_px_to_rem Whether to disable the px to rem conversion. Default false.
+					 *
+					 * @since 4.8.10
+					 */
+					$disable_px_to_rem = apply_filters( 'astra_disable_px_to_rem_conversion', false );
+
+					if ( $disable_px_to_rem ) {
+						$css_val = esc_attr( $value ) . $unit;
+						break;
+					}
+
 					$value            = intval( $value );
 					$fonts            = array();
 					$body_font_size   = astra_get_option( 'font-size-body' );
@@ -487,7 +508,7 @@ if ( ! function_exists( 'astra_get_options' ) ) {
 	function astra_get_options() {
 		// Ensure we're not interfering during WordPress installation.
 		if ( wp_installing() ) {
-			return [];
+			return array();
 		}
 
 		/**
@@ -751,6 +772,8 @@ if ( ! function_exists( 'astra_get_post_id' ) ) {
 
 			if ( is_home() ) {
 				$post_id = get_option( 'page_for_posts' );
+			} elseif ( function_exists( 'is_shop' ) && is_shop() && function_exists( 'wc_get_page_id' ) ) {
+				$post_id = wc_get_page_id( 'shop' );
 			} elseif ( is_archive() ) {
 				global $wp_query;
 				$post_id = $wp_query->get_queried_object_id();
@@ -1172,7 +1195,12 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 						<?php do_action( 'astra_before_archive_title' ); ?>
 						<h1 class='page-title ast-archive-title'><?php echo esc_html( apply_filters( 'astra_author_page_title', $author_name_html ) ); ?></h1>
 						<?php do_action( 'astra_after_archive_title' ); ?>
+						<?php
+						/** @psalm-suppress RedundantConditionGivenDocblockType */
+						if ( is_string( $author_description ) && ! empty( $author_description ) ) :
+							?>
 						<p><?php echo wp_kses_post( $author_description ); ?></p>
+						<?php endif; ?>
 						<?php do_action( 'astra_after_archive_description' ); ?>
 					</div>
 					<div class="ast-author-avatar">
@@ -1184,7 +1212,9 @@ if ( ! function_exists( 'astra_archive_page_info' ) ) {
 
 			} else {
 				$taxonomy_banner_content = astra_get_taxonomy_banner_legacy_layout();
-				echo wp_kses_post( $taxonomy_banner_content );
+				if ( is_string( $taxonomy_banner_content ) && ! empty( $taxonomy_banner_content ) ) {
+					echo wp_kses_post( $taxonomy_banner_content );
+				}
 			}
 		}
 	}
@@ -1327,24 +1357,31 @@ if ( ! function_exists( 'astra_get_pro_url' ) ) :
 	 * Returns an URL with utm tags
 	 * the admin settings page.
 	 *
-	 * @param string $url    URL fo the site.
-	 * @param string $source utm source.
-	 * @param string $medium utm medium.
-	 * @param string $campaign utm campaign.
+	 * @param string $path     Path for the Website URL.
+	 * @param string $source   UMM source.
+	 * @param string $medium   UTM medium.
+	 * @param string $campaign UTM campaign.
 	 * @return mixed
 	 */
-	function astra_get_pro_url( $url, $source = '', $medium = '', $campaign = '' ) {
-
+	function astra_get_pro_url( $path, $source = '', $medium = '', $campaign = '' ) {
+		$url           = esc_url( ASTRA_WEBSITE_BASE_URL . $path );
 		$astra_pro_url = trailingslashit( $url );
 
 		// Set up our URL if we have a source.
 		if ( ! empty( $source ) ) {
-			$astra_pro_url = add_query_arg( 'utm_source', sanitize_text_field( $source ), $url );
+			$astra_pro_url = add_query_arg( 'utm_source', sanitize_text_field( $source ), $astra_pro_url );
 		}
+
+		// Modify the utm_source parameter using the UTM ready link function to include tracking information.
+		if ( is_callable( '\BSF_UTM_Analytics\Inc\Utils::get_utm_ready_link' ) ) {
+			$astra_pro_url = \BSF_UTM_Analytics\Inc\Utils::get_utm_ready_link( $astra_pro_url, 'astra' );
+		}
+
 		// Set up our URL if we have a medium.
 		if ( ! empty( $medium ) ) {
 			$astra_pro_url = add_query_arg( 'utm_medium', sanitize_text_field( $medium ), $astra_pro_url );
 		}
+
 		// Set up our URL if we have a campaign.
 		if ( ! empty( $campaign ) ) {
 			$astra_pro_url = add_query_arg( 'utm_campaign', sanitize_text_field( $campaign ), $astra_pro_url );
@@ -2093,11 +2130,26 @@ function astra_get_post_type() {
  * @return string Upgrade URL.
  */
 function astra_get_upgrade_url( $type = 'pro' ) {
-	$upgrade_url = 'pricing' === $type ? astra_get_pro_url( 'https://wpastra.com/pricing/', 'customizer', 'free-theme', 'main-cta' ) : astra_get_pro_url( 'https://wpastra.com/pro/', 'dashboard', 'free-theme', 'upgrade-now' );
 	/** @psalm-suppress TypeDoesNotContainType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-	if ( false === ASTRA_THEME_ORG_VERSION ) {
+	if ( ! ASTRA_THEME_ORG_VERSION ) {
 		/** @psalm-suppress TypeDoesNotContainType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-		$upgrade_url = 'https://woo.com/products/astra-pro/';
+		return 'https://woo.com/products/astra-pro/';
 	}
+
+	switch ( $type ) {
+		case 'pricing':
+			$upgrade_url = astra_get_pro_url( '/pricing/', 'free-theme', 'customizer', 'main-cta' );
+			break;
+		case 'dashboard':
+			$upgrade_url = astra_get_pro_url( '/pricing/', 'free-theme', 'dashboard', 'upgrade' );
+			break;
+		case 'customizer':
+			$upgrade_url = astra_get_pro_url( '/pricing/', 'free-theme', 'dashboard', 'upgrade' );
+			break;
+		default:
+			$upgrade_url = astra_get_pro_url( '/pro/', 'free-theme', 'dashboard', 'upgrade-now' );
+			break;
+	}
+
 	return $upgrade_url;
 }

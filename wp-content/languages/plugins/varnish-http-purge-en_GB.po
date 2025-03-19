@@ -1,0 +1,628 @@
+# Translation of Plugins - Proxy Cache Purge - Stable (latest release) in English (UK)
+# This file is distributed under the same license as the Plugins - Proxy Cache Purge - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-03-27 20:37:41+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: en_GB\n"
+"Project-Id-Version: Plugins - Proxy Cache Purge - Stable (latest release)\n"
+
+#. Author of the plugin
+#: varnish-http-purge.php
+msgid "Mika Epstein, Danila Vershinin"
+msgstr "Mika Epstein, Danila Vershinin"
+
+#. translators: %1 is the type of caching service detected (i.e. nginx or
+#. varnish).
+#: debug.php:320
+msgid "We detected that the %1s caching service is running, but we are unable to determine that it's working. Make sure your server returns both Age and X-Varnish headers."
+msgstr "We detected that the %1s caching service is running, but we are unable to determine that it's working. Make sure your server returns both Age and X-Varnish headers."
+
+#: debug.php:766
+msgid "This plugin is usually fine, however it has been known to have issues with caching. Sometimes its pages will not be properly updated. This is being worked on, but has no ETA for resolution."
+msgstr "This plugin is usually fine, however it has been known to have issues with caching. Sometimes its pages will not be properly updated. This is being worked on, but has no ETA for resolution."
+
+#: settings.php:514
+msgid "Save IP Settings"
+msgstr "Save IP Settings"
+
+#: settings.php:506
+msgid "Save Maxposts Settings"
+msgstr "Save Maxposts Settings"
+
+#: settings.php:498
+msgid "Save Devmode Settings"
+msgstr "Save Devmode Settings"
+
+#: settings.php:193
+msgid "You have entered an invalid number."
+msgstr "You have entered an invalid number."
+
+#: settings.php:178
+msgid "The default value is \"50\" URLs. It is not recommended to set this above 75."
+msgstr "The default value is \"50\" URLs. It is not recommended to set this above 75."
+
+#: settings.php:176
+msgid "A maximum value has been defined in your wp-config file, so it is not editable in settings."
+msgstr "A maximum value has been defined in your wp-config file, so it is not editable in settings."
+
+#: settings.php:152
+msgid "Since it's possible to purge multiple URLs in sequence, there can be cases where too many URLs are queued at a time. In order to minimize disruption, the plugin has a limit of how many URLs can be queued before it runs a \"purge all\" instead. You can customize that value here."
+msgstr "Since it's possible to purge multiple URLs in sequence, there can be cases where too many URLs are queued at a time. In order to minimise disruption, the plugin has a limit of how many URLs can be queued before it runs a \"purge all\" instead. You can customise that value here."
+
+#: settings.php:201
+msgid "Number of Maximum URLs before a purge have been updated."
+msgstr "Maximum number of URLs before a purge has been updated."
+
+#: settings.php:63
+msgid "Maximum Individual URLs before Full Purge"
+msgstr "Maximum Individual URLs before Full Purge"
+
+#: debug.php:315
+msgid "We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri), your host removed the X-Cacheable tag, or if you're in the middle of a DNS move."
+msgstr "We were unable to find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri), your host removed the X-Cacheable tag, or if you're in the middle of a DNS move."
+
+#: debug.php:670
+msgid "CloudFlare is caching however you appear to be using Automatic Platform Optimization (APO). You may face issues with emptying cache on Varnish and APO depending on your webhost. If you find that saving posts takes an exceptionally long time, or does not appear to update content, try disabling APO."
+msgstr "CloudFlare is caching however you appear to be using Automatic Platform Optimisation (APO). You may face issues with emptying cache on Varnish and APO depending on your webhost. If you find that saving posts takes an exceptionally long time, or does not appear to update content, try disabling APO."
+
+#: debug.php:663
+msgid "CloudFlare is caching properly."
+msgstr "CloudFlare is caching properly."
+
+#: debug.php:657
+msgid "CloudFlare reported this page as not cached. That may be okay. If it goes away when you re-run this check, you're fine."
+msgstr "CloudFlare reported this page as not cached. That may be okay. If it goes away when you re-run this check, you're fine."
+
+#: varnish-http-purge.php:260
+msgid "Cache emptied!"
+msgstr "Cache emptied!"
+
+#: settings.php:290
+msgid "Proxy Cache IP Updated"
+msgstr "Proxy Cache IP Updated"
+
+#: settings.php:285
+msgid "Proxy Cache IPs Updated"
+msgstr "Proxy Cache IPs Updated"
+
+#: settings.php:219
+msgid "You may use multiple IPs by separating them with a comma (,). If you do so, all IPs will be sent purge requests. This can be useful if you're using round robin DNS entries or hosting multiple proxy cache solutions (i.e. Nginx and Varnish)."
+msgstr "You may use multiple IPs by separating them with a comma (,). If you do so, all IPs will be sent purge requests. This can be useful if you're using round robin DNS entries or hosting multiple proxy cache solutions (i.e. Nginx and Varnish)."
+
+#: debug.php:757
+msgid "This plugin may require add-ons to ensure full compatibility. Please check their documentation."
+msgstr "This plugin may require add-ons to ensure full compatibility. Please check their documentation."
+
+#: debug.php:432
+msgid "This site is hosted on DreamHost (as DreamPress). The results of this scan will be accurate."
+msgstr "This site is hosted on DreamHost (as DreamPress). The results of this scan will be accurate."
+
+#. Translators: %d is the number of issues reported
+#: health-check.php:81
+msgid "Proxy Cache Purge has reported caching errors (%s)"
+msgstr "Proxy Cache Purge has reported caching errors (%s)"
+
+#. Translators: %d is the number of issues reported
+#: health-check.php:77
+msgid "The most recent cache status check reported %d issue."
+msgid_plural "The most recent cache status check reported %d issues."
+msgstr[0] "The most recent cache status check reported %d issue."
+msgstr[1] "The most recent cache status check reported %d issues."
+
+#: health-check.php:72
+msgid "Enable Caching"
+msgstr "Enable Caching"
+
+#: health-check.php:67
+msgid "Proxy Cache Purge is active but in dev mode, which means it will not serve cached content to your users. If this is intentional, carry on. Otherwise you should re-enable caching."
+msgstr "Proxy Cache Purge is active but in dev mode, which means it will not serve cached content to your users. If this is intentional, carry on. Otherwise you should re-enable caching."
+
+#: health-check.php:64
+msgid "Proxy Cache Purge is in development mode"
+msgstr "Proxy Cache Purge is in development mode"
+
+#: health-check.php:51
+msgid "Caching can help load your site more quickly for visitors. You're doing great!"
+msgstr "Caching can help load your site more quickly for visitors. You're doing great!"
+
+#: health-check.php:46
+msgid "Performance"
+msgstr "Performance"
+
+#: health-check.php:43
+msgid "Proxy Cache Purge is working"
+msgstr "Proxy Cache Purge is working"
+
+#: health-check.php:16
+msgid "Proxy Cache Purge Status"
+msgstr "Proxy Cache Purge Status"
+
+#. Plugin URI of the plugin
+#: varnish-http-purge.php
+msgid "https://github.com/dvershinin/varnish-http-purge"
+msgstr "https://github.com/dvershinin/varnish-http-purge"
+
+#: wp-cli.php:266
+msgid "Unable to retrieve data. Debug cannot be run at this time. Please run \"curl -I [URL]\" manually on your personal computer."
+msgstr "Unable to retrieve data. Debug cannot be run at this time. Please run \"curl -I [URL]\" manually on your personal computer."
+
+#. translators: %s is the state of dev mode.
+#: wp-cli.php:157
+msgid "Proxy Cache Purge development mode has been %s."
+msgstr "Proxy Cache Purge development mode has been %s."
+
+#: wp-cli.php:114
+msgid "Proxy Cache Purge has flushed your cache."
+msgstr "Proxy Cache Purge has flushed your cache."
+
+#: settings.php:487
+msgid "Proxy Cache Purge Settings"
+msgstr "Proxy Cache Purge Settings"
+
+#: varnish-http-purge.php:304
+msgid "Proxy Cache Purge Development Mode has been activated via wp-config."
+msgstr "Proxy Cache Purge Development Mode has been activated via wp-config."
+
+#: settings.php:521
+msgid "The cache check page remains available to assist you in determining if pages on your site are properly cached by your server."
+msgstr "The cache check page remains available to assist you in determining if pages on your site are properly cached by your server."
+
+#: settings.php:317
+msgid "This feature performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in resolve potential conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket."
+msgstr "This feature performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you resolve potential conflicts on your own. When filing an issue with your webhost, we recommend you include the output in your ticket."
+
+#: settings.php:252
+msgid "A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings."
+msgstr "A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings."
+
+#: settings.php:220
+msgid "If your webhost set the service up for you, as is the case with DreamPress or WP Engine, ask them for the specifics."
+msgstr "If your webhost set the service up for you, as is the case with DreamPress or WP Engine, ask them for the specifics."
+
+#: settings.php:217
+msgid "There are cases when a custom IP Address is needed to for the plugin to properly communicate with the cache service. If you're using a CDN like Cloudflare or a Firewall Proxy like Sucuri, or your cache is Nginx based, you may need to customize this setting."
+msgstr "There are cases when a custom IP Address is needed to for the plugin to properly communicate with the cache service. If you're using a CDN like Cloudflare or a Firewall Proxy like Sucuri, or your cache is Nginx based, you may need to customise this setting."
+
+#: settings.php:105
+msgid "Development Mode has been activated via wp-config and cannot be deactivated here."
+msgstr "Development Mode has been activated via wp-config and cannot be deactivated here."
+
+#. translators: %s is the time (in hours) until Development Mode expires.
+#: settings.php:103
+msgid "Development Mode is active until %s. It will automatically disable after that time."
+msgstr "Development Mode is active until %s. It will automatically disable after that time."
+
+#: settings.php:45
+msgid "Proxy Cache"
+msgstr "Proxy Cache"
+
+#. Plugin Name of the plugin
+#: varnish-http-purge.php settings.php:45 settings.php:46
+msgid "Proxy Cache Purge"
+msgstr "Proxy Cache Purge"
+
+#: debug.php:348
+msgid "Your Nginx Proxy is set up correctly."
+msgstr "Your Nginx Proxy is set up correctly."
+
+#. translators: $1$s - DreamHost URL; $2$s - plugin name; $3$s - WP.org review
+#. link; $4$s - WP.org review link.
+#: settings.php:573
+msgid "Brought to you <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">DreamHost</a>. Please rate %2$s <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href=\"%4$s\" target=\"_blank\" rel=\"noopener\">WordPress.org</a> to help us spread the word."
+msgstr "Brought to you <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">DreamHost</a>. Please rate %2$s <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href=\"%4$s\" target=\"_blank\" rel=\"noopener\">WordPress.org</a> to help us spread the word."
+
+#. translators: %1$s is the time until dev mode expires.
+#: varnish-http-purge.php:316
+msgid "Proxy Cache Purge Development Mode is active for the next %1$s."
+msgstr "Proxy Cache Purge Development Mode is active for the next %1$s."
+
+#: settings.php:520
+msgid "Editing these settings via the Dashboard is disabled on Multisite as incorrect edits can prevent your network from loading entirely. You can toggle debug mode globally using the admin toolbar option, and you should define your Proxy IP directly into your wp-config file for best results."
+msgstr "Editing these settings via the Dashboard is disabled on Multisite as incorrect edits can prevent your network from loading entirely. You can toggle debug mode globally using the admin toolbar option, and you should define your Proxy IP directly into your wp-config file for best results."
+
+#: wp-cli.php:235
+msgid "Grep complete. If no data was output, you're good!"
+msgstr "Grep complete. If no data was output, you're good!"
+
+#. translators: %s is the pattern string.
+#: wp-cli.php:208
+msgid "Grepping for: %s."
+msgstr "Grepping for: %s."
+
+#: wp-cli.php:203
+msgid "Robots are scanning your site for possible issues with caching... "
+msgstr "Robots are scanning your site for possible issues with caching... "
+
+#. translators: %s is the bad command.
+#: wp-cli.php:151
+msgid "%s is not a valid subcommand for development mode."
+msgstr "%s is not a valid subcommand for development mode."
+
+#. translators: %s is the state of dev mode.
+#: wp-cli.php:147
+msgid "Proxy Cache Purge development mode is currently %s."
+msgstr "Proxy Cache Purge development mode is currently %s."
+
+#: wp-cli.php:145 wp-cli.php:155
+msgid "deactivated"
+msgstr "deactivated"
+
+#: wp-cli.php:145 wp-cli.php:155
+msgid "activated"
+msgstr "activated"
+
+#. translators: %2$s are the params being flushed.
+#: wp-cli.php:111
+msgid "Proxy Cache Purge is flushing the URL %1$s with params %2$s."
+msgstr "Proxy Cache Purge is flushing the URL %1$s with params %2$s."
+
+#: wp-cli.php:103
+msgid "Your cache must be purged manually."
+msgstr "Your cache must be purged manually."
+
+#. translators: %2$s is the version of WordPress.
+#: wp-cli.php:101
+msgid "To flush your cache, please run the following command:"
+msgstr "To flush your cache, please run the following command:"
+
+#. translators: %2$s is the version of WordPress.
+#: wp-cli.php:100
+msgid "This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.25.0 or greater. You're using WP-CLI %1$s and WordPress %2$s."
+msgstr "This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.25.0 or greater. You're using WP-CLI %1$s and WordPress %2$s."
+
+#: varnish-http-purge.php:424
+msgid "Pause Cache (24h)"
+msgstr "Pause Cache (24h)"
+
+#: varnish-http-purge.php:418
+msgid "Restart Cache"
+msgstr "Restart Cache"
+
+#: varnish-http-purge.php:406 varnish-http-purge.php:409
+msgid "Purge Database Cache"
+msgstr "Purge Database Cache"
+
+#. translators: %s is the state of cache.
+#: varnish-http-purge.php:365
+msgid "Cache (%s)"
+msgstr "Cache (%s)"
+
+#. translators: %2$s is a link to the settings pages.
+#: varnish-http-purge.php:313
+msgid "Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href=\"%2$s\">Proxy Settings Page</a>."
+msgstr "Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href=\"%2$s\">Proxy Settings Page</a>."
+
+#: varnish-http-purge.php:270
+msgid "Development Mode deactivated."
+msgstr "Development Mode deactivated."
+
+#: settings.php:132 varnish-http-purge.php:270
+msgid "Development Mode activated for the next 24 hours."
+msgstr "Development Mode activated for the next 24 hours."
+
+#: settings.php:489
+msgid "Proxy Cache Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes."
+msgstr "Proxy Cache Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes."
+
+#: settings.php:467 wp-cli.php:256
+msgid "An unknown error has occurred."
+msgstr "An unknown error has occurred."
+
+#: settings.php:456 wp-cli.php:250
+msgid "You must provide a URL on your own domain to scan."
+msgstr "You must provide a URL on your own domain to scan."
+
+#: settings.php:132
+msgid "Development Mode dectivated."
+msgstr "Development Mode dectivated."
+
+#: settings.php:124
+msgid "Something has gone wrong!"
+msgstr "Something has gone wrong!"
+
+#: settings.php:107
+msgid "Activate Development Mode"
+msgstr "Activate Development Mode"
+
+#: settings.php:80
+msgid "If you need to activate development mode for extended periods of time, you can add <code>define( 'VHP_DEVMODE', true );</code> in your wp-config file."
+msgstr "If you need to activate development mode for extended periods of time, you can add <code>define( 'VHP_DEVMODE', true );</code> in your wp-config file."
+
+#: settings.php:79
+msgid "In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution."
+msgstr "In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution."
+
+#: settings.php:69
+msgid "Set Custom IP"
+msgstr "Set Custom IP"
+
+#: settings.php:68
+msgid "Configure Custom IP"
+msgstr "Configure Custom IP"
+
+#: settings.php:59
+msgid "Development Mode"
+msgstr "Development Mode"
+
+#: settings.php:58
+msgid "Development Mode Settings"
+msgstr "Development Mode Settings"
+
+#: settings.php:47
+msgid "Check Caching"
+msgstr "Check Caching"
+
+#: settings.php:46
+msgid "Settings"
+msgstr "Settings"
+
+#: debug.php:806
+msgid "No installed plugins were found on the known conflicts list."
+msgstr "No installed plugins were found on the known conflicts list."
+
+#: debug.php:765
+msgid "This plugin is usually fine, but can be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message."
+msgstr "This plugin is usually fine, but can be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message."
+
+#: debug.php:735
+msgid "No installed themes were found on the known conflicts list."
+msgstr "No installed themes were found on the known conflicts list."
+
+#: debug.php:719 debug.php:787 varnish-http-purge.php:363
+msgid "Inactive"
+msgstr "Inactive"
+
+#: debug.php:717 debug.php:792 varnish-http-purge.php:363
+msgid "Active"
+msgstr "Active"
+
+#: debug.php:623
+msgid "The header Pragma is set to to \"no-cache\" which means visitors will never get cached content."
+msgstr "The header Pragma is set to to \"no-cache\" which means visitors will never get cached content."
+
+#. translators: %s is a number indicating how many seconds old the content is.
+#: debug.php:609
+msgid "The \"Age\" header is returning %s, which means it is not properly caching. Either this URL is intentionally excluded from caching, or a theme or plugin is instructing WordPress not to cache."
+msgstr "The \"Age\" header is returning %s, which means it is not properly caching. Either this URL is intentionally excluded from caching, or a theme or plugin is instructing WordPress not to cache."
+
+#: debug.php:603
+msgid "Your domain does not report an \"Age\" header, making it impossible to determine if the page is actually serving from cache."
+msgstr "Your domain does not report an \"Age\" header, making it impossible to determine if the page is actually serving from cache."
+
+#: debug.php:505
+msgid "No active cookies have been detected on your site. You may safely ignore any warnings about cookies set by plugins or themes, as your server has properly accounted for them."
+msgstr "No active cookies have been detected on your site. You may safely ignore any warnings about cookies set by plugins or themes, as your server has properly accounted for them."
+
+#: debug.php:312
+msgid "Your site is not responding. If this happens again, please contact your webhost."
+msgstr "Your site is not responding. If this happens again, please contact your webhost."
+
+#: debug.php:309
+msgid "No known cache service has been detected on your site."
+msgstr "No known cache service has been detected on your site."
+
+#. translators: %1 is the type of caching service detected (i.e. nginx or
+#. varnish).
+#: debug.php:302
+msgid "Your %1s caching service appears to be running properly."
+msgstr "Your %1s caching service appears to be running properly."
+
+#: debug.php:292
+msgid "Nginx"
+msgstr "Nginx"
+
+#: debug.php:193
+msgid "This URL does not resolve properly. Either it was not found or it redirects incorrectly."
+msgstr "This URL does not resolve properly. Either it was not found or it redirects incorrectly."
+
+#: debug.php:764
+msgid "This plugin was removed from WordPress.org and we do not recommend it's use."
+msgstr "This plugin was removed from WordPress.org and we do not recommend its use."
+
+#: settings.php:463
+msgid "URL Scanned."
+msgstr "URL Scanned."
+
+#: health-check.php:56 settings.php:306
+msgid "Check Caching Status"
+msgstr "Check Caching Status"
+
+#: settings.php:539
+msgid "Is Caching Working?"
+msgstr "Is Caching Working?"
+
+#: debug.php:763
+msgid "This plugin is not up to date with WordPress best practices and breaks caching."
+msgstr "This plugin is not up to date with WordPress best practices and breaks caching."
+
+#: debug.php:762
+msgid "This type of caching plugin does not work well with server side caching."
+msgstr "This type of caching plugin does not work well with server side caching."
+
+#: debug.php:761
+msgid "This plugin uses cookies, which may prevent server side caching."
+msgstr "This plugin uses cookies, which may prevent server side caching."
+
+#: debug.php:760
+msgid "This plugin uses sessions, which conflicts with server side caching."
+msgstr "This plugin uses sessions, which conflicts with server side caching."
+
+#: debug.php:759
+msgid "Translation plugins that use cookies and/or sessions prevent most server side caching from running properly."
+msgstr "Translation plugins that use cookies and/or sessions prevent most server side caching from running properly."
+
+#: debug.php:758
+msgid "This plugin has unexpected results with caching, making things not function properly."
+msgstr "This plugin has unexpected results with caching, making things not function properly."
+
+#: debug.php:594
+msgid "The header Cache-Control is returning \"max-age=0\", which means a page can be no older than 0 seconds before it needs to regenerate the cache."
+msgstr "The header Cache-Control is returning \"max-age=0\", which means a page can be no older than 0 seconds before it needs to regenerate the cache."
+
+#: debug.php:586
+msgid "The header Cache-Control is returning \"no-cache\", which means visitors will never get cached pages."
+msgstr "The header Cache-Control is returning \"no-cache\", which means visitors will never get cached pages."
+
+#: debug.php:511
+msgid "Cookies have been detected. Unless your caching service is configured properly for the specific cookies, it may not cache properly. Please contact your webhost or administrator with information about the cookies found."
+msgstr "Cookies have been detected. Unless your caching service is configured properly for the specific cookies, it may not cache properly. Please contact your webhost or administrator with information about the cookies found."
+
+#: debug.php:479
+msgid "Fastly is speeding up your site. Remember to empty all caches in all locations when necessary."
+msgstr "Fastly is speeding up your site. Remember to empty all caches in all locations when necessary."
+
+#: debug.php:446
+msgid "This site is hosted on GoDaddy. The results of this scan may not be accurate."
+msgstr "This site is hosted on GoDaddy. The results of this scan may not be accurate."
+
+#: debug.php:439
+msgid "This site is hosted on WordPress.com. The results of this scan may not be accurate."
+msgstr "This site is hosted on WordPress.com. The results of this scan may not be accurate."
+
+#: debug.php:424
+msgid "This site is hosted on Pagely. The results of this scan may not be accurate."
+msgstr "This site is hosted on Pagely. The results of this scan may not be accurate."
+
+#: debug.php:409
+msgid "CloudFlare has been detected. Make sure you configure WordPress properly by adding your Cache IP and to flush the CloudFlare cache if you see inconsistencies."
+msgstr "CloudFlare has been detected. Make sure you configure WordPress properly by adding your Cache IP, and flush the CloudFlare cache if you see inconsistencies."
+
+#: debug.php:401
+msgid "Your server is running Nginx."
+msgstr "Your server is running Nginx."
+
+#: debug.php:393
+msgid "Your server is running Apache."
+msgstr "Your server is running Apache."
+
+#: varnish-http-purge.php:394 varnish-http-purge.php:397
+msgid "Purge Cache (All Pages)"
+msgstr "Purge Cache (All Pages)"
+
+#: settings.php:459 wp-cli.php:253
+msgid "You have entered an invalid URL address."
+msgstr "You have entered an invalid URL address."
+
+#: settings.php:449
+msgid "You must enter a URL from your own domain to scan."
+msgstr "You must enter a URL from your own domain to scan."
+
+#: settings.php:270
+msgid "You have entered an invalid IP address."
+msgstr "You have entered an invalid IP address."
+
+#: settings.php:545
+msgid "Check URL"
+msgstr "Check URL"
+
+#: settings.php:401
+msgid "Technical Details"
+msgstr "Technical Details"
+
+#: debug.php:640
+msgid "Mod Pagespeed is active and configured to work properly with caching services."
+msgstr "Mod Pagespeed is active and configured to work properly with caching services."
+
+#: debug.php:615
+msgid "Your site is returning proper \"Age\" headers."
+msgstr "Your site is returning proper \"Age\" headers."
+
+#: debug.php:364
+msgid "Your server IP setup looks good."
+msgstr "Your server IP setup looks good."
+
+#: debug.php:185
+msgid "Success"
+msgstr "Success"
+
+#: varnish-http-purge.php:449 varnish-http-purge.php:452
+msgid "Purge Cache (This Page)"
+msgstr "Purge Cache (This Page)"
+
+#: debug.php:295
+msgid "Varnish"
+msgstr "Varnish"
+
+#. Description of the plugin
+#: varnish-http-purge.php
+msgid "Automatically empty cached pages when content on your site is modified."
+msgstr "Automatically empty cached pages when content on your site is modified."
+
+#: debug.php:645
+msgid "Mod Pagespeed is active but your caching headers may not be correct. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers."
+msgstr "Mod Pagespeed is active but your caching headers may not be correct. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers."
+
+#: debug.php:631
+msgid "X-Cache missed, which means your site was not able to serve this page as cached."
+msgstr "X-Cache missed, which means your site was not able to serve this page as cached."
+
+#: debug.php:471
+msgid "Your site is compressing content and making the internet faster."
+msgstr "Your site is compressing content and making the internet faster."
+
+#: debug.php:359
+msgid "You're using a custom Varnish IP that doesn't appear to match your server IP address. If you're using multiple caching servers or IPv6, this is fine. Please make sure you've properly configured it according to your webhost's specifications."
+msgstr "You're using a custom Varnish IP that doesn't appear to match your server IP address. If you're using multiple caching servers or IPv6, this is fine. Please make sure you've properly configured it according to your webhost's specifications."
+
+#. translators: %s is an IP address.
+#: debug.php:354
+msgid "Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove the IP. Please check with your webhost or server admin before doing so."
+msgstr "Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove the IP. Please check with your webhost or server admin before doing so."
+
+#. translators: %s is the URL someone asked to scan.
+#: settings.php:364
+msgid "Results for %s "
+msgstr "Results for %s "
+
+#: debug.php:189
+msgid "This request cannot be performed: "
+msgstr "This request cannot be performed: "
+
+#: settings.php:254
+msgid "Examples: "
+msgstr "Examples: "
+
+#: settings.php:221
+msgid "If you aren't sure what to do, contact your webhost or server admin before making any changes."
+msgstr "If you aren't sure what to do, contact your webhost or server admin before making any changes."
+
+#: settings.php:307
+msgid "Check A URL On Your Site: "
+msgstr "Check A URL On Your Site: "
+
+#. translators: %1$s links to the plugin's page on WordPress.org.
+#: varnish-http-purge.php:504
+msgid "<a href=\"%1$s\">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache."
+msgstr "<a href=\"%1$s\">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache."
+
+#: varnish-http-purge.php:508
+msgid "Empty Cache"
+msgstr "Empty Cache"
+
+#. translators: The URL should link to the update core page.
+#: varnish-http-purge.php:293
+msgid "Proxy Cache Purge requires WordPress 4.7 or greater. Please <a href=\"%1$s\">upgrade WordPress</a>."
+msgstr "Proxy Cache Purge requires WordPress 4.7 or greater. Please <a href=\"%1$s\">upgrade WordPress</a>."
+
+#. Author URI of the plugin
+#: varnish-http-purge.php
+msgid "https://halfelf.org/"
+msgstr "https://halfelf.org/"
+
+#: varnish-http-purge.php:510
+msgid "You do not have permission to empty the proxy cache for the whole site. Please contact your administrator."
+msgstr "You do not have permission to empty the proxy cache for the whole site. Please contact your administrator."
+
+#: varnish-http-purge.php:506
+msgid "Press the button below to force it to empty your entire cache."
+msgstr "Press the button below to force it to empty your entire cache."
+
+#. translators: The URL should link to the permalinks page.
+#: varnish-http-purge.php:282
+msgid "Proxy Cache Purge requires you to use custom permalinks. Please go to the <a href=\"%1$s\">Permalinks Options Page</a> to configure them."
+msgstr "Proxy Cache Purge requires you to use custom permalinks. Please go to the <a href=\"%1$s\">Permalinks Options Page</a> to configure them."

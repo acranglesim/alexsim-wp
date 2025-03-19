@@ -35,7 +35,6 @@ if ( ! class_exists( 'Astra_After_Setup_Theme' ) ) {
 	 * Astra_After_Setup_Theme initial setup
 	 */
 	class Astra_After_Setup_Theme {
-
 		/**
 		 * Instance
 		 *
@@ -212,9 +211,9 @@ if ( ! class_exists( 'Astra_After_Setup_Theme' ) ) {
 				foreach ( $palette as $index => $color_data ) {
 					$slug                       = ! empty( $color_data['slug'] ) ? $color_data['slug'] : '';
 					$new_palette_data[ $index ] = array(
-						'name'  => $name_pair[ $slug ],
+						'name'  => isset( $name_pair[ $slug ] ) ? $name_pair[ $slug ] : '', 
 						'slug'  => $slug,
-						'color' => $color_data['color'],
+						'color' => isset( $color_data['color'] ) ? $color_data['color'] : '',
 					);
 				}
 			}
@@ -295,7 +294,6 @@ if ( ! class_exists( 'Astra_After_Setup_Theme' ) ) {
 					$content_width = apply_filters( 'astra_content_width', astra_get_option( 'site-content-width', 1200 ) );
 				}
 			}
-
 		}
 
 		/**
@@ -346,7 +344,7 @@ if ( ! class_exists( 'Astra_After_Setup_Theme' ) ) {
 					$embed_html = wp_oembed_get( $url );
 					$html       = false !== $embed_html ? '<div class="wp-block-embed__wrapper"> <div class="ast-oembed-container ' . esc_attr( $ast_embed_wrapper_class ) . '" style="height: 100%;">' . $embed_html . '</div> </div>' : '';
 				} else {
-					$html = ( '' !== $html ) ? '<div class="ast-oembed-container ' . esc_attr( $ast_embed_wrapper_class ) . '" style="height: 100%;">' . $html . '</div>' : '';
+					$html = '' !== $html ? '<div class="ast-oembed-container ' . esc_attr( $ast_embed_wrapper_class ) . '" style="height: 100%;">' . $html . '</div>' : '';
 				}
 			} elseif ( '' === $html || $url === trim( $html ) ) {
 				$embed_html = wp_oembed_get( $url, array( 'width' => 600 ) );

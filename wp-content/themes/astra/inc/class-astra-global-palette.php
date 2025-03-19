@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Global palette class
  */
 class Astra_Global_Palette {
-
 	/**
 	 * Constructor
 	 *
@@ -158,6 +157,17 @@ class Astra_Global_Palette {
 					$color_palette_reorganize ? '#D8D8F5' : '#0D0614',
 					'#222222',
 				),
+				'palette_4' => array(
+					'#0085FF',
+					'#0177E3',
+					'#FFFFFF',
+					'#E7F6FF',
+					'#212A37',
+					'#0F172A',
+					'#4F5B62',
+					'#070614',
+					'#222222',
+				),
 			) : array(
 				'palette_1' => array(
 					'#046bd2',
@@ -192,11 +202,51 @@ class Astra_Global_Palette {
 					$color_palette_reorganize ? ( $update_colors_for_starter_library ? '#ADB6BE' : '#F2F5F7' ) : ( $update_colors_for_starter_library ? '#111111' : '#424242' ),
 					$update_colors_for_starter_library ? '#111111' : '#000000',
 				),
+				'palette_4' => array(
+					'#0085FF',
+					'#0177E3',
+					'#FFFFFF',
+					'#E7F6FF',
+					'#212A37',
+					'#0F172A',
+					'#4F5B62',
+					'#070614',
+					'#222222',
+				),
 			),
 			'presets'        => astra_get_palette_presets(),
 		);
 	}
 
+	/**
+	 * Get the key of the selected global color palette.
+	 *
+	 * @return string|null Palette key if found, otherwise null.
+	 */
+	public static function astra_get_active_global_palette() {
+
+		// Get the current palette option from global color palette.
+		$current_palette_option = astra_get_options();
+
+		if ( ! isset( $current_palette_option['global-color-palette']['palette'] ) ) {
+			return '';
+		}
+
+		$current_palette = $current_palette_option['global-color-palette']['palette'];
+
+		$default_palettes = self::get_default_color_palette()['palettes'] ?? [];
+
+		// Loop through the default palettes to match the selected palette.
+		foreach ( $default_palettes as $palette_key => $palette_colors ) {
+			if ( $current_palette === $palette_colors ) {
+				return $palette_key;
+			}
+		}
+
+		return '';
+	}
+
+	
 	/**
 	 * Get labels for palette colors.
 	 *
@@ -205,18 +255,29 @@ class Astra_Global_Palette {
 	 */
 	public static function get_palette_labels() {
 		$astra_settings           = Astra_Theme_Options::get_options();
-		$new_color_palette_labels = apply_filters( 'astra_new_color_labels', Astra_Dynamic_CSS::astra_4_8_9_compatibility() || isset( $astra_settings['new-color-labels'] ) );
+		$color_palette_reorganize = Astra_Dynamic_CSS::astra_4_8_9_compatibility();
+		$new_color_palette_labels = apply_filters( 'astra_new_color_labels', $color_palette_reorganize || isset( $astra_settings['new-color-labels'] ) );
+
+		$color_1_label = __( 'Brand', 'astra' );
+		$color_2_label = __( 'Alternate Brand', 'astra' );
+		$color_3_label = __( 'Headings', 'astra' );
+		$color_4_label = __( 'Text', 'astra' );
+		$color_5_label = $color_palette_reorganize ? __( 'Primary Background', 'astra' ) : __( 'Secondary Background', 'astra' );
+		$color_6_label = $color_palette_reorganize ? __( 'Secondary Background', 'astra' ) : __( 'Primary Background', 'astra' );
+		$color_7_label = $color_palette_reorganize ? __( 'Alternate Background', 'astra' ) : __( 'Subtle Background', 'astra' );
+		$color_8_label = $color_palette_reorganize ? __( 'Subtle Background', 'astra' ) : __( 'Alternate Background', 'astra' );
+		$color_9_label = __( 'Other Supporting', 'astra' );
 
 		return array(
-			$new_color_palette_labels ? __( 'Brand', 'astra' ) : __( 'Color 1', 'astra' ),
-			$new_color_palette_labels ? __( 'Alternate Brand', 'astra' ) : __( 'Color 2', 'astra' ),
-			$new_color_palette_labels ? __( 'Headings', 'astra' ) : __( 'Color 3', 'astra' ),
-			$new_color_palette_labels ? __( 'Text', 'astra' ) : __( 'Color 4', 'astra' ),
-			$new_color_palette_labels ? __( 'Primary Background', 'astra' ) : __( 'Color 5', 'astra' ),
-			$new_color_palette_labels ? __( 'Secondary Background', 'astra' ) : __( 'Color 6', 'astra' ),
-			$new_color_palette_labels ? __( 'Alternate Background', 'astra' ) : __( 'Color 7', 'astra' ),
-			$new_color_palette_labels ? __( 'Subtle Background', 'astra' ) : __( 'Color 8', 'astra' ),
-			$new_color_palette_labels ? __( 'Other Supporting', 'astra' ) : __( 'Color 9', 'astra' ),
+			$new_color_palette_labels ? $color_1_label : __( 'Color 1', 'astra' ),
+			$new_color_palette_labels ? $color_2_label : __( 'Color 2', 'astra' ),
+			$new_color_palette_labels ? $color_3_label : __( 'Color 3', 'astra' ),
+			$new_color_palette_labels ? $color_4_label : __( 'Color 4', 'astra' ),
+			$new_color_palette_labels ? $color_5_label : __( 'Color 5', 'astra' ),
+			$new_color_palette_labels ? $color_6_label : __( 'Color 6', 'astra' ),
+			$new_color_palette_labels ? $color_7_label : __( 'Color 7', 'astra' ),
+			$new_color_palette_labels ? $color_8_label : __( 'Color 8', 'astra' ),
+			$new_color_palette_labels ? $color_9_label : __( 'Color 9', 'astra' ),
 		);
 	}
 
@@ -312,7 +373,7 @@ class Astra_Global_Palette {
 			}
 		';
 
-		return $dynamic_css .= Astra_Enqueue_Scripts::trim_css( $global_border );
+		return $dynamic_css . Astra_Enqueue_Scripts::trim_css( $global_border );
 	}
 }
 
