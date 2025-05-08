@@ -1,0 +1,16 @@
+development_environment/
+config/*
+wp-content/uploads/*
+wp-config.php
+deployment-exclude-list.txt
+tmp/
+log/
+.git/
+.git/*
+.idea/
+.idea/*
+.gitattributes
+.gitignore
+.bitbucket/
+.bitbucket/*
+docker/
