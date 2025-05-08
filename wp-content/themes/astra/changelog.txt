@@ -1,5 +1,36 @@
 *** Astra Changelog ***
 
+2025-05-07 - version 4.11.0
+* New: Introducing a new polished UI for the Astra Customizer, offering an improved user experience and refreshed design. (https://wpastra.com/docs/astra-customizer-refined-ui/)
+* Improvement: Enhanced accessibility in post grid and search input markup.
+* Improvement: Added a filter to control the loading of Dark Mode compatibility CSS.
+* Fix: Resolved an issue where the submenu border radius was not applying correctly for inner menu links on hover.
+
+2025-04-24 - version 4.10.1
+* Fix: Resolved a dark mode styling behavior where <legend> elements were affected globally, even when dark mode was disabled.
+* Fix: Resolved an issue where toggle button styles were not being applied on the frontend.
+* Fix: Resolved an issue where focusing on Gravity Forms dropdown fields showed multiple arrows.
+
+2025-04-15 - version 4.10.0
+* Improvement: Optimized Dark Color Palette implementation for seamless integration with the new Color Switcher widget in Astra Pro.
+* Improvement: Removed unnecessary screen reader text from post navigation template for improved markup clarity.
+* Improvement: Compatibility with WordPress 6.8.
+
+2025-04-08 - version 4.9.2
+* Improved: Added aria-label with post title to linked featured images for better accessibility.
+* Fix: Prevented the old Header widget area from displaying after enabling the new Header Builder.
+* Fix: Resolved a conflict between Astra column setting and Elementor Loop Builder, which caused shop archive breakage.
+
+2025-04-02 - version 4.9.1
+* Improvement: Enhanced accessibility by adding aria-hidden attributes to decorative navigation arrows.
+* Improvement: Replaced a deprecated Elementor class with the updated class for improved compatibility.
+* Fix: Corrected the placement of the eye icon on the WooCommerce My Account page.
+* Fix: Resolved an issue where the customizer's heading color options were not applied inside the block editor.
+* Fix: Resolved an issue where the page did not scroll to the cart after adding a cross-sell product.
+* Fix: Resolved an issue where LearnDash quizzes label text was not visible.
+* Fix: Resolved an issue where clicking on the arrow navigation for submenus was redirecting to the page instead of opening the submenu on certain tablet devices.
+* Fix: Resolved an issue where the desktop menu did not display correctly when changing orientation on certain tablet devices.
+
 2025-03-06 - version 4.9.0
 * New: Added a new color palette in Astra's Global Color Palettes section which Act as a Dark palette - (Beta Feature). (https://wpastra.com/docs/dark-colour-palette/)
 * Improvement: Enhanced Smooth Scroll to ID functionality with dynamic sticky offset support for sticky headers with including slide and fade animations.

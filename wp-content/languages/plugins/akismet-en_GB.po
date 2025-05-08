@@ -201,7 +201,7 @@ msgstr "Akismet was unable to check this comment, but will automatically retry l
 msgid "Comment was caught by %s."
 msgstr "Comment was caught by %s."
 
-#: class.akismet.php:807
+#: class.akismet.php:804
 msgid "Akismet is not configured. Please enter an API key."
 msgstr "Akismet is not configured. Please enter an API key."
 
@@ -257,7 +257,7 @@ msgstr "Privacy"
 msgid "We collect information about visitors who comment on Sites that use our Akismet Anti-spam service. The information we collect depends on how the User sets up Akismet for the Site, but typically includes the commenter's IP address, user agent, referrer, and Site URL (along with other information directly provided by the commenter such as their name, username, email address, and the comment itself)."
 msgstr "We collect information about visitors who comment on sites that use our Akismet Anti-spam service. The information we collect depends on how the user sets up Akismet for the site, but typically includes the commenter's IP address, user agent, referrer, and site URL (along with other information directly provided by the commenter such as their name, username, email address, and the comment itself)."
 
-#: class.akismet.php:409
+#: class.akismet.php:430
 msgid "Comment discarded."
 msgstr "Comment discarded."
 
@@ -385,7 +385,7 @@ msgstr[1] "Akismet checked %s comments."
 msgid "There were no comments to check. Akismet will only check comments awaiting moderation."
 msgstr "There were no comments to check. Akismet will only check comments awaiting moderation."
 
-#: class.akismet.php:813
+#: class.akismet.php:810
 msgid "Comment not found."
 msgstr "Comment not found."
 
@@ -705,7 +705,7 @@ msgid "Past six months"
 msgstr "Past six months"
 
 #. translators: 1: WordPress documentation URL, 2: Akismet download URL.
-#: class.akismet.php:1741
+#: class.akismet.php:1740
 msgid "Please <a href=\"%1$s\">upgrade WordPress</a> to a current version, or <a href=\"%2$s\">downgrade to version 2.4 of the Akismet plugin</a>."
 msgstr "Please <a href=\"%1$s\">upgrade WordPress</a> to a current version, or <a href=\"%2$s\">downgrade to version 2.4 of the Akismet plugin</a>."
 

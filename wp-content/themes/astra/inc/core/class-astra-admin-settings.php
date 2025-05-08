@@ -19,7 +19,6 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 	 * Astra Admin Settings
 	 */
 	class Astra_Admin_Settings {
-
 		/**
 		 * Current Slug
 		 *
@@ -75,7 +74,7 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 
 			self::get_starter_templates_slug();
 
-			add_action( 'after_setup_theme', __CLASS__ . '::init_admin_settings', 99 );
+			add_action( 'after_setup_theme', self::class . '::init_admin_settings', 99 );
 		}
 
 		/**
@@ -83,21 +82,21 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 		 */
 		public static function init_admin_settings() {
 
-			add_action( 'admin_enqueue_scripts', __CLASS__ . '::register_scripts' );
+			add_action( 'admin_enqueue_scripts', self::class . '::register_scripts' );
 
-			add_action( 'customize_controls_enqueue_scripts', __CLASS__ . '::customizer_scripts' );
+			add_action( 'customize_controls_enqueue_scripts', self::class . '::customizer_scripts' );
 
-			add_action( 'astra_notice_before_markup_astra-sites-on-active', __CLASS__ . '::load_astra_admin_script' );
+			add_action( 'astra_notice_before_markup_astra-sites-on-active', self::class . '::load_astra_admin_script' );
 
-			add_action( 'admin_init', __CLASS__ . '::register_notices' );
-			add_action( 'astra_notice_before_markup', __CLASS__ . '::notice_assets' );
+			add_action( 'admin_init', self::class . '::register_notices' );
+			add_action( 'astra_notice_before_markup', self::class . '::notice_assets' );
 
-			add_action( 'admin_init', __CLASS__ . '::minimum_addon_version_notice' );
-			add_action( 'admin_init', __CLASS__ . '::minimum_addon_supported_version_notice' );
+			add_action( 'admin_init', self::class . '::minimum_addon_version_notice' );
+			add_action( 'admin_init', self::class . '::minimum_addon_supported_version_notice' );
 
 			if ( astra_showcase_upgrade_notices() ) {
-				add_action( 'admin_init', __CLASS__ . '::upgrade_to_pro_wc_notice' );
-				add_action( 'wp_nav_menu_item_custom_fields', __CLASS__ . '::add_custom_fields', 10, 4 );
+				add_action( 'admin_init', self::class . '::upgrade_to_pro_wc_notice' );
+				add_action( 'wp_nav_menu_item_custom_fields', self::class . '::add_custom_fields', 10, 4 );
 			}
 		}
 
@@ -314,8 +313,8 @@ if ( ! class_exists( 'Astra_Admin_Settings' ) ) {
 			if ( version_compare( ASTRA_EXT_VER, ASTRA_EXT_MIN_VER ) < 0 ) {
 
 				$message = sprintf(
-					/* translators: %1$1s: Theme Name, %2$2s: Minimum Required version of the addon */
-					__( 'Please update the %1$1s to version %2$2s or higher. Ignore if already updated.', 'astra' ),
+					/* translators: %1$s: Theme Name, %2$s: Minimum Required version of the addon */
+					__( 'Please update the %1$s to version %2$s or higher. Ignore if already updated.', 'astra' ),
 					astra_get_addon_name(),
 					ASTRA_EXT_MIN_VER
 				);

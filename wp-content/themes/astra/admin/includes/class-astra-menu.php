@@ -355,6 +355,7 @@ class Astra_Menu {
 			'astra_cta_btn_url'       => ASTRA_THEME_ORG_VERSION ? astra_get_pro_url( '/pricing/', 'free-theme', 'dashboard', 'unlock-pro-features-CTA' ) : 'https://woocommerce.com/products/astra-pro/',
 			/** @psalm-suppress TypeDoesNotContainType */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 			'plugin_configuring_text' => esc_html__( 'Configuring', 'astra' ),
+			'bsfUsageTrackingUrl'     => 'https://store.brainstormforce.com/usage-tracking/?utm_source=astra&utm_medium=dashboard&utm_campaign=usage_tracking',
 		);
 
 		$this->settings_app_scripts( apply_filters( 'astra_react_admin_localize', $localize ) );
@@ -808,7 +809,7 @@ class Astra_Menu {
 				'slug'        => 'cartflows',
 				'path'        => 'cartflows/cartflows.php',
 				'redirection' => false === get_option( 'wcf_setup_complete', false ) && ! get_option( 'wcf_setup_skipped', false ) ? admin_url( 'index.php?page=cartflow-setup' ) : admin_url( 'admin.php?page=cartflows' ),
-				'ratings'     => '(380+)',
+				'ratings'     => '(400+)',
 				'activations' => '200,000+',
 				'logoPath'    => array(
 					'internal_icon' => false,
@@ -819,17 +820,17 @@ class Astra_Menu {
 
 		if ( ! $under_useful_plugins ) {
 			$extensions[] = array(
-				'title'       => 'SureTriggers: WordPress Automation',
+				'title'       => 'OttoKit: WordPress Automation',
 				'subtitle'    => __( 'Connect your WordPress plugins, WooCommerce sites, apps, and websites for powerful automations.', 'astra' ),
 				'status'      => self::get_plugin_status( 'suretriggers/suretriggers.php' ),
 				'slug'        => 'suretriggers',
 				'path'        => 'suretriggers/suretriggers.php',
 				'redirection' => admin_url( 'admin.php?page=suretriggers' ),
-				'ratings'     => '(30+)',
-				'activations' => '50,000+',
+				'ratings'     => '(60+)',
+				'activations' => '1,00,000+',
 				'logoPath'    => array(
-					'internal_icon' => false,
-					'icon_path'     => 'https://ps.w.org/suretriggers/assets/icon-256x256.png',
+					'internal_icon' => true,
+					'icon_path'     => 'ottokit',
 				),
 			);
 		}
@@ -841,11 +842,11 @@ class Astra_Menu {
 			'slug'        => 'ultimate-addons-for-gutenberg',
 			'path'        => 'ultimate-addons-for-gutenberg/ultimate-addons-for-gutenberg.php',
 			'redirection' => admin_url( 'options-general.php?page=spectra' ),
-			'ratings'     => '(1400+)',
-			'activations' => '800,000+',
+			'ratings'     => '(1500+)',
+			'activations' => '10,00,000+',
 			'logoPath'    => array(
 				'internal_icon' => false,
-				'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon.svg',
+				'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon-256x256.gif',
 			),
 		);
 
@@ -856,8 +857,8 @@ class Astra_Menu {
 			'slug'        => 'checkout-plugins-stripe-woo',
 			'path'        => 'checkout-plugins-stripe-woo/checkout-plugins-stripe-woo.php',
 			'redirection' => false === get_option( 'cpsw_setup_status', false ) ? admin_url( 'index.php?page=cpsw-onboarding' ) : admin_url( 'admin.php?page=wc-settings&tab=cpsw_api_settings' ),
-			'ratings'     => '(15+)',
-			'activations' => '100,000+',
+			'ratings'     => '(25+)',
+			'activations' => '200,000+',
 			'logoPath'    => array(
 				'internal_icon' => false,
 				'icon_path'     => 'https://ps.w.org/checkout-plugins-stripe-woo/assets/icon-128x128.gif',
@@ -873,7 +874,7 @@ class Astra_Menu {
 				'path'        => 'checkout-paypal-woo/checkout-paypal-woo.php',
 				'redirection' => admin_url( 'admin.php?page=wc-settings&tab=cppw_api_settings' ),
 				'ratings'     => '(2)',
-				'activations' => '3,000+',
+				'activations' => '6,000+',
 				'logoPath'    => array(
 					'internal_icon' => false,
 					'icon_path'     => 'https://ps.w.org/checkout-paypal-woo/assets/icon-128x128.jpg',
@@ -888,8 +889,8 @@ class Astra_Menu {
 			'slug'        => 'woo-cart-abandonment-recovery',
 			'path'        => 'woo-cart-abandonment-recovery/woo-cart-abandonment-recovery.php',
 			'redirection' => admin_url( 'admin.php?page=woo-cart-abandonment-recovery' ),
-			'ratings'     => '(475+)',
-			'activations' => '200,000+',
+			'ratings'     => '(490+)',
+			'activations' => '300,000+',
 			'logoPath'    => array(
 				'internal_icon' => false,
 				'icon_path'     => 'https://ps.w.org/woo-cart-abandonment-recovery/assets/icon-128x128.png',
@@ -965,11 +966,11 @@ class Astra_Menu {
 					'redirection' => admin_url( 'options-general.php?page=spectra' ),
 					'logoPath'    => array(
 						'internal_icon' => false,
-						'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon.svg',
+						'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon-256x256.gif',
 					),
 				),
 				array(
-					'title'       => 'SureTriggers',
+					'title'       => 'OttoKit',
 					'subtitle'    => __( 'Automate your WordPress setup.', 'astra' ),
 					'isPro'       => false,
 					'status'      => self::get_plugin_status( 'suretriggers/suretriggers.php' ),
@@ -978,7 +979,7 @@ class Astra_Menu {
 					'redirection' => admin_url( 'admin.php?page=suretriggers' ),
 					'logoPath'    => array(
 						'internal_icon' => true,
-						'icon_path'     => 'suretriggers',
+						'icon_path'     => 'ottokit',
 					),
 				),
 				array(
@@ -1048,7 +1049,7 @@ class Astra_Menu {
 					'redirection' => admin_url( 'options-general.php?page=spectra' ),
 					'logoPath'    => array(
 						'internal_icon' => false,
-						'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon.svg',
+						'icon_path'     => 'https://ps.w.org/ultimate-addons-for-gutenberg/assets/icon-256x256.gif',
 					),
 				),
 				array(
@@ -1065,7 +1066,7 @@ class Astra_Menu {
 					),
 				),
 				array(
-					'title'       => 'SureTriggers',
+					'title'       => 'OttoKit',
 					'subtitle'    => __( 'Automate your WordPress setup.', 'astra' ),
 					'isPro'       => false,
 					'status'      => self::get_plugin_status( 'suretriggers/suretriggers.php' ),
@@ -1074,7 +1075,7 @@ class Astra_Menu {
 					'redirection' => admin_url( 'admin.php?page=suretriggers' ),
 					'logoPath'    => array(
 						'internal_icon' => true,
-						'icon_path'     => 'suretriggers',
+						'icon_path'     => 'ottokit',
 					),
 				),
 			)
