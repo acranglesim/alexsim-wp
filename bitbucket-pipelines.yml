@@ -7,4 +7,4 @@ pipelines:
             enabled: false
           script:
             - echo ${JENKINS_DEPLOY_URL}
-            - curl --verbose -X POST -L ${JENKINS_USER}:${JENKINS_USER_API_TOKEN} "https://jenkins.alexsim.co.uk/job/Alex%20Sim%20WP/job/Alex%20Sim%20WP/build?token=36e7409b08a5934297681aa90aae8a475b1d87df3363c9f04144942839b4daf0"
+            - curl --verbose -X POST -L --user ${JENKINS_USER}:${JENKINS_USER_API_TOKEN} "https://jenkins.alexsim.co.uk/job/Alex%20Sim%20WP/job/Alex%20Sim%20WP/build?token=36e7409b08a5934297681aa90aae8a475b1d87df3363c9f04144942839b4daf0"
