@@ -3,5 +3,7 @@ pipelines:
     main:
       - step:
           name: deploy
+          clone:
+          enabled: false
           script:
             - curl -X GET "https://jenkins.alexsim.co.uk/job/Alex%20Sim%20WP/job/Alex%20Sim%20WP/build?token=${JENKINS_ACCESS_TOKEN}"
