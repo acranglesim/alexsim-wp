@@ -4,3 +4,4 @@ wp-content/uploads/*
 wp-content/themes/plum-child/.sass-cache/*
 log/
 vendor/*
+test.php

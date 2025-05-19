@@ -1,0 +1,7 @@
+pipelines:
+  branches:
+    main:
+      - step:
+          name: deploy
+          script:
+            - curl -X GET "https://jenkins.alexsim.co.uk/job/Alex%20Sim%20WP/job/Alex%20Sim%20WP/build?token=${36e7409b08a5934297681aa90aae8a475b1d87df3363c9f04144942839b4daf0}"
