@@ -6,4 +6,4 @@ pipelines:
           clone:
             enabled: false
           script:
-            - curl -X POST -L ${JENKINS_USER}:${JENKINS_USER_API_TOKEN} "${JENKINS_DEPLOY_URL}${JENKINS_ACCESS_TOKEN}"
+            - curl --verbose -X POST -L ${JENKINS_USER}:${JENKINS_USER_API_TOKEN} "${JENKINS_DEPLOY_URL}${JENKINS_ACCESS_TOKEN}"
