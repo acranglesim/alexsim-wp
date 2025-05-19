@@ -6,5 +6,5 @@ pipelines:
           clone:
             enabled: false
           script:
-            - echo ${JENKINS_ACCESS_TOKEN}
+            - echo $JENKINS_ACCESS_TOKEN
             - curl -X GET "https://jenkins.alexsim.co.uk/job/Alex%20Sim%20WP/job/Alex%20Sim%20WP/build?token=${JENKINS_ACCESS_TOKEN}"
