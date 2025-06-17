@@ -462,7 +462,7 @@ class Astra_WP_Editor_CSS {
 			'.editor-styles-wrapper a'         => array(
 				'color' => esc_attr( $link_color ),
 			),
-			'.wp-block-post-content'  => array(
+			'.wp-block-post-content'           => array(
 				'color' => esc_attr( $text_color ),
 			),
 			'.has-text-color .block-editor-block-list__block:not(.wp-block-heading)' => array(
@@ -590,6 +590,9 @@ class Astra_WP_Editor_CSS {
 			'.wp-block-button.is-style-outline > .wp-block-button__link:hover, .wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color):hover' => array(
 				'color'            => esc_attr( $btn_h_color ),
 				'background-color' => esc_attr( $btn_bg_h_color ),
+			),
+			'.editor-styles-wrapper .block-editor-block-list__layout  .is-layout-grid.wp-block-group-is-layout-grid p, .editor-styles-wrapper .block-editor-block-list__layout .is-layout-flex.wp-block-group-is-layout-flex p' => array(
+				'margin-bottom' => '0',
 			),
 			'.wp-block-button.is-style-outline > .wp-block-button__link.has-text-color' => array(
 				'border-color' => 'initial',

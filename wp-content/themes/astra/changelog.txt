@@ -1,10 +1,34 @@
 *** Astra Changelog ***
 
+2025-06-17 - version 4.11.3
+* New: Enabled access to Astra Meta Settings inside the Elementor Editor under the Page Settings panel.
+* Fix: Social Sharing icons aligned uniformly with transparent backgrounds.
+* Fix: Off-Canvas menu dropdown not closing when using Sticky Header animation or on scroll-down behavior.
+* Fix: Resolved an issue with saving the Footer Builder layout in Customizer draft mode.
+* Fix: Resolved an issue where the new multiselect control was not saving the subsection value properly.
+* Fix: Resolved an issue where extra bottom margin CSS was being applied to Stack and Group blocks inside the editor.
+
+2025-06-05 - version 4.11.2
+* New: We've completely redesigned the Astra Dashboard with our new Force UI components, delivering a modern interface & enhanced user experience.
+* Improvement: Improvised Accessibility of the Off-canvas menu section by ensuring consistent toggle behavior during keyboard navigation and interaction.
+* Fix: Submenu item divider color and size options not applying correctly on responsive devices when the primary menu is placed inside the Off-Canvas section.
+* Fix: Resolved RTL alignment issue in Footer Builder where inner text did not respect right-to-left direction.
+* Fix: Prevented Spectra Tabs from triggering the off-canvas close event when switching tabs inside the Mega Menu.
+
+2025-05-20 - version 4.11.1
+* Improvement: Ensured consistent cart icon display across the preview and Customizer selector control.
+* Improvement: Enhanced text visibility during webfont loading for a better reading experience.
+* Improvement: Optimized Customizer performance by deferring non-critical data loading via AJAX, resulting in reduced memory usage.
+* Fix: Resolved Customizer loading conflict with Astra Pro and Gravity Forms by optimizing performance.
+* Fix: Inconsistent font size rendering for semantic inline text-level elements to ensure visual consistency with surrounding text.
+* Fix: Resolved an issue where switching between Customizer tabs failed in edge cases.
+
 2025-05-07 - version 4.11.0
 * New: Introducing a new polished UI for the Astra Customizer, offering an improved user experience and refreshed design. (https://wpastra.com/docs/astra-customizer-refined-ui/)
 * Improvement: Enhanced accessibility in post grid and search input markup.
 * Improvement: Added a filter to control the loading of Dark Mode compatibility CSS.
 * Fix: Resolved an issue where the submenu border radius was not applying correctly for inner menu links on hover.
+* Fix: Resolved a UI issue with the shipping country dropdown when WooCommerce notices were displayed.
 
 2025-04-24 - version 4.10.1
 * Fix: Resolved a dark mode styling behavior where <legend> elements were affected globally, even when dark mode was disabled.
