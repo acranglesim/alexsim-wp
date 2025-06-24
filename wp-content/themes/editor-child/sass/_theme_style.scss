@@ -1,0 +1,15 @@
+
+.toggle-bar {
+  a {
+    &.folder-toggle {
+      &.current {
+        .fa-folder {
+          display: block;
+        }
+        .fa-folder-open {
+          display: block;
+        }
+      }
+    }
+  }
+}
