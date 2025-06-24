@@ -2,6 +2,7 @@ wp-config.php
 .idea/
 wp-content/uploads/*
 wp-content/themes/plum-child/.sass-cache/*
+wp-content/themes/editor-child/.sass-cache/*
 log/
 vendor/*
 test.php
