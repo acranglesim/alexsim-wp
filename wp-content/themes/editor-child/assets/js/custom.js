@@ -3,6 +3,16 @@ jQuery(document).ready(function() {
         let elementId = jQuery(this).parent().attr("id");
         setCookie('wp-settings-alexsim-panel', elementId);
     })
+
+    let openPanel = getCookie('wp-settings-alexsim-panel')
+    if (openPanel) {
+        setTimeout(function(){
+            if (openPanel !== "panel-1") {
+                jQuery(".toggle-bar li#" + openPanel + " a").trigger("click");
+            }
+        }, 1)
+
+    }
 })
 
 

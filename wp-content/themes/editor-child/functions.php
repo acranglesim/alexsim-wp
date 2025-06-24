@@ -32,6 +32,8 @@ function add_custom() {
 }
 
 function get_cookie_panel() {
+    // Hard coded back tp panel one - PHP/Varnish/Redis is caching the cookie
+    return "panel-1";
     if (!array_key_exists('wp-settings-alexsim-panel', $_COOKIE)) {
         return "panel-1";
     }
