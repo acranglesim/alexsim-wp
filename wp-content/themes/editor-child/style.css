@@ -6,11 +6,3 @@
  Version:      1.0.0
 */
 @import url("../editor/style.css");
-/* line 6, sass/_theme_style.scss */
-.toggle-bar a.folder-toggle.current .fa-folder {
-  display: none;
-}
-/* line 9, sass/_theme_style.scss */
-.toggle-bar a.folder-toggle.current .fa-folder-open {
-  display: inline-block;
-}

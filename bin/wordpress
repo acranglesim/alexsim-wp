@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+
+<?php
+require_once('wp-load.php');
+
+$command = $argv;
+
+unset($command[0]);
+
+if (count($command) < 1) {
+    printHelp();
+    exit;
+}
+
+
+match ($command[1]) {
+    'setup:upgrade' => runMigrations(),
+    default => printHelp(),
+};
+
+function printHelp() {
+    echo "Please read below for how to use the command line tool" . PHP_EOL;
+    echo "bin/wordpress setup:upgrade - Runs any migrations not stored" . PHP_EOL;
+}
+
+function runMigrations() {
+    include('scripts/setupUpgrade.php');
+}
+
