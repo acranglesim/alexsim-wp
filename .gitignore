@@ -1,8 +1,49 @@
-wp-config.php
+# Ignore custom files
 .idea/
-wp-content/uploads/*
-wp-content/themes/plum-child/.sass-cache/*
-wp-content/themes/editor-child/assets/.sass-cache/*
 log/
 vendor/*
 test.php
+
+# ignore WordPress files
+/index.php
+/license.txt
+/readme.html
+/wp-activate.php
+/wp-blog-header.php
+/wp-comments-post.php
+/wp-config-sample.php
+/wp-config.php
+/wp-cron.php
+/wp-links-opml.php
+/wp-load.php
+/wp-login.php
+/wp-mail.php
+/wp-settings.php
+/wp-signup.php
+/wp-trackback.php
+/xmlrpc.php
+
+/wp-includes
+/wp-admin
+
+/wp-content/*
+!/wp-content
+
+# Ignore plugin folder - but show custom plugins
+/wp-content/plugins/*
+!/wp-content/plugins/
+!/wp-content/plugins/akismet
+!/wp-content/plugins/code-syntax-block
+!/wp-content/plugins/redis-cache
+!/wp-content/plugins/rt-slider
+!/wp-content/plugins/varnish-http-purge
+!/wp-content/plugins/view-transitions
+!/wp-content/plugins/wp-mail-smtp
+!/wp-content/plugins/wpforms-lite
+
+ # Ignore themes folder - but show custom themes
+/wp-content/themes/*
+!/wp-content/themes/
+!/wp-content/themes/editor
+!/wp-content/themes/editor-child
+wp-content/themes/editor-child/assets/.sass-cache/*

@@ -1,5 +1,25 @@
 {
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "wordpress/wordpress",
+        "version": "6.8.1",
+        "type": "wordpress-core",
+        "dist": {
+          "type": "zip",
+          "url": "https://github.com/WordPress/WordPress/archive/refs/tags/6.8.1.zip"
+        }
+      }
+    }
+  ],
     "require-dev": {
         "deployer/deployer": "^7.5"
-    }
+    },
+  "require": {
+    "wordpress/wordpress": "^6.8"
+  },
+  "scripts": {
+    "post-install-cmd": "cp -r ./vendor/wordpress/wordpress/* ./"
+  }
 }
