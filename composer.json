@@ -20,7 +20,9 @@
     "wordpress/wordpress": "^6.8"
   },
   "scripts": {
-    "post-install-cmd": "cp -r ./vendor/wordpress/wordpress/* ./",
-    "post-install-cmd": "cp -r ./wp-content/plugins/redis-cache/redis-cache.php ./wp-content/object-cache.php"
+    "post-install-cmd": [
+      "cp -r ./vendor/wordpress/wordpress/* ./",
+      "cp -r ./wp-content/plugins/redis-cache/redis-cache.php ./wp-content/object-cache.php"
+    ]
   }
 }
