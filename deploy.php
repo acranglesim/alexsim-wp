@@ -57,4 +57,5 @@ task('deploy', [
 // Hooks
 // Before
 // After
+after('deploy:success', 'setup:upgrade');
 after('deploy:failed', 'deploy:unlock');
