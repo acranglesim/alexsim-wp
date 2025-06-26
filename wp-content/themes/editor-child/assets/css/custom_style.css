@@ -1,0 +1,8 @@
+/* line 6, ../sass/_theme_style.scss */
+.toggle-bar a.folder-toggle.current .fa-folder {
+  display: block;
+}
+/* line 9, ../sass/_theme_style.scss */
+.toggle-bar a.folder-toggle.current .fa-folder-open {
+  display: block;
+}

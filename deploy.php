@@ -42,9 +42,17 @@ task('deploy:shared', function () {
 
 });
 
+// Update Database Variables
+task('setup:upgrade', function(){
+    writeln("<info>Updating Database Variables - Sets new version ID for js/css etc");
+    run("cd {{deploy_path}}/releases/{{release_name}} && bin/wordpress setup:upgrade");
+});
+
+
 // Tasks
 task('deploy', [
 ]);
+
 
 // Hooks
 // Before
