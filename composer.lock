@@ -4,14 +4,14 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be95bfdd9268a246e13501a176a7d223",
+    "content-hash": "b8bc26dd8c212609a7b47b0da2dc499e",
     "packages": [
         {
             "name": "wordpress/wordpress",
-            "version": "6.8.2",
+            "version": "6.8.3",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/WordPress/WordPress/archive/refs/tags/6.8.2.zip"
+                "url": "https://github.com/WordPress/WordPress/archive/refs/tags/6.8.3.zip"
             },
             "type": "wordpress-core"
         }
