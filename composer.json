@@ -4,11 +4,11 @@
       "type": "package",
       "package": {
         "name": "wordpress/wordpress",
-        "version": "6.8.2",
+        "version": "6.8.3",
         "type": "wordpress-core",
         "dist": {
           "type": "zip",
-          "url": "https://github.com/WordPress/WordPress/archive/refs/tags/6.8.2.zip"
+          "url": "https://github.com/WordPress/WordPress/archive/refs/tags/6.8.3.zip"
         }
       }
     }
